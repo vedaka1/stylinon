@@ -78,10 +78,13 @@ class OrderItemModel(Base):
         return f"OrderItemModel({self.__dict__})"
 
 
-def map_to_order_item(entity: OrderItemModel) -> OrderItem:
-    return OrderItem(
+def map_to_order_item(entity: OrderItemModel, with_product: bool = False) -> OrderItem:
+    order_item = OrderItem(
         order_id=entity.order_id,
         product_id=entity.product_id,
         quantity=entity.quantity,
         product=map_to_product(entity.product),
     )
+    if with_product:
+        order_item.product = map_to_product(entity.product)
+    return order_item

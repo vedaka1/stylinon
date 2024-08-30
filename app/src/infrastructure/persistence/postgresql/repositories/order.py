@@ -150,7 +150,11 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
         return None
 
     async def get_by_order_id(self, order_id: UUID) -> list[OrderItem]:
-        query = select(OrderItemModel).where(OrderItemModel.order_id == order_id)
+        query = (
+            select(OrderItemModel)
+            .where(OrderItemModel.order_id == order_id)
+            .options(joinedload(OrderItemModel.product))
+        )
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
-        return [map_to_order_item(entity) for entity in entities]
+        return [map_to_order_item(entity, with_product=True) for entity in entities]

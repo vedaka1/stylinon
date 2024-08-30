@@ -62,7 +62,10 @@ class SqlalchemyUserRepository(UserRepositoryInterface):
         return await self._get_by(key=UserPrimaryKey.EMAIL, value=email)
 
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        search: str | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[User]:
         query = select(UserModel)
         if search:

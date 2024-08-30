@@ -2,7 +2,10 @@ from uuid import UUID, uuid4
 
 import pytest
 from dishka import AsyncContainer
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.common.password_hasher import PasswordHasherInterface
+from src.application.common.transaction import TransactionManagerInterface
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
@@ -10,12 +13,44 @@ from src.domain.orders.repository import (
 )
 from src.domain.products.entities import Product
 from src.domain.products.repository import ProductRepositoryInterface
+from src.infrastructure.persistence.postgresql.models.order import (
+    OrderModel,
+    map_to_order,
+)
 
 # pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 class TestOrderRepository:
     async def test_create_order(self, container: AsyncContainer):
+        async with container() as di_container:
+            order_repository = await di_container.get(OrderRepositoryInterface)
+            sessionmaker = await di_container.get(async_sessionmaker)
+            transaction_manager = await di_container.get(TransactionManagerInterface)
+            # Create order
+            order = Order.create(
+                user_email="test@test.com",
+                transaction_id=uuid4(),
+                shipping_address="test_address",
+            )
+            await order_repository.create(order)
+            await transaction_manager.commit()
+            # Check it
+            async with sessionmaker() as session:
+                query = select(OrderModel).where(OrderModel.id == order.id)
+                cursor = await session.execute(query)
+                entity = cursor.scalar_one_or_none()
+                assert entity
+                order_data = map_to_order(entity)
+                assert order_data.user_email == order.user_email
+                assert order_data.transaction_id == order.transaction_id
+                assert order_data.shipping_address == order.shipping_address
+
+                query = delete(OrderModel).where(OrderModel.id == order.id)
+                await session.execute(query)
+                await session.commit()
+
+    async def test_get_order_by_id(self, container: AsyncContainer):
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
@@ -31,6 +66,7 @@ class TestOrderRepository:
             assert order_data.user_email == order.user_email
             assert order_data.transaction_id == order.transaction_id
             assert order_data.shipping_address == order.shipping_address
+            assert order_data.status == order.status
 
     async def test_delete_order(self, container: AsyncContainer):
         async with container() as di_container:
@@ -119,8 +155,9 @@ class TestOrderRepository:
             assert order_data.transaction_id == order.transaction_id
             assert order_data.shipping_address == order.shipping_address
             assert len(order_data.order_items) == 1
-            order_product = order_data.order_items[0]
-            assert order_product.product.name == product.name
-            assert order_product.product.description == product.description
-            assert order_product.product.category == product.category
-            assert order_product.product.price == product.price
+            order_item = order_data.order_items[0]
+            assert order_item.product.name == product.name
+            assert order_item.product.description == product.description
+            assert order_item.product.category == product.category
+            assert order_item.product.price == product.price
+            assert order_item.quantity == 1

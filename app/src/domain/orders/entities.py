@@ -9,14 +9,16 @@ from src.domain.products.entities import Product
 
 tz_Moscow = timezone("Europe/Moscow")
 
-
+# fmt: off
 class OrderStatus(Enum):
-    CREATED = "CREATED"
-    PROCESSING = "PROCESSING"
-    SHIPPED = "SHIPPED"
-    COMPLETED = "COMPLETED"
-    CANCELLED = "CANCELLED"
-    FAILED = "FAILED"
+    CREATED = "CREATED"         # Заказ создан и ожидает оплаты
+    APPROVED = "APPROVED"       # Заказ оплачен
+    PROCESSING = "PROCESSING"   # Заказ в обработке
+    SHIPPED = "SHIPPED"         # Заказ отправлен
+    COMPLETED = "COMPLETED"     # Заказ доставлен
+    CANCELLED = "CANCELLED"     # Заказ отменен
+    FAILED = "FAILED"           # Заказ не выполнен
+# fmt: on
 
 
 @dataclass

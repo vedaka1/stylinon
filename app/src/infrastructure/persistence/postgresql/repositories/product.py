@@ -55,7 +55,10 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         return map_to_product(entity) if entity else None
 
     async def get_by_category(
-        self, offset: int, limit: int, category: str
+        self,
+        category: str,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Product]:
         query = (
             select(ProductModel)
@@ -68,7 +71,10 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         return [map_to_product(entity) for entity in entities]
 
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        search: str | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Product]:
         query = select(ProductModel)
         if search:

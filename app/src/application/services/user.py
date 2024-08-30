@@ -25,7 +25,7 @@ class UserService(UserServiceInterface):
 
     async def update(self, user_id: UUID, user: User) -> None:
         await self.get_by_id(user_id=user_id)
-        await self.user_repository.update(user_id=user_id, user=user)
+        await self.user_repository.update(user=user)
         return None
 
     async def delete(self, user_id: UUID) -> None:

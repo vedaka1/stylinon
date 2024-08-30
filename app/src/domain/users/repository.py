@@ -32,7 +32,10 @@ class UserRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        search: str | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[User]: ...
 
     @abstractmethod

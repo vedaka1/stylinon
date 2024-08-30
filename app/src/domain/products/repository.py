@@ -20,12 +20,18 @@ class ProductRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_by_category(
-        self, offset: int, limit: int, category: str
+        self,
+        category: str,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Product]: ...
 
     @abstractmethod
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        search: str | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Product]: ...
 
     @abstractmethod

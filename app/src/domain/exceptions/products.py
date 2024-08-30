@@ -9,3 +9,13 @@ class ProductIncorrectPriceException(ApplicationException):
         *args: object,
     ) -> None:
         super().__init__(status_code, message, *args)
+
+
+class ProductNotFoundException(ApplicationException):
+    def __init__(
+        self,
+        status_code: int = 404,
+        message: str = "Product not found",
+        *args: object,
+    ) -> None:
+        super().__init__(status_code, message, *args)
