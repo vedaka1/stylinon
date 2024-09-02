@@ -1,7 +1,16 @@
 from dataclasses import dataclass
+from enum import Enum
 from uuid import UUID, uuid4
 
 from src.domain.exceptions.products import ProductIncorrectPriceException
+
+
+class UnitsOfMesaurement(Enum):
+    KILOGRAMS = "кг."
+    GRAMS = "г."
+    LITERS = "л."
+    MILLILITERS = "мл."
+    PIECE = "шт."
 
 
 @dataclass
@@ -11,7 +20,7 @@ class Product:
     category: str
     description: str
     price: int
-    units_of_measurement: str
+    units_of_measurement: UnitsOfMesaurement
 
     @staticmethod
     def create(
@@ -19,7 +28,7 @@ class Product:
         category: str,
         description: str,
         price: int,
-        units_of_measurement: str,
+        units_of_measurement: UnitsOfMesaurement,
     ) -> "Product":
         if price <= 0:
             raise ProductIncorrectPriceException

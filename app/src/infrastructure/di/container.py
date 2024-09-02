@@ -6,14 +6,22 @@ from dishka import AsyncContainer, Provider, Scope, make_async_container, provid
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.common.password_hasher import PasswordHasherInterface
 from src.application.common.transaction import TransactionManagerInterface
+from src.application.services.order import OrderService
+from src.application.services.order_item import OrderItemService
+from src.application.services.product import ProductService
 from src.application.services.user import UserService
 from src.application.usecases.auth import LoginUseCase, RegisterUseCase, login
+from src.application.usecases.order.create import CreateOrderUseCase
+from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
+from src.application.usecases.order.update import UpdateOrderUseCase
 from src.application.usecases.user.get import GetUsersListUseCase, GetUserUseCase
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
 )
+from src.domain.orders.service import OrderItemServiceInterface, OrderServiceInterface
 from src.domain.products.repository import ProductRepositoryInterface
+from src.domain.products.service import ProductServiceInterface
 from src.domain.users.repository import UserRepositoryInterface
 from src.domain.users.service import UserServiceInterface
 from src.infrastructure.authentication.jwt_processor import (
@@ -106,12 +114,19 @@ class UseCasesProvider(Provider):
     login = provide(LoginUseCase)
     get_user = provide(GetUserUseCase)
     get_users_list = provide(GetUsersListUseCase)
+    get_order = provide(GetOrderUseCase)
+    create_order = provide(CreateOrderUseCase)
+    get_many_orders = provide(GetManyOrdersUseCase)
+    update_order = provide(UpdateOrderUseCase)
 
 
 class ServiceProvider(Provider):
     scope = Scope.REQUEST
 
     user_service = provide(UserService, provides=UserServiceInterface)
+    order_service = provide(OrderService, provides=OrderServiceInterface)
+    order_item_service = provide(OrderItemService, provides=OrderItemServiceInterface)
+    product_service = provide(ProductService, provides=ProductServiceInterface)
 
 
 @lru_cache(1)

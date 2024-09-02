@@ -154,8 +154,8 @@ class TestOrderRepository:
             assert order_data.user_email == order.user_email
             assert order_data.transaction_id == order.transaction_id
             assert order_data.shipping_address == order.shipping_address
-            assert len(order_data.order_items) == 1
-            order_item = order_data.order_items[0]
+            assert len(order_data.items) == 1
+            order_item = order_data.items[0]
             assert order_item.product.name == product.name
             assert order_item.product.description == product.description
             assert order_item.product.category == product.category

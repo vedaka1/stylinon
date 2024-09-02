@@ -48,7 +48,7 @@ async def get_current_user(
     return APIResponse(data=response)
 
 
-@router.get("/", summary="Возвращает список пользователей")
+@router.get("", summary="Возвращает список пользователей")
 async def get_users(
     get_users_list_interactor: FromDishka[GetUsersListUseCase],
     command: GetUsersListCommand = Depends(get_users_list_command),

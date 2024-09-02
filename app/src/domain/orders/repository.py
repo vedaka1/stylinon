@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datetime import date
 from uuid import UUID
 
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
@@ -27,8 +28,8 @@ class OrderRepositoryInterface(ABC):
     @abstractmethod
     async def get_many(
         self,
-        date_from: str | None = None,
-        date_to: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
         status: OrderStatus | None = None,
     ) -> list[Order]: ...
 

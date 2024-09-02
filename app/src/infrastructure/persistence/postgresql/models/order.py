@@ -49,7 +49,7 @@ def map_to_order(entity: OrderModel, with_products: bool = False) -> Order:
         status=entity.status,
     )
     if with_products:
-        order.order_items = [
+        order.items = [
             map_to_order_item(order_item) for order_item in entity.order_items
         ]
     return order

@@ -9,8 +9,8 @@ from src.domain.users.entities import User
 
 @dataclass
 class RegisterCommand:
-    password: str
     email: EmailStr
+    password: str
     mobile_phone: str
     first_name: str
     last_name: str

@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
@@ -45,7 +46,11 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         query = (
             update(OrderModel)
             .where(OrderModel.id == order.id)
-            .values(status=order.status)
+            .values(
+                shipping_address=order.shipping_address,
+                tracking_number=order.tracking_number,
+                status=order.status,
+            )
         )
         await self.session.execute(query)
         return None
@@ -76,21 +81,23 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
 
     async def get_many(
         self,
-        date_from: str | None = None,
-        date_to: str | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
         status: OrderStatus | None = None,
     ) -> list[Order]:
-        query = select(OrderModel)
+        query = select(OrderModel).options(
+            selectinload(OrderModel.order_items).joinedload(OrderItemModel.product)
+        )
         if date_from:
             query = query.where(OrderModel.created_at >= date_from)
-        elif date_to:
+        if date_to:
             query = query.where(OrderModel.created_at <= date_to)
-        elif status:
+        if status:
             query = query.where(OrderModel.status == status)
 
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
-        return [map_to_order(entity) for entity in entities]
+        return [map_to_order(entity, with_products=True) for entity in entities]
 
     # async def count(
     #     self,

@@ -32,7 +32,7 @@ class Order:
     tracking_number: str | None
     status: OrderStatus
 
-    order_items: list["OrderItem"] = field(default_factory=list)
+    items: list["OrderItem"] = field(default_factory=list)
 
     @staticmethod
     def create(
@@ -61,14 +61,14 @@ class OrderItem:
     product_id: UUID
     quantity: int
 
-    product: Product
+    product: Product | None
 
     @staticmethod
     def create(
         order_id: UUID,
         product_id: UUID,
         quantity: int,
-        product: Product,
+        product: Product | None = None,
     ) -> "OrderItem":
         if quantity <= 0:
             raise OrderItemIncorrectQuantityException
