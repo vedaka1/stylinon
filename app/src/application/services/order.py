@@ -33,6 +33,7 @@ class OrderService(OrderServiceInterface):
             order.tracking_number = tracking_number
         if status:
             order.status = status
+
         return await self.order_repository.update(order)
 
     async def get_by_id(self, order_id: UUID) -> Order:
