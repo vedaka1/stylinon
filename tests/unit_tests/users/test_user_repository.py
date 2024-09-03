@@ -1,6 +1,4 @@
-import pytest
 from dishka import AsyncContainer
-from src.application.common.password_hasher import PasswordHasherInterface
 from src.domain.users.entities import User
 from src.domain.users.repository import UserRepositoryInterface
 
@@ -26,11 +24,11 @@ class TestUser:
         assert user_data.mobile_phone == "89999999999"
         assert user_data.first_name == "test_first_name"
         assert user_data.last_name == "test_last_name"
-        assert user_data.is_verified == False
+        assert user_data.is_verified is False
 
 
 class TestUserRepository:
-    async def test_create_user(self, container: AsyncContainer):
+    async def test_create_user(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             user_repository = await di_container.get(UserRepositoryInterface)
             # Create user
@@ -40,7 +38,7 @@ class TestUserRepository:
             user_data = await user_repository.get_by_id(user.id)
             TestUser.check_user(user_data)
 
-    async def test_delete_user(self, container: AsyncContainer):
+    async def test_delete_user(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             user_repository = await di_container.get(UserRepositoryInterface)
             # Create user
@@ -52,17 +50,17 @@ class TestUserRepository:
             result = await user_repository.get_by_id(user.id)
             assert result is None
 
-    async def test_get_user_by_email(self, container: AsyncContainer):
+    async def test_get_user_by_email(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             user_repository = await di_container.get(UserRepositoryInterface)
             # Create user
             user = TestUser.create_user()
             await user_repository.create(user)
             # Check it and get it
-            user = await user_repository.get_by_email(user.email)
-            TestUser.check_user(user)
+            user_data = await user_repository.get_by_email(user.email)
+            TestUser.check_user(user_data)
 
-    async def test_get_all_users(self, container: AsyncContainer):
+    async def test_get_all_users(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             user_repository = await di_container.get(UserRepositoryInterface)
             # Create users
@@ -78,7 +76,7 @@ class TestUserRepository:
             users = await user_repository.get_many(offset=0, limit=10, search="1q2w3e")
             assert len(users) == 0
 
-    async def test_count(self, container: AsyncContainer):
+    async def test_count(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             user_repository = await di_container.get(UserRepositoryInterface)
             # Create users

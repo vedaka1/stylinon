@@ -30,7 +30,9 @@ class JwtSettings:
     )
     ALGORITHM: str = get_env_var("ALGORITHM", to_cast=str, default="RS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = get_env_var(
-        "ACCESS_TOKEN_EXPIRE_MINUTES", to_cast=int, default=5
+        "ACCESS_TOKEN_EXPIRE_MINUTES",
+        to_cast=int,
+        default=5,
     )
 
 

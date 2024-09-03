@@ -20,12 +20,18 @@ class ProductServiceInterface(ABC):
 
     @abstractmethod
     async def get_by_category(
-        self, offset: int, limit: int, category: str
+        self,
+        offset: int,
+        limit: int,
+        category: str,
     ) -> list[Product]: ...
 
     @abstractmethod
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        offset: int,
+        limit: int,
+        search: str | None = None,
     ) -> list[Product]: ...
 
     @abstractmethod

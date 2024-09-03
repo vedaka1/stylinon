@@ -10,7 +10,6 @@ from src.application.usecases.auth import (  # UserConfirmationUseCase,
     LoginUseCase,
     RegisterUseCase,
 )
-from src.infrastructure.settings import settings
 
 router = APIRouter(
     tags=["Auth"],
@@ -23,7 +22,7 @@ router = APIRouter(
 async def register(
     command: RegisterCommand,
     register_user_interactor: FromDishka[RegisterUseCase],
-) -> APIResponse:
+) -> APIResponse[None]:
     await register_user_interactor.execute(command)
     return APIResponse()
 
@@ -37,9 +36,8 @@ async def login(
     response: Response,
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> APIResponse[UserOut]:
-    user, token = await login_interactor.execute(
-        LoginCommand(password=credentials.password, username=credentials.username)
-    )
+    command = LoginCommand(password=credentials.password, username=credentials.username)
+    user, token = await login_interactor.execute(command)
     response.set_cookie(
         "access_token",
         token.access_token,

@@ -81,7 +81,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             query = query.where(
                 ProductModel.name.ilike(f"%{search}%")
                 | ProductModel.category.ilike(f"%{search}%")
-                | ProductModel.description.ilike(f"%{search}%")
+                | ProductModel.description.ilike(f"%{search}%"),
             )
         query = query.limit(limit).offset(offset)
         cursor = await self.session.execute(query)

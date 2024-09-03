@@ -5,12 +5,12 @@ from uuid import UUID, uuid4
 from src.domain.exceptions.products import ProductIncorrectPriceException
 
 
-class UnitsOfMesaurement(Enum):
+class UnitsOfMesaurement(str, Enum):
     KILOGRAMS = "кг."
     GRAMS = "г."
     LITERS = "л."
     MILLILITERS = "мл."
-    PIECE = "шт."
+    PIECES = "шт."
 
 
 @dataclass

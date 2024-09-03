@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from uuid import UUID
 
 from src.domain.exceptions.user import UserAlreadyExistsException, UserNotFoundException
@@ -43,10 +42,15 @@ class UserService(UserServiceInterface):
         return await self.user_repository.get_by_email(email=email)
 
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        offset: int,
+        limit: int,
+        search: str | None = None,
     ) -> list[User]:
         return await self.user_repository.get_many(
-            offset=offset, limit=limit, search=search
+            offset=offset,
+            limit=limit,
+            search=search,
         )
 
     async def count(self, search: str | None = None) -> int:

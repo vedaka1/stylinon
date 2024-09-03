@@ -2,7 +2,7 @@ from datetime import date
 from uuid import UUID
 
 from src.domain.exceptions.order import OrderNotFoundException
-from src.domain.orders.entities import Order, OrderItem, OrderStatus
+from src.domain.orders.entities import Order, OrderStatus
 from src.domain.orders.repository import OrderRepositoryInterface
 from src.domain.orders.service import OrderServiceInterface
 
@@ -57,7 +57,9 @@ class OrderService(OrderServiceInterface):
         status: OrderStatus | None = None,
     ) -> list[Order]:
         return await self.order_repository.get_many(
-            date_from=date_from, date_to=date_to, status=status
+            date_from=date_from,
+            date_to=date_to,
+            status=status,
         )
 
     # @abstractmethod

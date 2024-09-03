@@ -1,21 +1,19 @@
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-import pytest
 from dishka import AsyncContainer
-from src.application.common.password_hasher import PasswordHasherInterface
-from src.domain.orders.entities import Order, OrderItem, OrderStatus
+from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
 )
-from src.domain.products.entities import Product
+from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 
 # pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 class TestOrderItemRepository:
-    async def test_create_order_item(self, container: AsyncContainer):
+    async def test_create_order_item(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             product_repository = await di_container.get(ProductRepositoryInterface)
@@ -26,7 +24,7 @@ class TestOrderItemRepository:
                 description="test_description",
                 category="test_category",
                 price=100,
-                units_of_measurement="шт.",
+                units_of_measurement=UnitsOfMesaurement.PIECES,
             )
             order = Order.create(
                 user_email="test@test.com",
@@ -48,7 +46,7 @@ class TestOrderItemRepository:
             assert order_items[0].product_id == product.id
             assert order_items[0].quantity == 1
 
-    async def test_delete_order_item(self, container: AsyncContainer):
+    async def test_delete_order_item(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             product_repository = await di_container.get(ProductRepositoryInterface)
@@ -59,7 +57,7 @@ class TestOrderItemRepository:
                 description="test_description",
                 category="test_category",
                 price=100,
-                units_of_measurement="шт.",
+                units_of_measurement=UnitsOfMesaurement.PIECES,
             )
             order = Order.create(
                 user_email="test@test.com",

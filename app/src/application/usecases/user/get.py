@@ -32,7 +32,8 @@ class GetUsersListUseCase:
     user_service: UserServiceInterface
 
     async def execute(
-        self, command: GetUsersListCommand
+        self,
+        command: GetUsersListCommand,
     ) -> ListPaginatedResponse[UserOut]:
         users = await self.user_service.get_many(
             offset=command.pagiantion.offset,

@@ -23,7 +23,10 @@ class UserServiceInterface(ABC):
 
     @abstractmethod
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        offset: int,
+        limit: int,
+        search: str | None = None,
     ) -> list[User]: ...
 
     @abstractmethod

@@ -1,16 +1,8 @@
-from typing import Annotated
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends, Response
-from fastapi.security import OAuth2PasswordRequestForm
-from src.application.contracts.commands.user import (
-    DeleteUserCommand,
-    GetUserCommand,
-    GetUsersListCommand,
-    UpdateUserCommand,
-    UserConfirmationCommand,
-)
+from fastapi import APIRouter, Depends
+from src.application.contracts.commands.user import GetUsersListCommand
 from src.application.contracts.common.pagination import (
     ListPaginatedResponse,
     PaginationQuery,
@@ -18,7 +10,6 @@ from src.application.contracts.common.pagination import (
 from src.application.contracts.common.response import APIResponse
 from src.application.contracts.responses.user import UserOut
 from src.application.usecases.user.get import GetUsersListUseCase, GetUserUseCase
-from src.infrastructure.settings import settings
 from src.presentation.dependencies.auth import get_current_user_id
 
 router = APIRouter(

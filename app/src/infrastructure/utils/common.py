@@ -2,7 +2,7 @@ import os
 from typing import Any, Callable
 
 
-def cache_async_result(func: Callable[[], Any]):
+def cache_async_result(func: Callable[[], Any]) -> Any:
     cache: dict[str, Any] = {}
 
     async def wrapper(*args: Any, **kwargs: Any) -> Any:

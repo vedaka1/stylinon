@@ -13,7 +13,9 @@ class GetManyOrdersUseCase:
 
     async def execute(self, command: GetManyOrdersCommand) -> list[Order]:
         return await self.order_service.get_many(
-            date_from=command.date_from, date_to=command.date_to, status=command.status
+            date_from=command.date_from,
+            date_to=command.date_to,
+            status=command.status,
         )
 
 

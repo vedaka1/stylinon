@@ -5,5 +5,5 @@ lint:
 	mypy ./app
 	flake8 ./app
 tests:
-	pytets -v
-.PHONY: lint
+	pytest -v
+.PHONY: lint tests

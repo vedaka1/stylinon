@@ -7,8 +7,8 @@ from fastapi.openapi.models import OAuthFlowPassword
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
+from src.application.common.jwt_processor import JwtTokenProcessorInterface
 from src.domain.exceptions.auth import UserIsNotAuthorizedException
-from src.infrastructure.authentication.jwt_processor import JwtTokenProcessorInterface
 from src.infrastructure.di.container import get_container
 
 
@@ -23,7 +23,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         if not scopes:
             scopes = {}
         flows = OAuthFlowsModel(
-            password=OAuthFlowPassword(tokenUrl=tokenUrl, scopes=scopes)
+            password=OAuthFlowPassword(tokenUrl=tokenUrl, scopes=scopes),
         )
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 

@@ -1,5 +1,4 @@
 from datetime import datetime
-from itertools import product
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -19,10 +18,12 @@ class OrderModel(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
     user_email: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False
+        TIMESTAMP(timezone=True),
+        nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True), nullable=False
+        TIMESTAMP(timezone=True),
+        nullable=False,
     )
     shipping_address: Mapped[str] = mapped_column(nullable=False)
     transaction_id: Mapped[UUID] = mapped_column(nullable=False)
@@ -59,10 +60,14 @@ class OrderItemModel(Base):
     __tablename__ = "order_items"
 
     order_id: Mapped[UUID] = mapped_column(
-        ForeignKey("orders.id", ondelete="CASCADE"), primary_key=True, nullable=False
+        ForeignKey("orders.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
     )
     product_id: Mapped[UUID] = mapped_column(
-        ForeignKey("products.id", ondelete="CASCADE"), primary_key=True, nullable=False
+        ForeignKey("products.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
     )
     quantity: Mapped[int] = mapped_column(nullable=False)
 

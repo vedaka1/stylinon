@@ -19,7 +19,8 @@ class OrderItemService(OrderItemServiceInterface):
 
     async def delete(self, order_id: UUID, product_id: UUID) -> None:
         return await self.order_item_repository.delete(
-            order_id=order_id, product_id=product_id
+            order_id=order_id,
+            product_id=product_id,
         )
 
     async def get_by_order_id(self, order_id: UUID) -> list[OrderItem]:

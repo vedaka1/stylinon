@@ -3,7 +3,7 @@ from datetime import date
 from uuid import UUID
 
 from pydantic import EmailStr
-from src.domain.orders.entities import Order, OrderStatus
+from src.domain.orders.entities import OrderStatus
 
 
 @dataclass

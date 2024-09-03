@@ -17,7 +17,7 @@ class PaginationQuery(BaseModel):
     limit: int
 
     @property
-    def offset(self):
+    def offset(self) -> int:
         return self.page * self.limit
 
 

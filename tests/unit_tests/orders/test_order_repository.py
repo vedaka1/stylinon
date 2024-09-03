@@ -1,17 +1,15 @@
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-import pytest
 from dishka import AsyncContainer
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
-from src.application.common.password_hasher import PasswordHasherInterface
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from src.application.common.transaction import TransactionManagerInterface
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
 )
-from src.domain.products.entities import Product
+from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 from src.infrastructure.persistence.postgresql.models.order import (
     OrderModel,
@@ -22,7 +20,7 @@ from src.infrastructure.persistence.postgresql.models.order import (
 
 
 class TestOrderRepository:
-    async def test_create_order(self, container: AsyncContainer):
+    async def test_create_order(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             sessionmaker = await di_container.get(async_sessionmaker)
@@ -46,11 +44,11 @@ class TestOrderRepository:
                 assert order_data.transaction_id == order.transaction_id
                 assert order_data.shipping_address == order.shipping_address
 
-                query = delete(OrderModel).where(OrderModel.id == order.id)
-                await session.execute(query)
+                delete_query = delete(OrderModel).where(OrderModel.id == order.id)
+                await session.execute(delete_query)
                 await session.commit()
 
-    async def test_get_order_by_id(self, container: AsyncContainer):
+    async def test_get_order_by_id(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
@@ -68,7 +66,7 @@ class TestOrderRepository:
             assert order_data.shipping_address == order.shipping_address
             assert order_data.status == order.status
 
-    async def test_delete_order(self, container: AsyncContainer):
+    async def test_delete_order(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
@@ -84,7 +82,7 @@ class TestOrderRepository:
             result = await order_repository.get_by_id(order.id)
             assert result is None
 
-    async def test_get_order_by_email(self, container: AsyncContainer):
+    async def test_get_order_by_email(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
@@ -98,7 +96,7 @@ class TestOrderRepository:
             orders = await order_repository.get_by_user_email(order.user_email)
             assert len(orders) == 1
 
-    async def test_get_all_orders(self, container: AsyncContainer):
+    async def test_get_all_orders(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create orders
@@ -121,7 +119,10 @@ class TestOrderRepository:
             orders = await order_repository.get_many(status=OrderStatus.PROCESSING)
             assert len(orders) == 1
 
-    async def test_get_order_by_id_with_products(self, container: AsyncContainer):
+    async def test_get_order_by_id_with_products(
+        self,
+        container: AsyncContainer,
+    ) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             product_repository = await di_container.get(ProductRepositoryInterface)
@@ -132,7 +133,7 @@ class TestOrderRepository:
                 description="test_description",
                 category="test_category",
                 price=100,
-                units_of_measurement="шт.",
+                units_of_measurement=UnitsOfMesaurement.PIECES,
             )
             order = Order.create(
                 user_email="test@test.com",
@@ -156,6 +157,7 @@ class TestOrderRepository:
             assert order_data.shipping_address == order.shipping_address
             assert len(order_data.items) == 1
             order_item = order_data.items[0]
+            assert order_item.product
             assert order_item.product.name == product.name
             assert order_item.product.description == product.description
             assert order_item.product.category == product.category

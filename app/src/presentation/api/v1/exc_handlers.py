@@ -11,7 +11,8 @@ logger = logging.getLogger()
 
 
 async def application_exception_handler(
-    request: Request, exc: ApplicationException
+    request: Request,
+    exc: ApplicationException,
 ) -> ORJSONResponse:
     logger.error(msg="Handle error", exc_info=exc, extra={"error": exc})
     return ErrorAPIResponse(details=exc.message, status_code=exc.status_code)
@@ -19,5 +20,6 @@ async def application_exception_handler(
 
 def init_exc_handlers(app: FastAPI) -> None:
     app.add_exception_handler(
-        ApplicationException, cast(ExceptionHandler, application_exception_handler)
+        ApplicationException,
+        cast(ExceptionHandler, application_exception_handler),
     )

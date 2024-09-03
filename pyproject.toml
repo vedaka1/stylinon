@@ -26,6 +26,9 @@ pytz = "^2024.1"
 mypy = "^1.11.1"
 flake8 = "^7.1.1"
 flake8-pyproject = "^1.2.3"
+black = "^24.8.0"
+isort = "^5.13.2"
+pre-commit = "^3.8.0"
 
 
 [tool.poetry.group.test.dependencies]
@@ -34,13 +37,19 @@ pytest-asyncio = "^0.24.0"
 testcontainers = {extras = ["postgres"], version = "^4.8.0"}
 
 [tool.mypy]
+strict = true
+ignore_missing_imports = true
 disable_error_code = ["import-untyped", "type-abstract"]
-color_output = true 
+color_output = true
 pretty = true
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
 
 [tool.flake8]
 max-line-length = 120
-exclude = ["migrations"] 
+exclude = ["migrations"]
 
 [build-system]
 requires = ["poetry-core"]

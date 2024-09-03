@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
@@ -65,7 +65,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         query = (
             select(OrderModel)
             .options(
-                selectinload(OrderModel.order_items).joinedload(OrderItemModel.product)
+                selectinload(OrderModel.order_items).joinedload(OrderItemModel.product),
             )
             .where(OrderModel.id == order_id)
         )
@@ -86,7 +86,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         status: OrderStatus | None = None,
     ) -> list[Order]:
         query = select(OrderModel).options(
-            selectinload(OrderModel.order_items).joinedload(OrderItemModel.product)
+            selectinload(OrderModel.order_items).joinedload(OrderItemModel.product),
         )
         if date_from:
             query = query.where(OrderModel.created_at >= date_from)
@@ -98,24 +98,6 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
         return [map_to_order(entity, with_products=True) for entity in entities]
-
-    # async def count(
-    #     self,
-    #     date_from: str | None = None,
-    #     date_to: str | None = None,
-    #     status: OrderStatus | None = None,
-    # ) -> int:
-    #     query = select(func.count()).select_from(OrderModel)
-    #     if date_from:
-    #         query = query.where(OrderModel.created_at >= date_from)
-    #     elif date_to:
-    #         query = query.where(OrderModel.created_at <= date_to)
-    #     elif status:
-    #         query = query.where(OrderModel.status == status)
-
-    #     cursor = await self.session.execute(query)
-    #     count = cursor.scalar_one_or_none()
-    #     return count if count else 0
 
 
 class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
@@ -136,7 +118,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
     async def delete(self, order_id: UUID, product_id: UUID) -> None:
         query = delete(OrderItemModel).where(
             (OrderItemModel.order_id == order_id)
-            & (OrderItemModel.product_id == product_id)
+            & (OrderItemModel.product_id == product_id),
         )
         await self.session.execute(query)
         return None
@@ -146,7 +128,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
             update(OrderItemModel)
             .where(
                 (OrderItemModel.order_id == order_item.order_id)
-                & (OrderItemModel.product_id == order_item.product_id)
+                & (OrderItemModel.product_id == order_item.product_id),
             )
             .values(
                 product_id=order_item.product_id,

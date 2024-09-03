@@ -1,10 +1,11 @@
 import logging
 import os
 from functools import lru_cache
-from typing import Generator
+from typing import AsyncGenerator, Generator
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
+from dishka import AsyncContainer
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.infrastructure.di.container import (
     DatabaseAdaptersProvider,
     DatabaseConfigurationProvider,
@@ -16,8 +17,13 @@ from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
     get_async_sessionmaker,
 )
-from src.infrastructure.persistence.postgresql.models import *
-from src.infrastructure.settings import settings
+from src.infrastructure.persistence.postgresql.models import (
+    Base,
+    OrderItemModel,
+    OrderModel,
+    ProductModel,
+    UserModel,
+)
 from testcontainers.postgres import PostgresContainer
 
 logger = logging.getLogger(__name__)
@@ -43,7 +49,7 @@ def postgres_url() -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def setup_db(postgres_url: str):
+async def setup_db(postgres_url: str) -> AsyncGenerator[None]:
     engine = get_async_engine(postgres_url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -52,7 +58,7 @@ async def setup_db(postgres_url: str):
 
 
 @pytest.fixture
-def container(postgres_url: str):
+def container(postgres_url: str) -> Generator[AsyncContainer]:
     from dishka import AsyncContainer, Provider, Scope, make_async_container, provide
 
     class SettingsProvider(Provider):
@@ -61,7 +67,10 @@ def container(postgres_url: str):
             return get_async_engine(db_url=postgres_url)
 
         @provide(scope=Scope.APP)
-        def session_factory(self, engine: AsyncEngine) -> async_sessionmaker:
+        def session_factory(
+            self,
+            engine: AsyncEngine,
+        ) -> async_sessionmaker[AsyncSession]:
             return get_async_sessionmaker(engine)
 
     @lru_cache(1)

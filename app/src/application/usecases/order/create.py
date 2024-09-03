@@ -22,7 +22,9 @@ class CreateOrderUseCase:
         )
         order_items = [
             OrderItem.create(
-                order_id=order.id, product_id=item.id, quantity=item.quantity
+                order_id=order.id,
+                product_id=item.id,
+                quantity=item.quantity,
             )
             for item in command.items
         ]

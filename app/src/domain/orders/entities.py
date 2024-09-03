@@ -9,8 +9,9 @@ from src.domain.products.entities import Product
 
 tz_Moscow = timezone("Europe/Moscow")
 
+
 # fmt: off
-class OrderStatus(Enum):
+class OrderStatus(str, Enum):
     CREATED = "CREATED"         # Заказ создан и ожидает оплаты
     APPROVED = "APPROVED"       # Заказ оплачен
     PROCESSING = "PROCESSING"   # Заказ в обработке
@@ -40,7 +41,7 @@ class Order:
         transaction_id: UUID,
         shipping_address: str,
         *,
-        status: OrderStatus = OrderStatus.CREATED
+        status: OrderStatus = OrderStatus.CREATED,
     ) -> "Order":
         current_date = datetime.now(tz=tz_Moscow)
         return Order(

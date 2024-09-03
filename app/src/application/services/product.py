@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from uuid import UUID
 
 from src.domain.exceptions.products import ProductNotFoundException
@@ -34,18 +34,28 @@ class ProductService(ProductServiceInterface):
         return product
 
     async def get_by_category(
-        self, offset: int, limit: int, category: str
+        self,
+        offset: int,
+        limit: int,
+        category: str,
     ) -> list[Product]:
         products = await self.product_repository.get_by_category(
-            category=category, offset=offset, limit=limit
+            category=category,
+            offset=offset,
+            limit=limit,
         )
         return products
 
     async def get_many(
-        self, offset: int, limit: int, search: str | None = None
+        self,
+        offset: int,
+        limit: int,
+        search: str | None = None,
     ) -> list[Product]:
         products = await self.product_repository.get_many(
-            search=search, offset=offset, limit=limit
+            search=search,
+            offset=offset,
+            limit=limit,
         )
         return products
 

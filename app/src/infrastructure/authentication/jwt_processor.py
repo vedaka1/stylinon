@@ -16,12 +16,14 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
             + timedelta(minutes=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES),
         }
         encoded_jwt = jwt.encode(
-            to_encode, settings.jwt.PRIVATE_KEY, algorithm=settings.jwt.ALGORITHM
+            to_encode,
+            settings.jwt.PRIVATE_KEY,
+            algorithm=settings.jwt.ALGORITHM,
         )
         return f"Bearer {encoded_jwt}"
 
     def validate_token(self, token: str) -> UUID | None:
-        """Returns a user id from token"""
+        """Returns a user id from token."""
         try:
             payload = jwt.decode(
                 token,

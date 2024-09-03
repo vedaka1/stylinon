@@ -4,13 +4,14 @@ from typing import AsyncGenerator
 
 from dishka import AsyncContainer, Provider, Scope, make_async_container, provide
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from src.application.common.jwt_processor import JwtTokenProcessorInterface
 from src.application.common.password_hasher import PasswordHasherInterface
 from src.application.common.transaction import TransactionManagerInterface
 from src.application.services.order import OrderService
 from src.application.services.order_item import OrderItemService
 from src.application.services.product import ProductService
 from src.application.services.user import UserService
-from src.application.usecases.auth import LoginUseCase, RegisterUseCase, login
+from src.application.usecases.auth import LoginUseCase, RegisterUseCase
 from src.application.usecases.order.create import CreateOrderUseCase
 from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
 from src.application.usecases.order.update import UpdateOrderUseCase
@@ -24,10 +25,7 @@ from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.service import ProductServiceInterface
 from src.domain.users.repository import UserRepositoryInterface
 from src.domain.users.service import UserServiceInterface
-from src.infrastructure.authentication.jwt_processor import (
-    JwtTokenProcessor,
-    JwtTokenProcessorInterface,
-)
+from src.infrastructure.authentication.jwt_processor import JwtTokenProcessor
 from src.infrastructure.authentication.password_hasher import PasswordHasher
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
@@ -44,7 +42,6 @@ from src.infrastructure.persistence.postgresql.repositories.user import (
     SqlalchemyUserRepository,
 )
 from src.infrastructure.persistence.postgresql.transaction import TransactionManager
-from src.infrastructure.settings import settings
 
 
 @lru_cache(1)
@@ -70,17 +67,22 @@ class SettingsProvider(Provider):
 
 class SecurityProvider(Provider):
     password_hasher = provide(
-        PasswordHasher, provides=PasswordHasherInterface, scope=Scope.APP
+        PasswordHasher,
+        provides=PasswordHasherInterface,
+        scope=Scope.APP,
     )
     jwt_processor = provide(
-        JwtTokenProcessor, provides=JwtTokenProcessorInterface, scope=Scope.APP
+        JwtTokenProcessor,
+        provides=JwtTokenProcessorInterface,
+        scope=Scope.APP,
     )
 
 
 class DatabaseConfigurationProvider(Provider):
     @provide(scope=Scope.REQUEST, provides=AsyncSession)
     async def provide_db_connection(
-        self, session_factory: async_sessionmaker[AsyncSession]
+        self,
+        session_factory: async_sessionmaker[AsyncSession],
     ) -> AsyncGenerator[AsyncSession, None]:
         session: AsyncSession = session_factory()
         yield session
@@ -91,19 +93,24 @@ class DatabaseAdaptersProvider(Provider):
     scope = Scope.REQUEST
 
     transaction_manager = provide(
-        TransactionManager, provides=TransactionManagerInterface
+        TransactionManager,
+        provides=TransactionManagerInterface,
     )
     user_repository = provide(
-        SqlalchemyUserRepository, provides=UserRepositoryInterface
+        SqlalchemyUserRepository,
+        provides=UserRepositoryInterface,
     )
     order_repositoty = provide(
-        SqlalchemyOrderRepository, provides=OrderRepositoryInterface
+        SqlalchemyOrderRepository,
+        provides=OrderRepositoryInterface,
     )
     order_item_repositoty = provide(
-        SqlalchemyOrderItemRepository, provides=OrderItemRepositoryInterface
+        SqlalchemyOrderItemRepository,
+        provides=OrderItemRepositoryInterface,
     )
     product_repository = provide(
-        SqlalchemyProductRepository, provides=ProductRepositoryInterface
+        SqlalchemyProductRepository,
+        provides=ProductRepositoryInterface,
     )
 
 

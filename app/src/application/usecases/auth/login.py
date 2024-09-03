@@ -24,7 +24,8 @@ class LoginUseCase:
         if not user:
             raise UserInvalidCredentialsException
         if not self.password_hasher.verify(
-            password=command.password, hash=user.hashed_password
+            password=command.password,
+            hash=user.hashed_password,
         ):
             raise UserInvalidCredentialsException
         access_token = self.jwt_processor.generate_token(user.id)

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from re import search
 from uuid import UUID
 
 from pydantic import EmailStr
