@@ -1,4 +1,10 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class ApplicationException(Exception):
+    ok: bool = False
+
     def __init__(
         self,
         status_code: int = 500,

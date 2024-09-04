@@ -1,16 +1,25 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from src.application.contracts.commands.user import LoginCommand, RegisterCommand
-from src.application.contracts.common.response import APIResponse
+from src.application.contracts.common.response import APIResponse, ErrorAPIResponse
 from src.application.contracts.responses.user import UserOut
 from src.application.usecases.auth import (  # UserConfirmationUseCase,
     LoginUseCase,
     RegisterUseCase,
 )
 from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
+from src.domain.exceptions.auth import (
+    TokenExpiredException,
+    UserIsNotAuthorizedException,
+    WrongTokenTypeException,
+)
+from src.domain.exceptions.user import (
+    UserAlreadyExistsException,
+    UserInvalidCredentialsException,
+)
 from src.presentation.dependencies.auth import get_refresh_token
 
 router = APIRouter(
@@ -20,7 +29,15 @@ router = APIRouter(
 )
 
 
-@router.post("/register", status_code=201, summary="Создает нового пользователя")
+@router.post(
+    "/register",
+    status_code=201,
+    summary="Создает нового пользователя",
+    responses={
+        201: {"model": APIResponse[None]},
+        409: {"model": UserAlreadyExistsException},
+    },
+)
 async def register(
     command: RegisterCommand,
     register_user_interactor: FromDishka[RegisterUseCase],
@@ -32,6 +49,10 @@ async def register(
 @router.post(
     "/login",
     summary="Аутентифицирует пользователя и устанавливает access и refresh токены",
+    responses={
+        200: {"model": APIResponse[UserOut]},
+        400: {"model": UserInvalidCredentialsException},
+    },
 )
 async def login(
     login_interactor: FromDishka[LoginUseCase],
@@ -57,7 +78,15 @@ async def login(
     return APIResponse(data=user)
 
 
-@router.post("/refresh", summary="Устанавливает новый access токен")
+@router.post(
+    "/refresh",
+    summary="Устанавливает новый access токен",
+    responses={
+        200: {"model": APIResponse[None]},
+        400: {"model": WrongTokenTypeException},
+        401: {"model": TokenExpiredException},
+    },
+)
 async def refresh(
     response: Response,
     refresh_interactor: FromDishka[RefreshTokenUseCase],

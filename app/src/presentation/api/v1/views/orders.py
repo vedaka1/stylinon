@@ -12,6 +12,8 @@ from src.application.contracts.common.response import APIResponse
 from src.application.usecases.order.create import CreateOrderUseCase
 from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
 from src.application.usecases.order.update import UpdateOrderUseCase
+from src.domain.exceptions.base import ApplicationException
+from src.domain.exceptions.order import OrderNotFoundException
 from src.domain.orders.entities import Order
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
@@ -41,7 +43,14 @@ async def create_order(
     return APIResponse()
 
 
-@router.get("/{order_id}", summary="Возвращает данные о заказе")
+@router.get(
+    "/{order_id}",
+    summary="Возвращает данные о заказе",
+    responses={
+        200: {"model": APIResponse[Order]},
+        404: {"model": OrderNotFoundException},
+    },
+)
 async def get_order(
     order_id: UUID,
     get_order_interactor: FromDishka[GetOrderUseCase],
@@ -50,7 +59,14 @@ async def get_order(
     return APIResponse(data=response)
 
 
-@router.patch("/{order_id}", summary="Обновить данные о заказе")
+@router.patch(
+    "/{order_id}",
+    summary="Обновить данные о заказе",
+    responses={
+        200: {"model": APIResponse[Order]},
+        404: {"model": OrderNotFoundException},
+    },
+)
 async def update_order(
     update_order_interactor: FromDishka[UpdateOrderUseCase],
     command: UpdateOrderCommand = Depends(),

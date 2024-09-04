@@ -1,10 +1,13 @@
 from dataclasses import dataclass, field
+from re import T
 from typing import Any, Generic, Mapping, TypeVar
 
 from fastapi.responses import ORJSONResponse
+from src.domain.exceptions.base import ApplicationException
 from starlette.background import BackgroundTask
 
 TData = TypeVar("TData")
+TErrorData = TypeVar("TErrorData", bound=ApplicationException)
 
 
 @dataclass

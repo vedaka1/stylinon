@@ -25,6 +25,7 @@ from src.application.usecases.product.get import (
     GetManyProductsUseCase,
     GetProductUseCase,
 )
+from src.domain.exceptions.products import ProductNotFoundException
 from src.domain.orders.entities import Order
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
@@ -79,7 +80,14 @@ async def create_product(
     return APIResponse()
 
 
-@router.get("/{order_id}", summary="Возвращает данные о заказе")
+@router.get(
+    "/{product_id}",
+    summary="Возвращает данные о товаре",
+    responses={
+        200: {"model": APIResponse[Product]},
+        404: {"model": ProductNotFoundException},
+    },
+)
 async def get_product(
     product_id: UUID,
     get_product_interactor: FromDishka[GetProductUseCase],
