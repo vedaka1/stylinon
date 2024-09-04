@@ -2,6 +2,7 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends
+from src.application.common.token import UserTokenData
 from src.application.contracts.commands.order import (
     CreateOrderCommand,
     GetManyOrdersCommand,
@@ -12,12 +13,13 @@ from src.application.usecases.order.create import CreateOrderUseCase
 from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
 from src.application.usecases.order.update import UpdateOrderUseCase
 from src.domain.orders.entities import Order
-from src.presentation.dependencies.auth import get_current_user_id
+from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
 router = APIRouter(
     tags=["Orders"],
     prefix="/orders",
     route_class=DishkaRoute,
+    dependencies=[Depends(auth_required)],
 )
 
 
@@ -25,9 +27,8 @@ router = APIRouter(
 async def get_many_orders(
     get_orders_list_interactor: FromDishka[GetManyOrdersUseCase],
     command: GetManyOrdersCommand = Depends(),
-    user_id: UUID = Depends(get_current_user_id),
 ) -> APIResponse[Order]:
-    response = await get_orders_list_interactor.execute(command)
+    response = await get_orders_list_interactor.execute(command=command)
     return APIResponse(data=response)
 
 
@@ -35,7 +36,6 @@ async def get_many_orders(
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],
     command: CreateOrderCommand,
-    user_id: UUID = Depends(get_current_user_id),
 ) -> APIResponse[None]:
     await create_orders_interactor.execute(command=command)
     return APIResponse()
@@ -45,7 +45,6 @@ async def create_order(
 async def get_order(
     order_id: UUID,
     get_order_interactor: FromDishka[GetOrderUseCase],
-    user_id: UUID = Depends(get_current_user_id),
 ) -> APIResponse[Order]:
     response = await get_order_interactor.execute(order_id=order_id)
     return APIResponse(data=response)
@@ -53,10 +52,8 @@ async def get_order(
 
 @router.patch("/{order_id}", summary="Обновить данные о заказе")
 async def update_order(
-    order_id: UUID,
     update_order_interactor: FromDishka[UpdateOrderUseCase],
     command: UpdateOrderCommand = Depends(),
-    user_id: UUID = Depends(get_current_user_id),
 ) -> APIResponse[None]:
     await update_order_interactor.execute(command=command)
     return APIResponse()

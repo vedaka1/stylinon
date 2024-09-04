@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+import pytest
 from dishka import AsyncContainer
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.repository import (
@@ -9,7 +10,7 @@ from src.domain.orders.repository import (
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 
-# pytestmark = pytest.mark.asyncio(loop_scope="session")
+pytestmark = pytest.mark.asyncio(scope="session")
 
 
 class TestOrderItemRepository:

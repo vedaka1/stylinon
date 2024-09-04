@@ -2,10 +2,10 @@ from dataclasses import dataclass
 
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
 from src.application.common.password_hasher import PasswordHasherInterface
+from src.application.common.token import Token
 from src.application.common.transaction import TransactionManagerInterface
 from src.application.contracts.commands.user import LoginCommand
 from src.application.contracts.responses.user import UserOut
-from src.domain.common.token import Token
 from src.domain.exceptions.user import UserInvalidCredentialsException
 from src.domain.users.service import UserServiceInterface
 from src.infrastructure.settings import settings
@@ -28,7 +28,11 @@ class LoginUseCase:
             hash=user.hashed_password,
         ):
             raise UserInvalidCredentialsException
-        access_token = self.jwt_processor.generate_token(user.id)
+        access_token = self.jwt_processor.create_access_token(
+            user_id=user.id,
+            user_role=user.role,
+        )
+        refresh_token = self.jwt_processor.create_refresh_token(user_id=user.id)
         user_out = UserOut(
             id=str(user.id),
             email=user.email,
@@ -40,7 +44,9 @@ class LoginUseCase:
         )
         token = Token(
             access_token=access_token,
-            max_age=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-            token_type="access",
+            refresh_token=refresh_token,
+            access_max_age=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+            refresh_max_age=settings.jwt.REFRESH_TOKEN_EXPIRE_DAYS * 60 * 60 * 24,
+            token_type="Bearer",
         )
         return user_out, token

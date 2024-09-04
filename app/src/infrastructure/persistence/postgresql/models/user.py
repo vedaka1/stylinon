@@ -11,9 +11,9 @@ class UserModel(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(nullable=False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
-    mobile_phone: Mapped[str]
-    first_name: Mapped[str]
-    last_name: Mapped[str]
+    mobile_phone: Mapped[str] = mapped_column(nullable=True)
+    first_name: Mapped[str] = mapped_column(nullable=True)
+    last_name: Mapped[str] = mapped_column(nullable=True)
     is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
     role: Mapped[UserRole] = mapped_column(nullable=False)
 

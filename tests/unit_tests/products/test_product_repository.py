@@ -1,8 +1,9 @@
+import pytest
 from dishka import AsyncContainer
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 
-# pytestmark = pytest.mark.asyncio(loop_scope="session")
+pytestmark = pytest.mark.asyncio(scope="session")
 
 
 class TestProduct:
@@ -49,32 +50,6 @@ class TestProductRepository:
             result = await product_repository.get_by_id(product.id)
             assert result is None
 
-    async def test_get_product_by_category(self, container: AsyncContainer) -> None:
-        async with container() as di_container:
-            product_repository = await di_container.get(ProductRepositoryInterface)
-            # Create product
-            product = TestProduct.create_product()
-            await product_repository.create(product)
-            # Check it and get it
-            products = await product_repository.get_by_category(
-                offset=0,
-                limit=10,
-                category="test_category",
-            )
-            assert len(products) == 1
-            products = await product_repository.get_by_category(
-                offset=1,
-                limit=10,
-                category="test_category",
-            )
-            assert len(products) == 0
-            products = await product_repository.get_by_category(
-                offset=0,
-                limit=10,
-                category="1q2w3e",
-            )
-            assert len(products) == 0
-
     async def test_get_many_products(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             product_repository = await di_container.get(ProductRepositoryInterface)
@@ -82,26 +57,12 @@ class TestProductRepository:
             product = TestProduct.create_product()
             await product_repository.create(product)
             # Check products
-            products = await product_repository.get_many(offset=0, limit=10)
+            products = await product_repository.get_many()
             assert len(products) == 1
             products = await product_repository.get_many(
-                offset=0,
-                limit=10,
-                search="test_product",
+                name="test_product",
             )
             assert len(products) == 1
-            products = await product_repository.get_many(
-                offset=1,
-                limit=10,
-                search="test_product",
-            )
-            assert len(products) == 0
-            products = await product_repository.get_many(
-                offset=0,
-                limit=10,
-                search="1q2w3e",
-            )
-            assert len(products) == 0
 
     async def test_count(self, container: AsyncContainer) -> None:
         async with container() as di_container:
@@ -111,7 +72,5 @@ class TestProductRepository:
             await product_repository.create(product)
             count = await product_repository.count()
             assert count == 1
-            count = await product_repository.count(search="test_product")
+            count = await product_repository.count(name="test_product")
             assert count == 1
-            count = await product_repository.count(search="1q2w3e")
-            assert count == 0

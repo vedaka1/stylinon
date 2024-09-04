@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 62b3800cc71f
+Revision ID: 66af1e112f25
 Revises: 
-Create Date: 2024-08-29 17:47:26.805693
+Create Date: 2024-09-04 11:59:40.160057
 
 """
 from typing import Sequence, Union
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '62b3800cc71f'
+revision: str = '66af1e112f25'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,7 +27,7 @@ def upgrade() -> None:
     sa.Column('shipping_address', sa.String(), nullable=False),
     sa.Column('transaction_id', sa.Uuid(), nullable=False),
     sa.Column('tracking_number', sa.String(), nullable=True),
-    sa.Column('status', sa.Enum('CREATED', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'FAILED', name='orderstatus'), nullable=False),
+    sa.Column('status', sa.Enum('CREATED', 'APPROVED', 'PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'FAILED', name='orderstatus'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_orders_id'), 'orders', ['id'], unique=False)
@@ -37,7 +37,7 @@ def upgrade() -> None:
     sa.Column('category', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
     sa.Column('price', sa.Integer(), nullable=False),
-    sa.Column('units_of_measurement', sa.String(), nullable=False),
+    sa.Column('units_of_measurement', sa.Enum('KILOGRAMS', 'GRAMS', 'LITERS', 'MILLILITERS', 'PIECES', name='unitsofmesaurement'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_products_id'), 'products', ['id'], unique=False)
@@ -45,9 +45,9 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('hashed_password', sa.String(), nullable=False),
-    sa.Column('mobile_phone', sa.String(), nullable=False),
-    sa.Column('first_name', sa.String(), nullable=False),
-    sa.Column('last_name', sa.String(), nullable=False),
+    sa.Column('mobile_phone', sa.String(), nullable=True),
+    sa.Column('first_name', sa.String(), nullable=True),
+    sa.Column('last_name', sa.String(), nullable=True),
     sa.Column('is_verified', sa.Boolean(), nullable=False),
     sa.Column('role', sa.Enum('ADMIN', 'USER', 'MANAGER', name='userrole'), nullable=False),
     sa.PrimaryKeyConstraint('id')

@@ -8,6 +8,7 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.token import UserTokenData
 from src.domain.exceptions.auth import UserIsNotAuthorizedException
 from src.infrastructure.di.container import get_container
 
@@ -42,6 +43,16 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
 oauth2_scheme = OAuth2PasswordBearerWithCookie("/api/v1/auth/login")
 
 
+async def get_refresh_token(
+    request: Request,
+) -> str:
+    refresh_token: str | None = request.cookies.get("refresh_token")
+    scheme, param = get_authorization_scheme_param(refresh_token)
+    if not refresh_token or scheme.lower() != "bearer":
+        raise UserIsNotAuthorizedException
+    return param
+
+
 async def auth_required(
     request: Request,
     token: Annotated[
@@ -55,18 +66,16 @@ async def auth_required(
     request.scope["auth"] = token
 
 
-async def get_current_user_id(
+async def get_current_user_data(
     token: Annotated[
         str,
         Depends(oauth2_scheme),
     ],
     container: AsyncContainer = Depends(get_container),
-) -> UUID | None:
+) -> UserTokenData:
     if not token:
         raise UserIsNotAuthorizedException
     async with container() as di_container:
         jwt_processor = await di_container.get(JwtTokenProcessorInterface)
-        user_id = jwt_processor.validate_token(token=token)
-        if not user_id:
-            raise UserIsNotAuthorizedException
-        return user_id
+        user_data = jwt_processor.validate_access_token(token=token)
+        return user_data

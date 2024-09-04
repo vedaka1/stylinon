@@ -19,3 +19,13 @@ class TokenExpiredException(ApplicationException):
         *args: object,
     ) -> None:
         super().__init__(status_code, message, *args)
+
+
+class WrongTokenTypeException(ApplicationException):
+    def __init__(
+        self,
+        status_code: int = 401,
+        message: str = "Wrong token type",
+        *args: object,
+    ) -> None:
+        super().__init__(status_code, message, *args)

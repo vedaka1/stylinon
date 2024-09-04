@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.products.entities import Product
+from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 from src.infrastructure.persistence.postgresql.models.product import (
     ProductModel,
@@ -72,26 +72,60 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
 
     async def get_many(
         self,
-        search: str | None = None,
+        name: str | None = None,
+        category: str | None = None,
+        description: str | None = None,
+        price_from: int | None = None,
+        price_to: int | None = None,
+        units_of_measurement: UnitsOfMesaurement | None = None,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Product]:
         query = select(ProductModel)
-        if search:
+        if name:
+            query = query.where(ProductModel.name.ilike(f"%{name}%"))
+        if category:
+            query = query.where(ProductModel.category.ilike(f"%{category}%"))
+        if description:
+            query = query.where(ProductModel.description.ilike(f"%{description}%"))
+        if price_from:
+            query = query.where(ProductModel.price >= price_from)
+        if price_to:
+            query = query.where(ProductModel.price <= price_to)
+        if units_of_measurement:
             query = query.where(
-                ProductModel.name.ilike(f"%{search}%")
-                | ProductModel.category.ilike(f"%{search}%")
-                | ProductModel.description.ilike(f"%{search}%"),
+                ProductModel.units_of_measurement == units_of_measurement,
             )
+
         query = query.limit(limit).offset(offset)
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
         return [map_to_product(entity) for entity in entities]
 
-    async def count(self, search: str | None = None) -> int:
+    async def count(
+        self,
+        name: str | None = None,
+        category: str | None = None,
+        description: str | None = None,
+        price_from: int | None = None,
+        price_to: int | None = None,
+        units_of_measurement: UnitsOfMesaurement | None = None,
+    ) -> int:
         query = select(func.count()).select_from(ProductModel)
-        if search:
-            query = query.where(ProductModel.name.ilike(f"%{search}%"))
+        if name:
+            query = query.where(ProductModel.name.ilike(f"%{name}%"))
+        if category:
+            query = query.where(ProductModel.category.ilike(f"%{category}%"))
+        if description:
+            query = query.where(ProductModel.description.ilike(f"%{description}%"))
+        if price_from:
+            query = query.where(ProductModel.price >= price_from)
+        if price_to:
+            query = query.where(ProductModel.price <= price_to)
+        if units_of_measurement:
+            query = query.where(
+                ProductModel.units_of_measurement == units_of_measurement,
+            )
         cursor = await self.session.execute(query)
         count = cursor.scalar_one_or_none()
         return count if count else 0

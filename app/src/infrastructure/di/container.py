@@ -12,9 +12,15 @@ from src.application.services.order_item import OrderItemService
 from src.application.services.product import ProductService
 from src.application.services.user import UserService
 from src.application.usecases.auth import LoginUseCase, RegisterUseCase
+from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
 from src.application.usecases.order.create import CreateOrderUseCase
 from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
 from src.application.usecases.order.update import UpdateOrderUseCase
+from src.application.usecases.product.create import CreateProductUseCase
+from src.application.usecases.product.get import (
+    GetManyProductsUseCase,
+    GetProductUseCase,
+)
 from src.application.usecases.user.get import GetUsersListUseCase, GetUserUseCase
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
@@ -119,12 +125,16 @@ class UseCasesProvider(Provider):
 
     register = provide(RegisterUseCase)
     login = provide(LoginUseCase)
+    refresh_token = provide(RefreshTokenUseCase)
     get_user = provide(GetUserUseCase)
     get_users_list = provide(GetUsersListUseCase)
     get_order = provide(GetOrderUseCase)
     create_order = provide(CreateOrderUseCase)
     get_many_orders = provide(GetManyOrdersUseCase)
     update_order = provide(UpdateOrderUseCase)
+    get_product = provide(GetProductUseCase)
+    create_product = provide(CreateProductUseCase)
+    get_many_products = provide(GetManyProductsUseCase)
 
 
 class ServiceProvider(Provider):

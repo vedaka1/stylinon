@@ -2,6 +2,7 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends
+from src.application.common.token import UserTokenData
 from src.application.contracts.commands.user import GetUsersListCommand
 from src.application.contracts.common.pagination import (
     ListPaginatedResponse,
@@ -10,7 +11,7 @@ from src.application.contracts.common.pagination import (
 from src.application.contracts.common.response import APIResponse
 from src.application.contracts.responses.user import UserOut
 from src.application.usecases.user.get import GetUsersListUseCase, GetUserUseCase
-from src.presentation.dependencies.auth import get_current_user_id
+from src.presentation.dependencies.auth import get_current_user_data
 
 router = APIRouter(
     tags=["Users"],
@@ -33,9 +34,9 @@ def get_users_list_command(
 @router.get("/me", summary="Возвращает текущего авторизованного пользователя")
 async def get_current_user(
     get_user_interactor: FromDishka[GetUserUseCase],
-    user_id: UUID = Depends(get_current_user_id),
+    user_data: UserTokenData = Depends(get_current_user_data),
 ) -> APIResponse[UserOut]:
-    response = await get_user_interactor.execute(user_id)
+    response = await get_user_interactor.execute(user_id=user_data.user_id)
     return APIResponse(data=response)
 
 
@@ -43,7 +44,7 @@ async def get_current_user(
 async def get_users(
     get_users_list_interactor: FromDishka[GetUsersListUseCase],
     command: GetUsersListCommand = Depends(get_users_list_command),
-    user_id: UUID = Depends(get_current_user_id),
+    user_data: UserTokenData = Depends(get_current_user_data),
 ) -> APIResponse[ListPaginatedResponse[UserOut]]:
-    response = await get_users_list_interactor.execute(command)
+    response = await get_users_list_interactor.execute(command=command)
     return APIResponse(data=response)

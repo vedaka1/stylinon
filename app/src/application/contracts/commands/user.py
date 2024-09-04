@@ -10,9 +10,9 @@ from src.domain.users.entities import User
 class RegisterCommand:
     email: EmailStr
     password: str
-    mobile_phone: str
-    first_name: str
-    last_name: str
+    mobile_phone: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
 
 
 @dataclass

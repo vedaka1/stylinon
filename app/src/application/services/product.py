@@ -2,7 +2,7 @@ from abc import abstractmethod
 from uuid import UUID
 
 from src.domain.exceptions.products import ProductNotFoundException
-from src.domain.products.entities import Product
+from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.service import ProductServiceInterface
 
@@ -13,7 +13,6 @@ class ProductService(ProductServiceInterface):
     def __init__(self, product_repository: ProductRepositoryInterface) -> None:
         self.product_repository = product_repository
 
-    @abstractmethod
     async def create(self, product: Product) -> None:
         await self.product_repository.create(product)
         return None
@@ -35,9 +34,9 @@ class ProductService(ProductServiceInterface):
 
     async def get_by_category(
         self,
+        category: str,
         offset: int,
         limit: int,
-        category: str,
     ) -> list[Product]:
         products = await self.product_repository.get_by_category(
             category=category,
@@ -48,16 +47,41 @@ class ProductService(ProductServiceInterface):
 
     async def get_many(
         self,
-        offset: int,
-        limit: int,
-        search: str | None = None,
+        name: str | None = None,
+        category: str | None = None,
+        description: str | None = None,
+        price_from: int | None = None,
+        price_to: int | None = None,
+        units_of_measurement: UnitsOfMesaurement | None = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> list[Product]:
         products = await self.product_repository.get_many(
-            search=search,
+            name=name,
+            category=category,
+            description=description,
+            price_from=price_from,
+            price_to=price_to,
+            units_of_measurement=units_of_measurement,
             offset=offset,
             limit=limit,
         )
         return products
 
-    async def count(self, search: str | None = None) -> int:
-        return await self.product_repository.count(search=search)
+    async def count(
+        self,
+        name: str | None = None,
+        category: str | None = None,
+        description: str | None = None,
+        price_from: int | None = None,
+        price_to: int | None = None,
+        units_of_measurement: UnitsOfMesaurement | None = None,
+    ) -> int:
+        return await self.product_repository.count(
+            name=name,
+            category=category,
+            description=description,
+            price_from=price_from,
+            price_to=price_to,
+            units_of_measurement=units_of_measurement,
+        )

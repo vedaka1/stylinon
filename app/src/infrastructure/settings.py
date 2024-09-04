@@ -34,6 +34,11 @@ class JwtSettings:
         to_cast=int,
         default=5,
     )
+    REFRESH_TOKEN_EXPIRE_DAYS: int = get_env_var(
+        "REFRESH_TOKEN_EXPIRE_DAYS",
+        to_cast=int,
+        default=30,
+    )
 
 
 class Settings:

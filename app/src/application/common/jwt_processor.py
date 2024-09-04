@@ -1,11 +1,34 @@
 from abc import ABC, abstractmethod
+from enum import Enum
+from typing import Any
 from uuid import UUID
+
+from src.application.common.token import UserTokenData
+from src.domain.users.entities import UserRole
+
+
+class TokenType(Enum):
+    ACCESS = "access_token"
+    REFRESH = "refresh_token"
 
 
 class JwtTokenProcessorInterface(ABC):
 
     @abstractmethod
-    def generate_token(self, user_id: UUID) -> str: ...
+    def create_access_token(self, user_id: UUID, user_role: UserRole) -> str: ...
 
     @abstractmethod
-    def validate_token(self, token: str) -> UUID | None: ...
+    def create_refresh_token(self, user_id: UUID) -> str: ...
+
+    @abstractmethod
+    def _generate_token(
+        self,
+        token_type: TokenType,
+        payload: dict[str, Any],
+    ) -> str: ...
+
+    @abstractmethod
+    def validate_access_token(self, token: str) -> UserTokenData: ...
+
+    @abstractmethod
+    def validate_refresh_token(self, token: str) -> UUID: ...

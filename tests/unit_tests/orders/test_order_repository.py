@@ -1,8 +1,9 @@
 from uuid import uuid4
 
+import pytest
 from dishka import AsyncContainer
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from src.application.common.transaction import TransactionManagerInterface
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.repository import (
@@ -16,14 +17,14 @@ from src.infrastructure.persistence.postgresql.models.order import (
     map_to_order,
 )
 
-# pytestmark = pytest.mark.asyncio(loop_scope="session")
+pytestmark = pytest.mark.asyncio(scope="session")
 
 
 class TestOrderRepository:
     async def test_create_order(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
-            sessionmaker = await di_container.get(async_sessionmaker)
+            sessionmaker = await di_container.get(async_sessionmaker[AsyncSession])
             transaction_manager = await di_container.get(TransactionManagerInterface)
             # Create order
             order = Order.create(
@@ -47,6 +48,7 @@ class TestOrderRepository:
                 delete_query = delete(OrderModel).where(OrderModel.id == order.id)
                 await session.execute(delete_query)
                 await session.commit()
+                await session.close()
 
     async def test_get_order_by_id(self, container: AsyncContainer) -> None:
         async with container() as di_container:
