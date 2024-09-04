@@ -7,9 +7,7 @@ from src.domain.orders.service import OrderServiceInterface
 
 @dataclass
 class UpdateOrderUseCase:
-
     order_service: OrderServiceInterface
-
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: UpdateOrderCommand) -> None:

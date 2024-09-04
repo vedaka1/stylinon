@@ -15,7 +15,12 @@ class TokenType(Enum):
 class JwtTokenProcessorInterface(ABC):
 
     @abstractmethod
-    def create_access_token(self, user_id: UUID, user_role: UserRole) -> str: ...
+    def create_access_token(
+        self,
+        user_id: UUID,
+        user_role: UserRole,
+        email: str,
+    ) -> str: ...
 
     @abstractmethod
     def create_refresh_token(self, user_id: UUID) -> str: ...

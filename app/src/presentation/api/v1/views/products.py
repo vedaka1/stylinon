@@ -2,12 +2,6 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends
-from src.application.common.token import UserTokenData
-from src.application.contracts.commands.order import (
-    CreateOrderCommand,
-    GetManyOrdersCommand,
-    UpdateOrderCommand,
-)
 from src.application.contracts.commands.product import (
     CreateProductCommand,
     GetManyProductsCommand,
@@ -17,16 +11,12 @@ from src.application.contracts.common.pagination import (
     PaginationQuery,
 )
 from src.application.contracts.common.response import APIResponse
-from src.application.usecases.order.create import CreateOrderUseCase
-from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
-from src.application.usecases.order.update import UpdateOrderUseCase
 from src.application.usecases.product.create import CreateProductUseCase
 from src.application.usecases.product.get import (
     GetManyProductsUseCase,
     GetProductUseCase,
 )
 from src.domain.exceptions.products import ProductNotFoundException
-from src.domain.orders.entities import Order
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 

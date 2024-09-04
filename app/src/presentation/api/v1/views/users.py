@@ -1,4 +1,4 @@
-from uuid import UUID
+import email
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends
@@ -9,8 +9,13 @@ from src.application.contracts.common.pagination import (
     PaginationQuery,
 )
 from src.application.contracts.common.response import APIResponse
+from src.application.contracts.responses.order import OrderOut
 from src.application.contracts.responses.user import UserOut
-from src.application.usecases.user.get import GetUsersListUseCase, GetUserUseCase
+from src.application.usecases.user.get import (
+    GetUserOrdersUseCase,
+    GetUsersListUseCase,
+    GetUserUseCase,
+)
 from src.presentation.dependencies.auth import get_current_user_data
 
 router = APIRouter(
@@ -37,6 +42,15 @@ async def get_current_user(
     user_data: UserTokenData = Depends(get_current_user_data),
 ) -> APIResponse[UserOut]:
     response = await get_user_interactor.execute(user_id=user_data.user_id)
+    return APIResponse(data=response)
+
+
+@router.get("/me/orders", summary="Возвращает заказы текущего пользователя")
+async def get_current_user_orders(
+    get_user_orders_interactor: FromDishka[GetUserOrdersUseCase],
+    user_data: UserTokenData = Depends(get_current_user_data),
+) -> APIResponse[OrderOut]:
+    response = await get_user_orders_interactor.execute(email=user_data.email)
     return APIResponse(data=response)
 
 

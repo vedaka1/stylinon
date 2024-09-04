@@ -16,4 +16,5 @@ class Token:
 @dataclass
 class UserTokenData:
     user_id: UUID
+    email: str
     role: UserRole

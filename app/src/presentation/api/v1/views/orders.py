@@ -2,18 +2,20 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends
-from src.application.common.token import UserTokenData
 from src.application.contracts.commands.order import (
     CreateOrderCommand,
     GetManyOrdersCommand,
     UpdateOrderCommand,
 )
 from src.application.contracts.common.response import APIResponse
+from src.application.contracts.responses.order import OrderOut
 from src.application.usecases.order.create import CreateOrderUseCase
 from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
 from src.application.usecases.order.update import UpdateOrderUseCase
-from src.domain.exceptions.base import ApplicationException
-from src.domain.exceptions.order import OrderNotFoundException
+from src.domain.exceptions.order import (
+    OrderItemIncorrectQuantityException,
+    OrderNotFoundException,
+)
 from src.domain.orders.entities import Order
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
@@ -29,12 +31,19 @@ router = APIRouter(
 async def get_many_orders(
     get_orders_list_interactor: FromDishka[GetManyOrdersUseCase],
     command: GetManyOrdersCommand = Depends(),
-) -> APIResponse[Order]:
+) -> APIResponse[OrderOut]:
     response = await get_orders_list_interactor.execute(command=command)
     return APIResponse(data=response)
 
 
-@router.post("", summary="Создает новый заказ")
+@router.post(
+    "",
+    summary="Создает новый заказ",
+    responses={
+        200: {"model": APIResponse[None]},
+        400: {"model": OrderItemIncorrectQuantityException},
+    },
+)
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],
     command: CreateOrderCommand,

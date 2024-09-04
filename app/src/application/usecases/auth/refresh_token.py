@@ -20,6 +20,7 @@ class RefreshTokenUseCase:
         access_token = self.jwt_processor.create_access_token(
             user_id=user.id,
             user_role=user.role,
+            email=user.email,
         )
         token = Token(
             access_token=access_token,

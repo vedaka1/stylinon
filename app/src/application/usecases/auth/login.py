@@ -31,6 +31,7 @@ class LoginUseCase:
         access_token = self.jwt_processor.create_access_token(
             user_id=user.id,
             user_role=user.role,
+            email=user.email,
         )
         refresh_token = self.jwt_processor.create_refresh_token(user_id=user.id)
         user_out = UserOut(

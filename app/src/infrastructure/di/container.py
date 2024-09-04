@@ -21,7 +21,11 @@ from src.application.usecases.product.get import (
     GetManyProductsUseCase,
     GetProductUseCase,
 )
-from src.application.usecases.user.get import GetUsersListUseCase, GetUserUseCase
+from src.application.usecases.user.get import (
+    GetUserOrdersUseCase,
+    GetUsersListUseCase,
+    GetUserUseCase,
+)
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
@@ -128,6 +132,7 @@ class UseCasesProvider(Provider):
     refresh_token = provide(RefreshTokenUseCase)
     get_user = provide(GetUserUseCase)
     get_users_list = provide(GetUsersListUseCase)
+    get_user_orders_list = provide(GetUserOrdersUseCase)
     get_order = provide(GetOrderUseCase)
     create_order = provide(CreateOrderUseCase)
     get_many_orders = provide(GetManyOrdersUseCase)

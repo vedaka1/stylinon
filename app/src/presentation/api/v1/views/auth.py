@@ -4,18 +4,14 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from src.application.contracts.commands.user import LoginCommand, RegisterCommand
-from src.application.contracts.common.response import APIResponse, ErrorAPIResponse
+from src.application.contracts.common.response import APIResponse
 from src.application.contracts.responses.user import UserOut
 from src.application.usecases.auth import (  # UserConfirmationUseCase,
     LoginUseCase,
     RegisterUseCase,
 )
 from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
-from src.domain.exceptions.auth import (
-    TokenExpiredException,
-    UserIsNotAuthorizedException,
-    WrongTokenTypeException,
-)
+from src.domain.exceptions.auth import TokenExpiredException, WrongTokenTypeException
 from src.domain.exceptions.user import (
     UserAlreadyExistsException,
     UserInvalidCredentialsException,

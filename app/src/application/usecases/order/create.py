@@ -11,7 +11,6 @@ from src.domain.orders.service import OrderItemServiceInterface, OrderServiceInt
 class CreateOrderUseCase:
     order_service: OrderServiceInterface
     order_item_service: OrderItemServiceInterface
-
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateOrderCommand) -> None:

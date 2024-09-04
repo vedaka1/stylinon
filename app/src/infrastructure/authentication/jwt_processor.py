@@ -13,10 +13,16 @@ from src.infrastructure.settings import settings
 
 class JwtTokenProcessor(JwtTokenProcessorInterface):
 
-    def create_access_token(self, user_id: UUID, user_role: UserRole) -> str:
+    def create_access_token(
+        self,
+        user_id: UUID,
+        user_role: UserRole,
+        email: str,
+    ) -> str:
         payload = {
             "sub": str(user_id),
             "role": str(user_role),
+            "email": str(email),
             "exp": datetime.now(timezone.utc)
             + timedelta(minutes=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES),
         }
@@ -55,12 +61,17 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
             )
             user_id = payload.get("sub")
             user_role = payload.get("role")
+            user_email = payload.get("email")
             token_type = payload.get("type")
             if token_type == TokenType.REFRESH.value:
                 raise WrongTokenTypeException
             if datetime.fromtimestamp(payload.get("exp")) <= datetime.now():
                 raise TokenExpiredException
-            return UserTokenData(user_id=UUID(user_id), role=user_role)
+            return UserTokenData(
+                user_id=UUID(user_id),
+                email=user_email,
+                role=user_role,
+            )
 
         except jwt.ExpiredSignatureError:
             raise TokenExpiredException
