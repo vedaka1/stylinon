@@ -3,7 +3,7 @@ from dishka import AsyncContainer
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.repository import ProductRepositoryInterface
 
-pytestmark = pytest.mark.asyncio(scope="session")
+pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 class TestProduct:
@@ -37,6 +37,25 @@ class TestProductRepository:
             # Check it
             product_data = await product_repository.get_by_id(product.id)
             TestProduct.check_product(product_data)
+
+    async def test_create_many_products(self, container: AsyncContainer) -> None:
+        async with container() as di_container:
+            product_repository = await di_container.get(ProductRepositoryInterface)
+            # Create product
+            products = [
+                Product.create(
+                    name=f"test_product{i}",
+                    description=f"test_description{i}",
+                    price=100,
+                    category=f"test_category{i}",
+                    units_of_measurement=UnitsOfMesaurement.PIECES,
+                )
+                for i in range(10)
+            ]
+            await product_repository.create_many(products)
+            # Check it
+            products_data = await product_repository.get_many()
+            assert len(products_data) == len(products)
 
     async def test_delete_product(self, container: AsyncContainer) -> None:
         async with container() as di_container:

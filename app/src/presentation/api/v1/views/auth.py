@@ -88,7 +88,6 @@ async def refresh(
     refresh_interactor: FromDishka[RefreshTokenUseCase],
     refresh_token: Annotated[str, Depends(get_refresh_token)],
 ) -> APIResponse[None]:
-    print(refresh_token)
     token = await refresh_interactor.execute(refresh_token=refresh_token)
     response.set_cookie(
         "access_token",
@@ -105,6 +104,7 @@ async def logout(
     response: Response,
 ) -> APIResponse[UserOut]:
     response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
     return APIResponse()
 
 

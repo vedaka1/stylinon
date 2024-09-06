@@ -3,7 +3,7 @@ from dishka import AsyncContainer
 from src.domain.users.entities import User
 from src.domain.users.repository import UserRepositoryInterface
 
-pytestmark = pytest.mark.asyncio(scope="session")
+pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 class TestUser:

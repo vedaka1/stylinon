@@ -19,7 +19,7 @@ class Product:
     name: str
     category: str
     description: str
-    price: int
+    price: int  # в копейках
     units_of_measurement: UnitsOfMesaurement
 
     @staticmethod

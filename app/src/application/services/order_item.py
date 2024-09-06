@@ -14,6 +14,9 @@ class OrderItemService(OrderItemServiceInterface):
     async def create(self, order_item: OrderItem) -> None:
         return await self.order_item_repository.create(order_item=order_item)
 
+    async def create_many(self, order_items: list[OrderItem]) -> None:
+        return await self.order_item_repository.create_many(order_items=order_items)
+
     async def update(self, order_item: OrderItem) -> None:
         return await self.order_item_repository.update(order_item=order_item)
 

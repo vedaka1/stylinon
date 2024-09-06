@@ -28,6 +28,23 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         await self.session.execute(query)
         return None
 
+    async def create_many(self, products: list[Product]) -> None:
+        query = insert(ProductModel).values(
+            [
+                {
+                    "id": product.id,
+                    "name": product.name,
+                    "category": product.category,
+                    "description": product.description,
+                    "price": product.price,
+                    "units_of_measurement": product.units_of_measurement,
+                }
+                for product in products
+            ],
+        )
+        await self.session.execute(query)
+        return None
+
     async def update(self, product: Product) -> None:
         query = (
             update(ProductModel)

@@ -19,17 +19,17 @@ class TestAuth:
         )
         assert response.status_code == 201
 
-    # async def test_login(self, client: AsyncClient):
-    #     response = await client.post(
-    #         "/auth/login",
-    #         data={"username": "test_auth@test.com", "password": "1234qwe"},
-    #     )
-    #     assert response.status_code == 200
-    #     print(response.text)
-    #     assert response.cookies.get("access_token") is not None
+    async def test_login(self, client: AsyncClient) -> None:
+        response = await client.post(
+            "/auth/login",
+            data={"username": "test_auth@test.com", "password": "1234qwe"},
+        )
+        assert response.status_code == 200
+        assert response.cookies.get("access_token") is not None
+        assert response.cookies.get("refresh_token") is not None
 
     # async def test_refresh_token(self, client: AsyncClient):
-    #     response = await client.post("/auth/refresh")
+    #     response = await client.post("/auth/refresh", cookies=client.cookies)
     #     assert response.status_code == 200
     #     assert response.cookies.get("access_token") is not None
     #     assert response.cookies.get("refresh_token") is not None
@@ -39,7 +39,7 @@ class TestAuth:
             response = await client.post("/auth/logout")
             assert response.status_code == 200
             assert response.cookies.get("access_token") is None
-            # assert response.cookies.get("refresh_token") is None
+            assert response.cookies.get("refresh_token") is None
             sessionmaker = await di_container.get(async_sessionmaker[AsyncSession])
             session = sessionmaker()
             await session.execute(

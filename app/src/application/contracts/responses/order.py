@@ -16,7 +16,6 @@ class OrderOut:
     transaction_id: UUID
     tracking_number: str | None
     status: OrderStatus
-
     items: list["OrderItemOut"] = field(default_factory=list)
 
 

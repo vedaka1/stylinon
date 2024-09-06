@@ -54,6 +54,9 @@ class OrderItemServiceInterface(ABC):
     async def create(self, order_item: OrderItem) -> None: ...
 
     @abstractmethod
+    async def create_many(self, order_items: list[OrderItem]) -> None: ...
+
+    @abstractmethod
     async def update(self, order_item: OrderItem) -> None: ...
 
     @abstractmethod

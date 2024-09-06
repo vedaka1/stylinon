@@ -19,7 +19,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         tokenUrl: str,
         scheme_name: Optional[str] = None,
         scopes: Optional[Dict[str, str]] = None,
-        auto_error: bool = True,
+        auto_error: bool = False,
     ):
         if not scopes:
             scopes = {}
@@ -47,6 +47,7 @@ async def get_refresh_token(
     request: Request,
 ) -> str:
     refresh_token: str | None = request.cookies.get("refresh_token")
+    print(request.cookies)
     scheme, param = get_authorization_scheme_param(refresh_token)
     if not refresh_token or scheme.lower() != "bearer":
         raise UserIsNotAuthorizedException

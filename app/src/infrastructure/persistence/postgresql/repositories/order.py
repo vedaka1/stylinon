@@ -115,6 +115,20 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
         await self.session.execute(query)
         return None
 
+    async def create_many(self, order_items: list[OrderItem]) -> None:
+        query = insert(OrderItemModel).values(
+            [
+                {
+                    "order_id": order_item.order_id,
+                    "product_id": order_item.product_id,
+                    "quantity": order_item.quantity,
+                }
+                for order_item in order_items
+            ],
+        )
+        await self.session.execute(query)
+        return None
+
     async def delete(self, order_id: UUID, product_id: UUID) -> None:
         query = delete(OrderItemModel).where(
             (OrderItemModel.order_id == order_id)

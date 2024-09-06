@@ -1,6 +1,10 @@
 from src.infrastructure.utils.common import get_env_var
 
 
+class TochkaBankSettings:
+    TOKEN: str = get_env_var("TOCHKA_TOKEN", to_cast=str)
+
+
 class DatabaseSettings:
     POSTGRES_HOST: str = get_env_var("POSTGRES_HOST", to_cast=str, default="postgres")
     POSTGRES_PORT: int = get_env_var("POSTGRES_PORT", to_cast=int, default=5432)
@@ -44,6 +48,7 @@ class JwtSettings:
 class Settings:
     db: DatabaseSettings = DatabaseSettings()
     jwt: JwtSettings = JwtSettings()
+    tochka: TochkaBankSettings = TochkaBankSettings()
 
 
 settings = Settings()

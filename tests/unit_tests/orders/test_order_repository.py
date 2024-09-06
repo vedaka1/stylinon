@@ -17,7 +17,7 @@ from src.infrastructure.persistence.postgresql.models.order import (
     map_to_order,
 )
 
-pytestmark = pytest.mark.asyncio(scope="session")
+pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
 class TestOrderRepository:
