@@ -14,20 +14,23 @@ class ProductService(ProductServiceInterface):
         self.product_repository = product_repository
 
     async def create(self, product: Product) -> None:
-        await self.product_repository.create(product)
+        await self.product_repository.create(product=product)
         return None
 
+    async def create_many(self, products: list[Product]) -> None:
+        return await self.product_repository.create_many(products=products)
+
     async def delete(self, product_id: UUID) -> None:
-        await self.product_repository.delete(product_id)
+        await self.product_repository.delete(product_id=product_id)
         return None
 
     async def update(self, product: Product) -> None:
         await self.get_by_id(product.id)
-        await self.product_repository.update(product)
+        await self.product_repository.update(product=product)
         return None
 
     async def get_by_id(self, product_id: UUID) -> Product:
-        product = await self.product_repository.get_by_id(product_id)
+        product = await self.product_repository.get_by_id(product_id=product_id)
         if not product:
             raise ProductNotFoundException
         return product

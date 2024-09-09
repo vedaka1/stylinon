@@ -1,10 +1,13 @@
+from dataclasses import asdict
 from http import client
-from typing import Any
+from typing import Any, cast
 
 import aiohttp
 import httpx
+from src.application.contracts.common.product import ProductInPayment
 from src.domain.products.entities import Product
 from src.infrastructure.acquiring.interface import AcquiringGatewayInterface
+from src.infrastructure.acquiring.mappers import map_object_to_dict
 
 
 class TochkaAcquiringGateway(AcquiringGatewayInterface):
@@ -13,36 +16,32 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
 
     def __init__(
         self,
-        token: str,
+        session: aiohttp.ClientSession,
         base_url: str = "https://enter.tochka.com/sandbox/v2",
     ):
-        self.headers = {"Authorization": f"Bearer {token}"}
         self.base_url = base_url
+        self.session = session
 
-    async def get_customer_info(self) -> dict[str, Any] | None:
-        async with aiohttp.ClientSession(
-            headers=self.headers,
-            base_url=self.base_url,
-        ) as session:
-            data = None
-            response = await session.get("/open-banking/v1.0/customers/123456789")
-            if response.status == 200:
-                data = await response.json()
-            elif response.status in self.error_codes:
-                raise Exception("test")
-            return data["Data"] if data else None
+    async def get_customer_info(self) -> dict[str, Any]:
+        response = await self.session.get(
+            f"{self.base_url}/open-banking/v1.0/customers/123456789",
+        )
+        if response.status == 200:
+            response_data = await response.json()
+            return cast(dict[str, Any], response_data["Data"])
+        else:
+            raise Exception("test")
 
     async def create_payment_operation_with_receipt(
         self,
         client_email: str,
-        items: list[Product],
+        items: list[ProductInPayment],
         purpose: str = "Перевод за оказанные услуги",
         payment_mode: list[str] = ["sbp", "card"],
         save_card: bool = True,
-    ) -> dict[str, Any] | None:
-        amount = sum([item.price for item in items]) * 100
-        data = None
-        body = {
+    ) -> dict[str, Any]:
+        amount = sum([item.amount * item.quantity for item in items]) * 100
+        request_data = {
             "Data": {
                 "customerCode": 123456789,
                 "amount": amount,
@@ -57,19 +56,15 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
                 "Client": {
                     "email": client_email,
                 },
-                "Items": [item for item in items],
+                "Items": [map_object_to_dict(item=item) for item in items],
             },
         }
-        async with aiohttp.ClientSession(
-            headers=self.headers,
-            base_url=self.base_url,
-        ) as session:
-            response = await session.post(
-                "/acquiring/v1.0/payments_with_receipt",
-                json=body,
-            )
-            if response.status == 200:
-                data = await response.json()
-            elif response.status in self.error_codes:
-                raise Exception("test")
-            return data["Data"] if data else None
+        response = await self.session.post(
+            f"{self.base_url}/acquiring/v1.0/payments_with_receipt",
+            json=request_data,
+        )
+        if response.status == 200:
+            response_data = await response.json()
+            return cast(dict[str, Any], response_data["Data"])
+        else:
+            raise Exception("test")

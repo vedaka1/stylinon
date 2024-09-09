@@ -1,14 +1,12 @@
-import email
-
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends
-from src.application.common.token import UserTokenData
 from src.application.contracts.commands.user import GetUsersListCommand
 from src.application.contracts.common.pagination import (
     ListPaginatedResponse,
     PaginationQuery,
 )
 from src.application.contracts.common.response import APIResponse
+from src.application.contracts.common.token import UserTokenData
 from src.application.contracts.responses.order import OrderOut
 from src.application.contracts.responses.user import UserOut
 from src.application.usecases.user.get import (

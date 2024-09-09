@@ -1,3 +1,4 @@
+from .auth import RefreshSessionModel
 from .base import Base
 from .order import OrderItemModel, OrderModel
 from .product import ProductModel
@@ -9,4 +10,5 @@ __all__ = [
     "OrderModel",
     "OrderItemModel",
     "ProductModel",
+    "RefreshSessionModel",
 ]

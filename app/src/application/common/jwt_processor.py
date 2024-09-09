@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from src.application.common.token import UserTokenData
+from src.application.contracts.common.token import UserTokenData
 from src.domain.users.entities import UserRole
 
 

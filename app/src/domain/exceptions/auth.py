@@ -16,6 +16,18 @@ class UserIsNotAuthorizedException(ApplicationException):
 
 
 @dataclass
+class RefreshTokenNotFoundException(ApplicationException):
+    status_code: int = 404
+    message: str = "Refresh token not found"
+
+    def __init__(
+        self,
+        *args: object,
+    ) -> None:
+        super().__init__(self.status_code, self.message, *args)
+
+
+@dataclass
 class TokenExpiredException(ApplicationException):
     status_code: int = 401
     message: str = "Your access token has expired"

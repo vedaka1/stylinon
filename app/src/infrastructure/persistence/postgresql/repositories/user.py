@@ -8,7 +8,7 @@ from src.infrastructure.persistence.postgresql.models.user import UserModel, map
 
 
 class SqlalchemyUserRepository(UserRepositoryInterface):
-    __slots__ = ["session"]
+    __slots__ = ("session",)
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

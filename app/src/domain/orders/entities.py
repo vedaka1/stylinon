@@ -3,11 +3,8 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID, uuid4
 
-from pytz import timezone
 from src.domain.exceptions.order import OrderItemIncorrectQuantityException
 from src.domain.products.entities import Product
-
-tz_Moscow = timezone("Europe/Moscow")
 
 
 # fmt: off
@@ -43,7 +40,7 @@ class Order:
         *,
         status: OrderStatus = OrderStatus.CREATED,
     ) -> "Order":
-        current_date = datetime.now(tz=tz_Moscow)
+        current_date = datetime.now()
         return Order(
             id=uuid4(),
             user_email=user_email,

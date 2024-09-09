@@ -1,3 +1,4 @@
+import asyncio
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
@@ -18,7 +19,7 @@ from src.application.usecases.product.get import (
 )
 from src.domain.exceptions.products import ProductNotFoundException
 from src.domain.products.entities import Product, UnitsOfMesaurement
-from src.presentation.dependencies.auth import auth_required, get_current_user_data
+from src.presentation.dependencies.auth import auth_required
 
 router = APIRouter(
     tags=["Products"],

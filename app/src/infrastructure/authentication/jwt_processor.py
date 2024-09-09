@@ -4,7 +4,7 @@ from uuid import UUID
 
 import jwt
 from src.application.common.jwt_processor import JwtTokenProcessorInterface, TokenType
-from src.application.common.token import UserTokenData
+from src.application.contracts.common.token import UserTokenData
 from src.domain.exceptions.auth import TokenExpiredException, WrongTokenTypeException
 from src.domain.exceptions.base import ApplicationException
 from src.domain.users.entities import UserRole

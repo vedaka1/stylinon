@@ -8,7 +8,7 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
-from src.application.common.token import UserTokenData
+from src.application.contracts.common.token import UserTokenData
 from src.domain.exceptions.auth import UserIsNotAuthorizedException
 from src.infrastructure.di.container import get_container
 
@@ -47,7 +47,6 @@ async def get_refresh_token(
     request: Request,
 ) -> str:
     refresh_token: str | None = request.cookies.get("refresh_token")
-    print(request.cookies)
     scheme, param = get_authorization_scheme_param(refresh_token)
     if not refresh_token or scheme.lower() != "bearer":
         raise UserIsNotAuthorizedException

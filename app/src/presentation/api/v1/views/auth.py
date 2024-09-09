@@ -10,8 +10,13 @@ from src.application.usecases.auth import (  # UserConfirmationUseCase,
     LoginUseCase,
     RegisterUseCase,
 )
+from src.application.usecases.auth.login import LogoutUseCase
 from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
-from src.domain.exceptions.auth import TokenExpiredException, WrongTokenTypeException
+from src.domain.exceptions.auth import (
+    TokenExpiredException,
+    UserIsNotAuthorizedException,
+    WrongTokenTypeException,
+)
 from src.domain.exceptions.user import (
     UserAlreadyExistsException,
     UserInvalidCredentialsException,
@@ -76,7 +81,7 @@ async def login(
 
 @router.post(
     "/refresh",
-    summary="Устанавливает новый access токен",
+    summary="Устанавливает новые access и refresh токены",
     responses={
         200: {"model": APIResponse[None]},
         400: {"model": WrongTokenTypeException},
@@ -96,13 +101,30 @@ async def refresh(
         httponly=True,
         secure=True,
     )
+    response.set_cookie(
+        "refresh_token",
+        token.refresh_token,
+        max_age=token.refresh_max_age,
+        httponly=True,
+        secure=True,
+    )
     return APIResponse()
 
 
-@router.post("/logout", summary="Logout")
+@router.post(
+    "/logout",
+    summary="Logout",
+    responses={
+        200: {"model": APIResponse[None]},
+        401: {"model": TokenExpiredException},
+    },
+)
 async def logout(
     response: Response,
-) -> APIResponse[UserOut]:
+    logout_interactor: FromDishka[LogoutUseCase],
+    refresh_token: Annotated[str, Depends(get_refresh_token)],
+) -> APIResponse[None]:
+    await logout_interactor.execute(refresh_token=refresh_token)
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return APIResponse()

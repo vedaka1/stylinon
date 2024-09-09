@@ -7,11 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
 from src.application.common.password_hasher import PasswordHasherInterface
 from src.application.common.transaction import TransactionManagerInterface
+from src.application.services.auth import AuthService, AuthServiceInterface
 from src.application.services.order import OrderService
 from src.application.services.order_item import OrderItemService
 from src.application.services.product import ProductService
 from src.application.services.user import UserService
 from src.application.usecases.auth import LoginUseCase, RegisterUseCase
+from src.application.usecases.auth.login import LogoutUseCase
 from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
 from src.application.usecases.order.create import CreateOrderUseCase
 from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
@@ -47,6 +49,10 @@ from src.infrastructure.persistence.postgresql.repositories.order import (
 )
 from src.infrastructure.persistence.postgresql.repositories.product import (
     SqlalchemyProductRepository,
+)
+from src.infrastructure.persistence.postgresql.repositories.refresh import (
+    RefreshTokenRepository,
+    RefreshTokenRepositoryInterface,
 )
 from src.infrastructure.persistence.postgresql.repositories.user import (
     SqlalchemyUserRepository,
@@ -122,6 +128,10 @@ class DatabaseAdaptersProvider(Provider):
         SqlalchemyProductRepository,
         provides=ProductRepositoryInterface,
     )
+    refresh_session_repository = provide(
+        RefreshTokenRepository,
+        provides=RefreshTokenRepositoryInterface,
+    )
 
 
 class UseCasesProvider(Provider):
@@ -129,6 +139,7 @@ class UseCasesProvider(Provider):
 
     register = provide(RegisterUseCase)
     login = provide(LoginUseCase)
+    logout = provide(LogoutUseCase)
     refresh_token = provide(RefreshTokenUseCase)
     get_user = provide(GetUserUseCase)
     get_users_list = provide(GetUsersListUseCase)
@@ -146,6 +157,7 @@ class ServiceProvider(Provider):
     scope = Scope.REQUEST
 
     user_service = provide(UserService, provides=UserServiceInterface)
+    auth_service = provide(AuthService, provides=AuthServiceInterface)
     order_service = provide(OrderService, provides=OrderServiceInterface)
     order_item_service = provide(OrderItemService, provides=OrderItemServiceInterface)
     product_service = provide(ProductService, provides=ProductServiceInterface)

@@ -2,7 +2,7 @@ from src.infrastructure.utils.common import get_env_var
 
 
 class TochkaBankSettings:
-    TOKEN: str = get_env_var("TOCHKA_TOKEN", to_cast=str)
+    TOKEN: str = get_env_var("TOCHKA_TOKEN", to_cast=str, default="working_token")
 
 
 class DatabaseSettings:
