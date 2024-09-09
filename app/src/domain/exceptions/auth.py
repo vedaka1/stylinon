@@ -49,3 +49,15 @@ class WrongTokenTypeException(ApplicationException):
         *args: object,
     ) -> None:
         super().__init__(self.status_code, self.message, *args)
+
+
+@dataclass
+class NotEnoughPermissionsException(ApplicationException):
+    status_code: int = 403
+    message: str = "Not enough permissions"
+
+    def __init__(
+        self,
+        *args: object,
+    ) -> None:
+        super().__init__(self.status_code, self.message, *args)

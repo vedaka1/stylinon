@@ -21,7 +21,7 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
     ) -> str:
         payload = {
             "sub": str(user_id),
-            "role": str(user_role),
+            "role": str(user_role.value),
             "email": str(email),
             "exp": datetime.now(timezone.utc)
             + timedelta(minutes=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES),

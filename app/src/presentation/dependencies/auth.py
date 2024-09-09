@@ -5,11 +5,14 @@ from dishka import AsyncContainer
 from fastapi import Depends, Request
 from fastapi.openapi.models import OAuthFlowPassword
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
-from fastapi.security import OAuth2
+from fastapi.security import OAuth2, SecurityScopes
 from fastapi.security.utils import get_authorization_scheme_param
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
 from src.application.contracts.common.token import UserTokenData
-from src.domain.exceptions.auth import UserIsNotAuthorizedException
+from src.domain.exceptions.auth import (
+    NotEnoughPermissionsException,
+    UserIsNotAuthorizedException,
+)
 from src.infrastructure.di.container import get_container
 
 
@@ -40,7 +43,13 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         return param
 
 
-oauth2_scheme = OAuth2PasswordBearerWithCookie("/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(
+    tokenUrl="/api/v1/auth/login",
+    scopes={
+        "user": "Basic rights",
+        "admin": "Admin rights",
+    },
+)
 
 
 async def get_refresh_token(
@@ -67,6 +76,7 @@ async def auth_required(
 
 
 async def get_current_user_data(
+    security_scopes: SecurityScopes,
     token: Annotated[
         str,
         Depends(oauth2_scheme),
@@ -78,4 +88,7 @@ async def get_current_user_data(
     async with container() as di_container:
         jwt_processor = await di_container.get(JwtTokenProcessorInterface)
         user_data = jwt_processor.validate_access_token(token=token)
+        for scope in security_scopes.scopes:
+            if scope != user_data.role:
+                raise NotEnoughPermissionsException
         return user_data

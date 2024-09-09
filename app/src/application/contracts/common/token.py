@@ -22,7 +22,7 @@ class Token:
 class UserTokenData:
     user_id: UUID
     email: str
-    role: UserRole
+    role: str
 
 
 @dataclass

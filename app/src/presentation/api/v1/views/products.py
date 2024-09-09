@@ -1,8 +1,9 @@
 import asyncio
+from typing import Annotated
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 from src.application.contracts.commands.product import (
     CreateProductCommand,
     GetManyProductsCommand,
@@ -12,6 +13,7 @@ from src.application.contracts.common.pagination import (
     PaginationQuery,
 )
 from src.application.contracts.common.response import APIResponse
+from src.application.contracts.common.token import UserTokenData
 from src.application.usecases.product.create import CreateProductUseCase
 from src.application.usecases.product.get import (
     GetManyProductsUseCase,
@@ -19,7 +21,7 @@ from src.application.usecases.product.get import (
 )
 from src.domain.exceptions.products import ProductNotFoundException
 from src.domain.products.entities import Product, UnitsOfMesaurement
-from src.presentation.dependencies.auth import auth_required
+from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
 router = APIRouter(
     tags=["Products"],
@@ -66,6 +68,10 @@ async def get_many_products(
 async def create_product(
     create_product_interactor: FromDishka[CreateProductUseCase],
     command: CreateProductCommand,
+    user_data: Annotated[
+        UserTokenData,
+        Security(get_current_user_data, scopes=["admin"]),
+    ],
 ) -> APIResponse[None]:
     await create_product_interactor.execute(command=command)
     return APIResponse()

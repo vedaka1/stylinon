@@ -1,4 +1,4 @@
-from typing import Annotated, Any
+from typing import Annotated
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Response
@@ -116,7 +116,7 @@ async def refresh(
     summary="Logout",
     responses={
         200: {"model": APIResponse[None]},
-        401: {"model": TokenExpiredException},
+        401: {"model": UserIsNotAuthorizedException},
     },
 )
 async def logout(
