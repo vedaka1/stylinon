@@ -1,21 +1,17 @@
-import asyncio
 from typing import Annotated
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Security
-from src.application.contracts.commands.product import (
+from src.application.auth.dto import UserTokenData
+from src.application.common.pagination import ListPaginatedResponse, PaginationQuery
+from src.application.common.response import APIResponse
+from src.application.products.commands import (
     CreateProductCommand,
     GetManyProductsCommand,
 )
-from src.application.contracts.common.pagination import (
-    ListPaginatedResponse,
-    PaginationQuery,
-)
-from src.application.contracts.common.response import APIResponse
-from src.application.contracts.common.token import UserTokenData
-from src.application.usecases.product.create import CreateProductUseCase
-from src.application.usecases.product.get import (
+from src.application.products.usecases import (
+    CreateProductUseCase,
     GetManyProductsUseCase,
     GetProductUseCase,
 )

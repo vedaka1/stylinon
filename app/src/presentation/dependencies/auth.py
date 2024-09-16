@@ -7,8 +7,8 @@ from fastapi.openapi.models import OAuthFlowPassword
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security import OAuth2, SecurityScopes
 from fastapi.security.utils import get_authorization_scheme_param
+from src.application.auth.dto import UserTokenData
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
-from src.application.contracts.common.token import UserTokenData
 from src.domain.exceptions.auth import (
     NotEnoughPermissionsException,
     UserIsNotAuthorizedException,

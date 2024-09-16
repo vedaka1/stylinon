@@ -1,29 +1,40 @@
 import logging
+import logging.config
 from functools import lru_cache
 from typing import AsyncGenerator
 
+import aiohttp
 from dishka import AsyncContainer, Provider, Scope, make_async_container, provide
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from src.application.acquiring.interface import AcquiringGatewayInterface
+from src.application.acquiring.service import AcquiringService
+from src.application.auth.service import AuthService, AuthServiceInterface
+from src.application.auth.usecases import (
+    LoginUseCase,
+    LogoutUseCase,
+    RefreshTokenUseCase,
+    RegisterUseCase,
+)
+from src.application.common.acquiring import AcquiringServiceInterface
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
 from src.application.common.password_hasher import PasswordHasherInterface
 from src.application.common.transaction import TransactionManagerInterface
-from src.application.services.auth import AuthService, AuthServiceInterface
-from src.application.services.order import OrderService
-from src.application.services.order_item import OrderItemService
-from src.application.services.product import ProductService
-from src.application.services.user import UserService
-from src.application.usecases.auth import LoginUseCase, RegisterUseCase
-from src.application.usecases.auth.login import LogoutUseCase
-from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
-from src.application.usecases.order.create import CreateOrderUseCase
-from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
-from src.application.usecases.order.update import UpdateOrderUseCase
-from src.application.usecases.product.create import CreateProductUseCase
-from src.application.usecases.product.get import (
+from src.application.orders.service import OrderItemService, OrderService
+from src.application.orders.usecases import (
+    CreateOrderUseCase,
+    GetManyOrdersUseCase,
+    GetOrderUseCase,
+    UpdateOrderByWebhookUseCase,
+    UpdateOrderUseCase,
+)
+from src.application.products.service import ProductService
+from src.application.products.usecases import (
+    CreateProductUseCase,
     GetManyProductsUseCase,
     GetProductUseCase,
 )
-from src.application.usecases.user.get import (
+from src.application.users.service import UserService
+from src.application.users.usecases import (
     GetUserOrdersUseCase,
     GetUsersListUseCase,
     GetUserUseCase,
@@ -37,8 +48,10 @@ from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.service import ProductServiceInterface
 from src.domain.users.repository import UserRepositoryInterface
 from src.domain.users.service import UserServiceInterface
+from src.infrastructure.acquiring.main import TochkaAcquiringGateway
 from src.infrastructure.authentication.jwt_processor import JwtTokenProcessor
 from src.infrastructure.authentication.password_hasher import PasswordHasher
+from src.infrastructure.logging_config import logger_config_dict
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
     get_async_sessionmaker,
@@ -58,16 +71,12 @@ from src.infrastructure.persistence.postgresql.repositories.user import (
     SqlalchemyUserRepository,
 )
 from src.infrastructure.persistence.postgresql.transaction import TransactionManager
+from src.infrastructure.settings import settings
 
 
 @lru_cache(1)
 def init_logger() -> None:
-    logging.basicConfig(
-        # filename="log.log",
-        level=logging.INFO,
-        encoding="UTF-8",
-        format="%(asctime)s %(levelname)s: %(message)s",
-    )
+    logging.config.dictConfig(logger_config_dict)
     return None
 
 
@@ -79,6 +88,11 @@ class SettingsProvider(Provider):
     @provide(scope=Scope.APP)
     def session_factory(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
         return get_async_sessionmaker(engine)
+
+    @provide(scope=Scope.APP)
+    def acquiring_session(self) -> aiohttp.ClientSession:
+        headers = {"Authorization": f"Bearer {settings.tochka.TOKEN}"}
+        return aiohttp.ClientSession(headers=headers)
 
 
 class SecurityProvider(Provider):
@@ -148,6 +162,7 @@ class UseCasesProvider(Provider):
     create_order = provide(CreateOrderUseCase)
     get_many_orders = provide(GetManyOrdersUseCase)
     update_order = provide(UpdateOrderUseCase)
+    update_order_by_webhook = provide(UpdateOrderByWebhookUseCase)
     get_product = provide(GetProductUseCase)
     create_product = provide(CreateProductUseCase)
     get_many_products = provide(GetManyProductsUseCase)
@@ -157,10 +172,20 @@ class ServiceProvider(Provider):
     scope = Scope.REQUEST
 
     user_service = provide(UserService, provides=UserServiceInterface)
+    acquiring_service = provide(AcquiringService, provides=AcquiringServiceInterface)
     auth_service = provide(AuthService, provides=AuthServiceInterface)
     order_service = provide(OrderService, provides=OrderServiceInterface)
     order_item_service = provide(OrderItemService, provides=OrderItemServiceInterface)
     product_service = provide(ProductService, provides=ProductServiceInterface)
+
+
+class GatewayProvider(Provider):
+    scope = Scope.REQUEST
+
+    acquiring_gateway = provide(
+        TochkaAcquiringGateway,
+        provides=AcquiringGatewayInterface,
+    )
 
 
 @lru_cache(1)
@@ -172,4 +197,5 @@ def get_container() -> AsyncContainer:
         DatabaseAdaptersProvider(),
         ServiceProvider(),
         UseCasesProvider(),
+        GatewayProvider(),
     )

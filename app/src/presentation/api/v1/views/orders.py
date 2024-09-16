@@ -1,17 +1,22 @@
+import logging
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends
-from src.application.contracts.commands.order import (
+from fastapi import APIRouter, Depends, Request
+from src.application.common.response import APIResponse
+from src.application.orders.commands import (
     CreateOrderCommand,
     GetManyOrdersCommand,
     UpdateOrderCommand,
 )
-from src.application.contracts.common.response import APIResponse
-from src.application.contracts.responses.order import OrderOut
-from src.application.usecases.order.create import CreateOrderUseCase
-from src.application.usecases.order.get import GetManyOrdersUseCase, GetOrderUseCase
-from src.application.usecases.order.update import UpdateOrderUseCase
+from src.application.orders.responses import CreateOrderResponse, OrderOut
+from src.application.orders.usecases import (
+    CreateOrderUseCase,
+    GetManyOrdersUseCase,
+    GetOrderUseCase,
+    UpdateOrderByWebhookUseCase,
+    UpdateOrderUseCase,
+)
 from src.domain.exceptions.order import (
     OrderItemIncorrectQuantityException,
     OrderNotFoundException,
@@ -23,11 +28,14 @@ router = APIRouter(
     tags=["Orders"],
     prefix="/orders",
     route_class=DishkaRoute,
-    dependencies=[Depends(auth_required)],
 )
 
 
-@router.get("", summary="Возвращает список заказов")
+@router.get(
+    "",
+    summary="Возвращает список заказов",
+    dependencies=[Depends(auth_required)],
+)
 async def get_many_orders(
     get_orders_list_interactor: FromDishka[GetManyOrdersUseCase],
     command: GetManyOrdersCommand = Depends(),
@@ -40,16 +48,17 @@ async def get_many_orders(
     "",
     summary="Создает новый заказ",
     responses={
-        200: {"model": APIResponse[None]},
+        200: {"model": APIResponse[CreateOrderResponse]},
         400: {"model": OrderItemIncorrectQuantityException},
     },
+    dependencies=[Depends(auth_required)],
 )
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],
     command: CreateOrderCommand,
-) -> APIResponse[None]:
-    await create_orders_interactor.execute(command=command)
-    return APIResponse()
+) -> APIResponse[CreateOrderResponse]:
+    response = await create_orders_interactor.execute(command=command)
+    return APIResponse(data=response)
 
 
 @router.get(
@@ -59,6 +68,7 @@ async def create_order(
         200: {"model": APIResponse[Order]},
         404: {"model": OrderNotFoundException},
     },
+    dependencies=[Depends(auth_required)],
 )
 async def get_order(
     order_id: UUID,
@@ -75,10 +85,21 @@ async def get_order(
         200: {"model": APIResponse[Order]},
         404: {"model": OrderNotFoundException},
     },
+    dependencies=[Depends(auth_required)],
 )
 async def update_order(
     update_order_interactor: FromDishka[UpdateOrderUseCase],
     command: UpdateOrderCommand = Depends(),
 ) -> APIResponse[None]:
     await update_order_interactor.execute(command=command)
+    return APIResponse()
+
+
+@router.post("/webhooks/payment")
+async def payment_webhook(
+    request: Request,
+    update_order_interactor: FromDishka[UpdateOrderByWebhookUseCase],
+) -> APIResponse[None]:
+    token = await request.body()
+    await update_order_interactor.execute(token=token.decode())
     return APIResponse()

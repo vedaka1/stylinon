@@ -17,9 +17,9 @@ class OrderServiceInterface(ABC):
     async def update(
         self,
         order_id: UUID,
-        shipping_address: str | None,
-        tracking_number: str | None,
-        status: OrderStatus | None,
+        shipping_address: str | None = None,
+        tracking_number: str | None = None,
+        status: OrderStatus | None = None,
     ) -> None: ...
 
     @abstractmethod
@@ -27,6 +27,9 @@ class OrderServiceInterface(ABC):
 
     @abstractmethod
     async def get_by_id_with_products(self, order_id: UUID) -> Order: ...
+
+    @abstractmethod
+    async def get_by_operation_id(self, operation_id: UUID) -> Order: ...
 
     @abstractmethod
     async def get_by_user_email(self, user_email: str) -> list[Order]: ...

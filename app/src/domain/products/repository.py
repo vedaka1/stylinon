@@ -52,3 +52,9 @@ class ProductRepositoryInterface(ABC):
         price_to: int | None = None,
         units_of_measurement: UnitsOfMesaurement | None = None,
     ) -> int: ...
+
+    @abstractmethod
+    async def get_many_by_ids(
+        self,
+        product_ids: list[UUID],
+    ) -> tuple[list[Product], set[UUID]]: ...

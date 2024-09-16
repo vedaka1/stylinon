@@ -3,15 +3,16 @@ from typing import Annotated
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from src.application.contracts.commands.user import LoginCommand, RegisterCommand
-from src.application.contracts.common.response import APIResponse
-from src.application.contracts.responses.user import UserOut
-from src.application.usecases.auth import (  # UserConfirmationUseCase,
+from src.application.auth.commands import LoginCommand, RegisterCommand
+from src.application.auth.usecases import (  # UserConfirmationUseCase,
     LoginUseCase,
+    LogoutUseCase,
+    RefreshTokenUseCase,
     RegisterUseCase,
 )
-from src.application.usecases.auth.login import LogoutUseCase
-from src.application.usecases.auth.refresh_token import RefreshTokenUseCase
+from src.application.auth.usecases.login import LogoutUseCase
+from src.application.common.response import APIResponse
+from src.application.users.responses import UserOut
 from src.domain.exceptions.auth import (
     TokenExpiredException,
     UserIsNotAuthorizedException,

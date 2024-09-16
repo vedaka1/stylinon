@@ -1,30 +1,27 @@
-from dataclasses import asdict
-from http import client
 from typing import Any, cast
 
 import aiohttp
-import httpx
-from src.application.contracts.common.product import ProductInPayment
-from src.domain.products.entities import Product
-from src.infrastructure.acquiring.interface import AcquiringGatewayInterface
-from src.infrastructure.acquiring.mappers import map_object_to_dict
+from src.application.acquiring.interface import AcquiringGatewayInterface
+from src.application.products.dto import ProductInPaymentDTO
+from src.infrastructure.acquiring.exceptions import (
+    CreatePaymentOperationWithReceiptException,
+)
+from src.infrastructure.acquiring.mappers import map_product_in_payment_to_dict
 
 
 class TochkaAcquiringGateway(AcquiringGatewayInterface):
 
-    error_codes: set[int] = {400, 401, 403, 404, 500}
-
     def __init__(
         self,
         session: aiohttp.ClientSession,
-        base_url: str = "https://enter.tochka.com/sandbox/v2",
     ):
-        self.base_url = base_url
         self.session = session
+        self.base_url = "https://enter.tochka.com/sandbox/v2"
+        self.api_version = "v1.0"
 
     async def get_customer_info(self) -> dict[str, Any]:
         response = await self.session.get(
-            f"{self.base_url}/open-banking/v1.0/customers/123456789",
+            f"{self.base_url}/open-banking/{self.api_version}/customers/123456789",
         )
         if response.status == 200:
             response_data = await response.json()
@@ -35,12 +32,13 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
     async def create_payment_operation_with_receipt(
         self,
         client_email: str,
-        items: list[ProductInPayment],
+        items: list[ProductInPaymentDTO],
         purpose: str = "Перевод за оказанные услуги",
         payment_mode: list[str] = ["sbp", "card"],
         save_card: bool = True,
+        consumerId: str | None = None,
     ) -> dict[str, Any]:
-        amount = sum([item.amount * item.quantity for item in items]) * 100
+        amount = self._calculate_order_amount(products=items)
         request_data = {
             "Data": {
                 "customerCode": 123456789,
@@ -50,21 +48,22 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
                 "failRedirectUrl": "https://example.com/fail",
                 "paymentMode": payment_mode,
                 "saveCard": save_card,
-                # "consumerId": "fedac807-078d-45ac-a43b-5c01c57edbf8",
-                # "taxSystemCode": "osn",
-                # "merchantId": "200000000001056",
+                "taxSystemCode": "osn",
+                "merchantId": "200000000001056",
                 "Client": {
                     "email": client_email,
                 },
-                "Items": [map_object_to_dict(item=item) for item in items],
+                "Items": [map_product_in_payment_to_dict(item=item) for item in items],
             },
         }
+        if consumerId:
+            request_data["Data"]["consumerId"] = consumerId
         response = await self.session.post(
-            f"{self.base_url}/acquiring/v1.0/payments_with_receipt",
+            f"{self.base_url}/acquiring/{self.api_version}/payments_with_receipt",
             json=request_data,
         )
         if response.status == 200:
             response_data = await response.json()
             return cast(dict[str, Any], response_data["Data"])
         else:
-            raise Exception("test")
+            raise CreatePaymentOperationWithReceiptException

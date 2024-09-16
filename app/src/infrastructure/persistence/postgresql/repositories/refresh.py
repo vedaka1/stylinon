@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.application.contracts.common.token import RefreshSession
+from src.application.auth.dto import RefreshSession
 from src.infrastructure.persistence.postgresql.models.auth import (
     RefreshSessionModel,
     map_to_refresh_session,

@@ -2,16 +2,13 @@ from typing import Annotated
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Security
-from src.application.contracts.commands.user import GetUsersListCommand
-from src.application.contracts.common.pagination import (
-    ListPaginatedResponse,
-    PaginationQuery,
-)
-from src.application.contracts.common.response import APIResponse
-from src.application.contracts.common.token import UserTokenData
-from src.application.contracts.responses.order import OrderOut
-from src.application.contracts.responses.user import UserOut
-from src.application.usecases.user.get import (
+from src.application.auth.dto import UserTokenData
+from src.application.common.pagination import ListPaginatedResponse, PaginationQuery
+from src.application.common.response import APIResponse
+from src.application.orders.responses import OrderOut
+from src.application.users.commands import GetUsersListCommand
+from src.application.users.responses import UserOut
+from src.application.users.usecases import (
     GetUserOrdersUseCase,
     GetUsersListUseCase,
     GetUserUseCase,
@@ -54,7 +51,7 @@ async def get_current_user(
     get_user_interactor: FromDishka[GetUserUseCase],
     user_data: Annotated[
         UserTokenData,
-        Security(get_current_user_data, scopes=["user"]),
+        Security(get_current_user_data, scopes=[]),
     ],
 ) -> APIResponse[UserOut]:
     response = await get_user_interactor.execute(user_id=user_data.user_id)

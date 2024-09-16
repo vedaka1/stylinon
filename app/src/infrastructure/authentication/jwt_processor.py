@@ -1,10 +1,11 @@
+import json
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 import jwt
+from src.application.auth.dto import UserTokenData
 from src.application.common.jwt_processor import JwtTokenProcessorInterface, TokenType
-from src.application.contracts.common.token import UserTokenData
 from src.domain.exceptions.auth import TokenExpiredException, WrongTokenTypeException
 from src.domain.exceptions.base import ApplicationException
 from src.domain.users.entities import UserRole
@@ -46,7 +47,7 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         payload["type"] = token_type.value
         encoded_jwt = jwt.encode(
             payload=payload,
-            key=settings.jwt.PRIVATE_KEY,
+            key=self._convert_key_to_valid_string(settings.jwt.PRIVATE_KEY),
             algorithm=settings.jwt.ALGORITHM,
         )
         return f"Bearer {encoded_jwt}"
@@ -55,8 +56,8 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         """Returns a user id from token."""
         try:
             payload = jwt.decode(
-                token,
-                settings.jwt.PUBLIC_KEY,
+                jwt=token,
+                key=settings.jwt.PUBLIC_KEY,
                 algorithms=[settings.jwt.ALGORITHM],
             )
             user_id = payload.get("sub")
@@ -65,14 +66,11 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
             token_type = payload.get("type")
             if token_type == TokenType.REFRESH.value:
                 raise WrongTokenTypeException
-            if datetime.fromtimestamp(payload.get("exp")) <= datetime.now():
-                raise TokenExpiredException
             return UserTokenData(
                 user_id=UUID(user_id),
                 email=user_email,
                 role=user_role,
             )
-
         except jwt.ExpiredSignatureError:
             raise TokenExpiredException
         except (jwt.DecodeError, ValueError, KeyError):
@@ -82,19 +80,29 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         """Returns a user id from token."""
         try:
             payload = jwt.decode(
-                token,
-                settings.jwt.PUBLIC_KEY,
+                jwt=token,
+                key=settings.jwt.PUBLIC_KEY,
                 algorithms=[settings.jwt.ALGORITHM],
             )
             user_id = payload.get("sub")
             token_type = payload.get("type")
             if token_type == TokenType.ACCESS.value:
                 raise WrongTokenTypeException
-            if datetime.fromtimestamp(payload.get("exp")) <= datetime.now():
-                raise TokenExpiredException
             return UUID(user_id)
 
         except jwt.ExpiredSignatureError:
             raise TokenExpiredException
+        except (jwt.DecodeError, ValueError, KeyError):
+            raise ApplicationException
+
+    def validate_acquiring_token(self, token: str) -> dict[str, Any]:
+        try:
+            jwk_key = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
+            payload = jwt.decode(
+                jwt=token,
+                key=jwk_key,
+                algorithms=[settings.tochka.ALGORITHM],
+            )
+            return cast(dict[str, Any], payload)
         except (jwt.DecodeError, ValueError, KeyError):
             raise ApplicationException

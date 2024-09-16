@@ -30,7 +30,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
             created_at=order.created_at,
             updated_at=order.updated_at,
             shipping_address=order.shipping_address,
-            transaction_id=order.transaction_id,
+            operation_id=order.operation_id,
             tracking_number=order.tracking_number,
             status=order.status,
         )
@@ -71,13 +71,25 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         )
         cursor = await self.session.execute(query)
         entity = cursor.scalar_one_or_none()
-        return map_to_order(entity, with_products=True) if entity else None
+        return map_to_order(entity, with_relations=True) if entity else None
+
+    async def get_by_operation_id(self, operation_id: UUID) -> Order | None:
+        query = select(OrderModel).where(OrderModel.operation_id == operation_id)
+        cursor = await self.session.execute(query)
+        entity = cursor.scalar_one_or_none()
+        return map_to_order(entity) if entity else None
 
     async def get_by_user_email(self, user_email: str) -> list[Order]:
-        query = select(OrderModel).where(OrderModel.user_email == user_email)
+        query = (
+            select(OrderModel)
+            .options(
+                selectinload(OrderModel.order_items).joinedload(OrderItemModel.product),
+            )
+            .where(OrderModel.user_email == user_email)
+        )
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
-        return [map_to_order(entity) for entity in entities]
+        return [map_to_order(entity, with_relations=True) for entity in entities]
 
     async def get_many(
         self,
@@ -97,7 +109,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
 
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
-        return [map_to_order(entity, with_products=True) for entity in entities]
+        return [map_to_order(entity, with_relations=True) for entity in entities]
 
 
 class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):

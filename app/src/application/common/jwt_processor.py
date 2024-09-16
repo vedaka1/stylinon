@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from src.application.contracts.common.token import UserTokenData
+from src.application.auth.dto import UserTokenData
 from src.domain.users.entities import UserRole
 
 
@@ -37,3 +37,11 @@ class JwtTokenProcessorInterface(ABC):
 
     @abstractmethod
     def validate_refresh_token(self, token: str) -> UUID: ...
+
+    @abstractmethod
+    def validate_acquiring_token(self, token: str) -> dict[str, Any]: ...
+
+    @staticmethod
+    def _convert_key_to_valid_string(key: str) -> str:
+        new_key = key.replace("\\n", "\n")
+        return new_key

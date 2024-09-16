@@ -3,6 +3,8 @@ from src.infrastructure.utils.common import get_env_var
 
 class TochkaBankSettings:
     TOKEN: str = get_env_var("TOCHKA_TOKEN", to_cast=str, default="working_token")
+    PUBLIC_KEY: str = get_env_var("ACQUIRING_PUBLIC_KEY", to_cast=str)
+    ALGORITHM: str = get_env_var("ACQUIRING_ALGORITHM", to_cast=str, default="RS256")
 
 
 class DatabaseSettings:

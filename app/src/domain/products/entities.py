@@ -40,3 +40,6 @@ class Product:
             price=price,
             units_of_measurement=units_of_measurement,
         )
+
+    def __hash__(self) -> int:
+        return hash(self.id)

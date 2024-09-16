@@ -26,7 +26,7 @@ class OrderModel(Base):
         nullable=False,
     )
     shipping_address: Mapped[str] = mapped_column(nullable=False)
-    transaction_id: Mapped[UUID] = mapped_column(nullable=False)
+    operation_id: Mapped[UUID] = mapped_column(nullable=False)
     tracking_number: Mapped[str] = mapped_column(nullable=True)
     status: Mapped[OrderStatus] = mapped_column(nullable=False)
 
@@ -38,18 +38,18 @@ class OrderModel(Base):
         return f"OrderModel({self.__dict__})"
 
 
-def map_to_order(entity: OrderModel, with_products: bool = False) -> Order:
+def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
     order = Order(
         id=entity.id,
         user_email=entity.user_email,
         created_at=entity.created_at,
         updated_at=entity.updated_at,
         shipping_address=entity.shipping_address,
-        transaction_id=entity.transaction_id,
+        operation_id=entity.operation_id,
         tracking_number=entity.tracking_number,
         status=entity.status,
     )
-    if with_products:
+    if with_relations:
         order.items = [
             map_to_order_item(order_item) for order_item in entity.order_items
         ]

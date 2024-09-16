@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import TIMESTAMP, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
-from src.application.contracts.common.token import RefreshSession
+from src.application.auth.dto import RefreshSession
 from src.infrastructure.persistence.postgresql.models.base import Base
 
 

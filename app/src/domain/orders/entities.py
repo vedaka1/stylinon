@@ -26,7 +26,7 @@ class Order:
     created_at: datetime
     updated_at: datetime
     shipping_address: str
-    transaction_id: UUID
+    operation_id: UUID
     tracking_number: str | None
     status: OrderStatus
 
@@ -35,7 +35,7 @@ class Order:
     @staticmethod
     def create(
         user_email: str,
-        transaction_id: UUID,
+        operation_id: UUID,
         shipping_address: str,
         *,
         status: OrderStatus = OrderStatus.CREATED,
@@ -47,7 +47,7 @@ class Order:
             created_at=current_date,
             updated_at=current_date,
             shipping_address=shipping_address,
-            transaction_id=transaction_id,
+            operation_id=operation_id,
             tracking_number=None,
             status=status,
         )

@@ -146,3 +146,15 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         cursor = await self.session.execute(query)
         count = cursor.scalar_one_or_none()
         return count if count else 0
+
+    async def get_many_by_ids(
+        self,
+        product_ids: list[UUID],
+    ) -> tuple[list[Product], set[UUID]]:
+        """Returns a tuple with a list of existing products and a set of missing products, if any"""
+        query = select(ProductModel).filter(ProductModel.id.in_(product_ids))
+        cursor = await self.session.execute(query)
+        entities = cursor.scalars().all()
+        existing_products_ids = {product.id for product in entities}
+        missing_products_ids = set(product_ids) - existing_products_ids
+        return [map_to_product(entity) for entity in entities], missing_products_ids

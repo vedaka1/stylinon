@@ -23,6 +23,9 @@ class OrderRepositoryInterface(ABC):
     async def get_by_id_with_products(self, order_id: UUID) -> Order | None: ...
 
     @abstractmethod
+    async def get_by_operation_id(self, operation_id: UUID) -> Order | None: ...
+
+    @abstractmethod
     async def get_by_user_email(self, user_email: str) -> list[Order]: ...
 
     @abstractmethod
