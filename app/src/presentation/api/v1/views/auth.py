@@ -4,6 +4,11 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from src.application.auth.commands import LoginCommand, RegisterCommand
+from src.application.auth.exceptions import (
+    NotAuthorizedException,
+    TokenExpiredException,
+    WrongTokenTypeException,
+)
 from src.application.auth.usecases import (  # UserConfirmationUseCase,
     LoginUseCase,
     LogoutUseCase,
@@ -13,12 +18,7 @@ from src.application.auth.usecases import (  # UserConfirmationUseCase,
 from src.application.auth.usecases.login import LogoutUseCase
 from src.application.common.response import APIResponse
 from src.application.users.responses import UserOut
-from src.domain.exceptions.auth import (
-    TokenExpiredException,
-    UserIsNotAuthorizedException,
-    WrongTokenTypeException,
-)
-from src.domain.exceptions.user import (
+from src.domain.users.exceptions import (
     UserAlreadyExistsException,
     UserInvalidCredentialsException,
 )
@@ -65,14 +65,14 @@ async def login(
     user, token = await login_interactor.execute(command=command)
     response.set_cookie(
         "access_token",
-        token.access_token,
+        value=token.type + token.access_token,
         max_age=token.access_max_age,
         httponly=True,
         secure=True,
     )
     response.set_cookie(
         "refresh_token",
-        token.refresh_token,
+        value=token.type + token.access_token,
         max_age=token.refresh_max_age,
         httponly=True,
         secure=True,
@@ -97,14 +97,14 @@ async def refresh(
     token = await refresh_interactor.execute(refresh_token=refresh_token)
     response.set_cookie(
         "access_token",
-        token.access_token,
+        value=token.type + token.access_token,
         max_age=token.access_max_age,
         httponly=True,
         secure=True,
     )
     response.set_cookie(
         "refresh_token",
-        token.refresh_token,
+        value=token.type + token.access_token,
         max_age=token.refresh_max_age,
         httponly=True,
         secure=True,
@@ -117,7 +117,7 @@ async def refresh(
     summary="Logout",
     responses={
         200: {"model": APIResponse[None]},
-        401: {"model": UserIsNotAuthorizedException},
+        401: {"model": NotAuthorizedException},
     },
 )
 async def logout(

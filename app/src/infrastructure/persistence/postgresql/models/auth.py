@@ -17,7 +17,7 @@ class RefreshSessionModel(Base):
         nullable=False,
     )
     expires_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
+        TIMESTAMP(timezone=False),
         nullable=False,
     )
 

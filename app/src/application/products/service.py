@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from uuid import UUID
 
-from src.domain.exceptions.products import ProductNotFoundException
 from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.service import ProductServiceInterface
 

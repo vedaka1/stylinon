@@ -4,7 +4,7 @@ from typing import cast
 from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
 from src.application.common.response import ErrorAPIResponse
-from src.domain.exceptions.base import ApplicationException
+from src.domain.common.exceptions.base import ApplicationException
 from starlette.types import ExceptionHandler
 
 logger = logging.getLogger()

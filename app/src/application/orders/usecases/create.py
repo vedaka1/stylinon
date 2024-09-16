@@ -1,14 +1,13 @@
 from dataclasses import dataclass
-from uuid import uuid4
 
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.transaction import TransactionManagerInterface
 from src.application.orders.commands import CreateOrderCommand
 from src.application.orders.responses import CreateOrderResponse
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
-from src.domain.exceptions.products import ManyProductsNotFoundException
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.service import OrderItemServiceInterface, OrderServiceInterface
+from src.domain.products.exceptions import ManyProductsNotFoundException
 from src.domain.products.service import ProductServiceInterface
 
 # from src.infrastructure.acquiring.interface import AcquiringGatewayInterface
@@ -23,7 +22,6 @@ class CreateOrderUseCase:
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateOrderCommand) -> CreateOrderResponse:
-        # raise Exception("Not implemented")
         products, missing_products = await self.products_service.get_many_by_ids(
             product_ids=[item.id for item in command.items],
         )

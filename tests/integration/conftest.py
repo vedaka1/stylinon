@@ -14,7 +14,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.common.response import ErrorAPIResponse
-from src.domain.exceptions.base import ApplicationException
+from src.domain.common.exceptions.base import ApplicationException
 from src.infrastructure.di.container import (
     DatabaseAdaptersProvider,
     DatabaseConfigurationProvider,

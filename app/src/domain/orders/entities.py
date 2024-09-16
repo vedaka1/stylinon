@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID, uuid4
 
-from src.domain.exceptions.order import OrderItemIncorrectQuantityException
+from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import Product
 
 

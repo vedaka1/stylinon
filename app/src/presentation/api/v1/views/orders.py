@@ -17,11 +17,11 @@ from src.application.orders.usecases import (
     UpdateOrderByWebhookUseCase,
     UpdateOrderUseCase,
 )
-from src.domain.exceptions.order import (
+from src.domain.orders.entities import Order
+from src.domain.orders.exceptions import (
     OrderItemIncorrectQuantityException,
     OrderNotFoundException,
 )
-from src.domain.orders.entities import Order
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
 router = APIRouter(

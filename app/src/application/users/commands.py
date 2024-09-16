@@ -7,21 +7,6 @@ from src.domain.users.entities import User
 
 
 @dataclass
-class RegisterCommand:
-    email: EmailStr
-    password: str
-    mobile_phone: str | None = None
-    first_name: str | None = None
-    last_name: str | None = None
-
-
-@dataclass
-class LoginCommand:
-    password: str
-    username: str
-
-
-@dataclass
 class GetUserCommand:
     user_id: UUID
 

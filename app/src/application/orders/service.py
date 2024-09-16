@@ -2,8 +2,8 @@ from datetime import date
 from uuid import UUID
 
 from src.application.common.jwt_processor import JwtTokenProcessorInterface
-from src.domain.exceptions.order import OrderNotFoundException
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
+from src.domain.orders.exceptions import OrderNotFoundException
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,

@@ -18,11 +18,11 @@ class OrderModel(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
     user_email: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
+        TIMESTAMP(timezone=False),
         nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
+        TIMESTAMP(timezone=False),
         nullable=False,
     )
     shipping_address: Mapped[str] = mapped_column(nullable=False)

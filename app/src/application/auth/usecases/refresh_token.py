@@ -12,7 +12,6 @@ class RefreshTokenUseCase:
 
     async def execute(self, refresh_token: str) -> Token:
         try:
-            token = await self.auth_service.refresh(refresh_token)
-            return token
+            return await self.auth_service.refresh(refresh_token)
         finally:
             await self.transaction_manager.commit()

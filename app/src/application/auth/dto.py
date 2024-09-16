@@ -21,6 +21,10 @@ class RefreshSession:
     refresh_token: str
     expires_at: datetime
 
+    def __post_init__(self) -> None:
+        token = self.refresh_token.removeprefix("Bearer ")
+        self.refresh_token = token
+
     @staticmethod
     def create(user_id: UUID, refresh_token: str) -> "RefreshSession":
         return RefreshSession(

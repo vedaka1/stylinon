@@ -1,7 +1,10 @@
 from uuid import UUID
 
-from src.domain.exceptions.user import UserAlreadyExistsException, UserNotFoundException
 from src.domain.users.entities import User
+from src.domain.users.exceptions import (
+    UserAlreadyExistsException,
+    UserNotFoundException,
+)
 from src.domain.users.repository import UserRepositoryInterface
 from src.domain.users.service import UserServiceInterface
 

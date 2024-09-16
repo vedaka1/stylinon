@@ -40,8 +40,3 @@ class JwtTokenProcessorInterface(ABC):
 
     @abstractmethod
     def validate_acquiring_token(self, token: str) -> dict[str, Any]: ...
-
-    @staticmethod
-    def _convert_key_to_valid_string(key: str) -> str:
-        new_key = key.replace("\\n", "\n")
-        return new_key

@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.domain.exceptions.order import OrderItemIncorrectQuantityException
+from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import UnitsOfMesaurement
 
 

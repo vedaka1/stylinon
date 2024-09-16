@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from src.domain.exceptions.base import ApplicationException
+from src.domain.common.exceptions.base import ApplicationException
 
 
 @dataclass

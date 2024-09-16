@@ -4,15 +4,39 @@ from typing import Any, cast
 from uuid import UUID
 
 import jwt
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.asymmetric.types import (
+    PrivateKeyTypes,
+    PublicKeyTypes,
+)
 from src.application.auth.dto import UserTokenData
+from src.application.auth.exceptions import (
+    TokenExpiredException,
+    WrongTokenTypeException,
+)
 from src.application.common.jwt_processor import JwtTokenProcessorInterface, TokenType
-from src.domain.exceptions.auth import TokenExpiredException, WrongTokenTypeException
-from src.domain.exceptions.base import ApplicationException
+from src.domain.common.exceptions.base import ApplicationException
 from src.domain.users.entities import UserRole
 from src.infrastructure.settings import settings
 
 
+def load_rsa_private_key() -> RSAPrivateKey:
+    key = settings.jwt.PRIVATE_KEY
+    formatted_key = key.replace("\\n", "\n")
+    rsa_key = serialization.load_pem_private_key(
+        data=formatted_key.encode(),
+        password=None,
+        backend=default_backend(),
+    )
+    return cast(RSAPrivateKey, rsa_key)
+
+
 class JwtTokenProcessor(JwtTokenProcessorInterface):
+
+    private_key: RSAPrivateKey = load_rsa_private_key()
+    jwk_key: jwt.PyJWK = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
 
     def create_access_token(
         self,
@@ -47,10 +71,22 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         payload["type"] = token_type.value
         encoded_jwt = jwt.encode(
             payload=payload,
-            key=self._convert_key_to_valid_string(settings.jwt.PRIVATE_KEY),
+            key=self.private_key,
             algorithm=settings.jwt.ALGORITHM,
         )
-        return f"Bearer {encoded_jwt}"
+        return encoded_jwt
+
+        # try:
+        #     with ThreadPoolExecutor(max_workers=7) as executor:
+        #         token = executor.submit(
+        #             jwt.encode,
+        #             payload=payload,
+        #             key=self.key,
+        #             algorithm=settings.jwt.ALGORITHM,
+        #         ).result(5)
+        #         return token
+        # except:
+        #     raise ApplicationException
 
     def validate_access_token(self, token: str) -> UserTokenData:
         """Returns a user id from token."""
@@ -97,10 +133,10 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
 
     def validate_acquiring_token(self, token: str) -> dict[str, Any]:
         try:
-            jwk_key = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
+
             payload = jwt.decode(
                 jwt=token,
-                key=jwk_key,
+                key=self.jwk_key,
                 algorithms=[settings.tochka.ALGORITHM],
             )
             return cast(dict[str, Any], payload)

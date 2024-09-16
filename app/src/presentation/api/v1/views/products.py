@@ -15,8 +15,8 @@ from src.application.products.usecases import (
     GetManyProductsUseCase,
     GetProductUseCase,
 )
-from src.domain.exceptions.products import ProductNotFoundException
 from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.domain.products.exceptions import ProductNotFoundException
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
 router = APIRouter(

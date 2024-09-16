@@ -1,8 +1,8 @@
 import pytest
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
-from src.domain.exceptions.order import OrderItemIncorrectQuantityException
-from src.domain.exceptions.products import ProductIncorrectPriceException
+from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.domain.products.exceptions import ProductIncorrectPriceException
 
 
 def test_success_create_product() -> None:

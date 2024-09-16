@@ -2,18 +2,18 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from src.application.auth.dto import RefreshSession, Token
-from src.application.common.jwt_processor import JwtTokenProcessorInterface
-from src.application.common.password_hasher import PasswordHasherInterface
-from src.domain.exceptions.auth import (
+from src.application.auth.exceptions import (
     RefreshTokenNotFoundException,
     TokenExpiredException,
 )
-from src.domain.exceptions.user import (
+from src.application.common.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.password_hasher import PasswordHasherInterface
+from src.domain.users.entities import User
+from src.domain.users.exceptions import (
     UserAlreadyExistsException,
     UserInvalidCredentialsException,
     UserNotFoundException,
 )
-from src.domain.users.entities import User
 from src.domain.users.repository import UserRepositoryInterface
 from src.infrastructure.persistence.postgresql.repositories.refresh import (
     RefreshTokenRepositoryInterface,
