@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 from src.application.acquiring.dto import AcquiringWebhookType
 from src.application.acquiring.exceptions import IncorrectAcqioringWebhookTypeException
-from src.application.common.acquiring import AcquiringServiceInterface
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.acquiring import AcquiringServiceInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import UpdateOrderCommand
 from src.domain.orders.entities import OrderStatus
 from src.domain.orders.service import OrderServiceInterface

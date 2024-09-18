@@ -15,10 +15,10 @@ from src.application.auth.usecases import (
     RefreshTokenUseCase,
     RegisterUseCase,
 )
-from src.application.common.acquiring import AcquiringServiceInterface
-from src.application.common.jwt_processor import JwtTokenProcessorInterface
-from src.application.common.password_hasher import PasswordHasherInterface
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.acquiring import AcquiringServiceInterface
+from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.password_hasher import PasswordHasherInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.service import OrderItemService, OrderService
 from src.application.orders.usecases import (
     CreateOrderUseCase,

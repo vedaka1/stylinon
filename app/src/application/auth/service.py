@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 
 from src.application.auth.dto import RefreshSession, Token
 from src.application.auth.exceptions import (
     RefreshTokenNotFoundException,
     TokenExpiredException,
 )
-from src.application.common.jwt_processor import JwtTokenProcessorInterface
-from src.application.common.password_hasher import PasswordHasherInterface
+from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.domain.users.entities import User
 from src.domain.users.exceptions import (
     UserAlreadyExistsException,
@@ -118,9 +117,11 @@ class AuthService(AuthServiceInterface):
         return None
 
     async def refresh(self, refresh_token: str) -> Token:
+        print(refresh_token)
         refresh_session = await self.refresh_token_repository.get(
             refresh_token=refresh_token,
         )
+        print(refresh_session)
         if not refresh_session:
             raise RefreshTokenNotFoundException
         try:

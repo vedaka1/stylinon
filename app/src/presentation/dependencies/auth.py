@@ -1,5 +1,4 @@
 from typing import Annotated, Dict, Optional
-from uuid import UUID
 
 from dishka import AsyncContainer
 from fastapi import Depends, Request
@@ -12,7 +11,7 @@ from src.application.auth.exceptions import (
     NotAuthorizedException,
     NotEnoughPermissionsException,
 )
-from src.application.common.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
 from src.infrastructure.di.container import get_container
 
 

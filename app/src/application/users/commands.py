@@ -32,3 +32,8 @@ class GetUsersListCommand:
 class UserConfirmationCommand:
     id: UUID
     code: UUID
+
+
+@dataclass
+class GetUserBySessionCommand:
+    session_id: UUID

@@ -1,6 +1,7 @@
 import logging
+from typing import Any
 
-logger_config_dict = {
+logger_config_dict: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {

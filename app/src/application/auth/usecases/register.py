@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from src.application.auth.commands import RegisterCommand
 from src.application.auth.service import AuthServiceInterface
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 
 logger = logging.getLogger()
 

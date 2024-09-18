@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.products.commands import CreateProductCommand
 from src.domain.products.entities import Product
 from src.domain.products.service import ProductServiceInterface

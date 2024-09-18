@@ -1,8 +1,8 @@
 from typing import Any
 
 from src.application.acquiring.interface import AcquiringGatewayInterface
-from src.application.common.acquiring import AcquiringServiceInterface
-from src.application.common.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.acquiring import AcquiringServiceInterface
+from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
 from src.application.products.dto import ProductInPaymentDTO
 
 

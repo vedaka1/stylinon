@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from re import T
 from typing import Any, Generic, Mapping, TypeVar
 
 from fastapi.responses import ORJSONResponse
@@ -25,5 +24,9 @@ class ErrorAPIResponse(ORJSONResponse):
         media_type: str | None = None,
         background: BackgroundTask | None = None,
     ) -> None:
-        content = {"ok": False, "error_code": status_code, "details": details}
+        content: dict[str, Any] = {
+            "ok": False,
+            "error_code": status_code,
+            "details": details,
+        }
         super().__init__(content, status_code, headers, media_type, background)

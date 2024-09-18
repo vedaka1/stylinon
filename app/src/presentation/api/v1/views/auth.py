@@ -3,7 +3,12 @@ from typing import Annotated
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from src.application.auth.commands import LoginCommand, RegisterCommand
+from src.application.auth.commands import (
+    LoginCommand,
+    LogoutCommand,
+    RefreshTokenCommand,
+    RegisterCommand,
+)
 from src.application.auth.exceptions import (
     NotAuthorizedException,
     TokenExpiredException,
@@ -72,7 +77,7 @@ async def login(
     )
     response.set_cookie(
         "refresh_token",
-        value=token.type + token.access_token,
+        value=token.type + token.refresh_token,
         max_age=token.refresh_max_age,
         httponly=True,
         secure=True,
@@ -94,7 +99,8 @@ async def refresh(
     refresh_interactor: FromDishka[RefreshTokenUseCase],
     refresh_token: Annotated[str, Depends(get_refresh_token)],
 ) -> APIResponse[None]:
-    token = await refresh_interactor.execute(refresh_token=refresh_token)
+    command = RefreshTokenCommand(refresh_token=refresh_token)
+    token = await refresh_interactor.execute(command=command)
     response.set_cookie(
         "access_token",
         value=token.type + token.access_token,
@@ -104,7 +110,7 @@ async def refresh(
     )
     response.set_cookie(
         "refresh_token",
-        value=token.type + token.access_token,
+        value=token.type + token.refresh_token,
         max_age=token.refresh_max_age,
         httponly=True,
         secure=True,
@@ -125,7 +131,8 @@ async def logout(
     logout_interactor: FromDishka[LogoutUseCase],
     refresh_token: Annotated[str, Depends(get_refresh_token)],
 ) -> APIResponse[None]:
-    await logout_interactor.execute(refresh_token=refresh_token)
+    command = LogoutCommand(refresh_token=refresh_token)
+    await logout_interactor.execute(command=command)
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return APIResponse()

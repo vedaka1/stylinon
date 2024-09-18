@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timedelta, timezone
 from typing import Any, cast
 from uuid import UUID
@@ -7,16 +6,15 @@ import jwt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
-from cryptography.hazmat.primitives.asymmetric.types import (
-    PrivateKeyTypes,
-    PublicKeyTypes,
-)
 from src.application.auth.dto import UserTokenData
 from src.application.auth.exceptions import (
     TokenExpiredException,
     WrongTokenTypeException,
 )
-from src.application.common.jwt_processor import JwtTokenProcessorInterface, TokenType
+from src.application.common.interfaces.jwt_processor import (
+    JwtTokenProcessorInterface,
+    TokenType,
+)
 from src.domain.common.exceptions.base import ApplicationException
 from src.domain.users.entities import UserRole
 from src.infrastructure.settings import settings
@@ -44,7 +42,7 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         user_role: UserRole,
         email: str,
     ) -> str:
-        payload = {
+        payload: dict[str, Any] = {
             "sub": str(user_id),
             "role": str(user_role.value),
             "email": str(email),
@@ -57,7 +55,7 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         )
 
     def create_refresh_token(self, user_id: UUID) -> str:
-        payload = {
+        payload: dict[str, Any] = {
             "sub": str(user_id),
             "exp": datetime.now(timezone.utc)
             + timedelta(days=settings.jwt.REFRESH_TOKEN_EXPIRE_DAYS),

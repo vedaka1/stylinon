@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 
 
 @dataclass

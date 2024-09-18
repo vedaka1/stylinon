@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from pydantic import EmailStr
 
@@ -16,3 +17,13 @@ class RegisterCommand:
 class LoginCommand:
     password: str
     username: str
+
+
+@dataclass
+class LogoutCommand:
+    refresh_token: str
+
+
+@dataclass
+class RefreshTokenCommand:
+    refresh_token: str

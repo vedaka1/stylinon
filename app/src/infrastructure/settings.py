@@ -52,5 +52,11 @@ class Settings:
     jwt: JwtSettings = JwtSettings()
     tochka: TochkaBankSettings = TochkaBankSettings()
 
+    SESSION_MAX_AGE_DAYS: int = get_env_var(
+        "SESSION_MAX_AGE_DAYS",
+        to_cast=int,
+        default=30,
+    )
+
 
 settings = Settings()

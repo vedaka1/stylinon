@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from uuid import UUID
 
-from src.domain.users.entities import User
+from src.domain.users.entities import User, UserSession
 
 
 class UserPrimaryKey(Enum):
@@ -40,3 +40,21 @@ class UserRepositoryInterface(ABC):
 
     @abstractmethod
     async def count(self, search: str | None = None) -> int: ...
+
+
+class UserSessionRepositoryInterface(ABC):
+
+    @abstractmethod
+    async def create(self, session: UserSession) -> None: ...
+
+    @abstractmethod
+    async def update(self, session: UserSession) -> None: ...
+
+    @abstractmethod
+    async def delete(self, session_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def get_by_id(self, session_id: UUID) -> UserSession | None: ...
+
+    @abstractmethod
+    async def get_by_user_id(self, user_id: UUID) -> list[UserSession]: ...

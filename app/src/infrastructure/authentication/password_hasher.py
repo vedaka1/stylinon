@@ -1,7 +1,7 @@
 from typing import cast
 
 from passlib.context import CryptContext
-from src.application.common.password_hasher import PasswordHasherInterface
+from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

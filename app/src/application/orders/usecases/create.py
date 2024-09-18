@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.application.acquiring.interface import AcquiringGatewayInterface
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import CreateOrderCommand
 from src.application.orders.responses import CreateOrderResponse
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
