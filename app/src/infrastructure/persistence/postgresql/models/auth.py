@@ -20,6 +20,7 @@ class RefreshSessionModel(Base):
         TIMESTAMP(timezone=False),
         nullable=False,
     )
+    user_agent: Mapped[str] = mapped_column(nullable=False)
 
     def __repr__(self) -> str:
         return f"RefreshSessionModel({self.__dict__})"
@@ -30,4 +31,5 @@ def map_to_refresh_session(entity: RefreshSessionModel) -> RefreshSession:
         refresh_token=entity.refresh_token,
         user_id=entity.user_id,
         expires_at=entity.expires_at,
+        user_agent=entity.user_agent,
     )

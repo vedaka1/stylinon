@@ -2,6 +2,7 @@ import asyncio
 import logging
 from abc import ABC, abstractmethod
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from smtplib import SMTP, SMTP_SSL
 
@@ -31,7 +32,12 @@ logger = logging.getLogger()
 class AuthServiceInterface(ABC):
 
     @abstractmethod
-    async def login(self, username: str, password: str) -> tuple[User, Token]: ...
+    async def login(
+        self,
+        username: str,
+        password: str,
+        user_agent: str,
+    ) -> tuple[User, Token]: ...
 
     @abstractmethod
     async def logout(self, refresh_token: str) -> None: ...
@@ -41,9 +47,9 @@ class AuthServiceInterface(ABC):
         self,
         email: str,
         password: str,
-        mobile_phone: str | None,
-        first_name: str | None,
-        last_name: str | None,
+        mobile_phone: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
     ) -> None: ...
 
     @abstractmethod
@@ -79,7 +85,12 @@ class AuthService(AuthServiceInterface):
         self.jwt_processor = jwt_processor
         self.smtp_server = smtp_server
 
-    async def login(self, username: str, password: str) -> tuple[User, Token]:
+    async def login(
+        self,
+        username: str,
+        password: str,
+        user_agent: str,
+    ) -> tuple[User, Token]:
         user = await self.user_repository.get_by_email(email=username)
         if not user:
             raise UserNotFoundException
@@ -93,10 +104,26 @@ class AuthService(AuthServiceInterface):
             user_role=user.role,
             email=user.email,
         )
+        current_session = (
+            await self.refresh_token_repository.get_by_user_id_and_user_agent(
+                user_id=user.id,
+                user_agent=user_agent,
+            )
+        )
+        if current_session:
+            max_age = current_session.expires_at - datetime.now()
+            token = Token(
+                access_token=access_token,
+                refresh_token=current_session.refresh_token,
+                access_max_age=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                refresh_max_age=int(max_age.total_seconds()),
+            )
+            return user, token
         refresh_token = self.jwt_processor.create_refresh_token(user_id=user.id)
         refresh_session = RefreshSession.create(
             refresh_token=refresh_token,
             user_id=user.id,
+            user_agent=user_agent,
         )
         await self.refresh_token_repository.create(refresh_session=refresh_session)
         token = Token(
@@ -115,9 +142,9 @@ class AuthService(AuthServiceInterface):
         self,
         email: str,
         password: str,
-        mobile_phone: str | None,
-        first_name: str | None,
-        last_name: str | None,
+        mobile_phone: str | None = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
     ) -> None:
         user_exist = await self.user_repository.get_by_email(email=email)
         if user_exist:
@@ -134,11 +161,9 @@ class AuthService(AuthServiceInterface):
         return None
 
     async def refresh(self, refresh_token: str) -> Token:
-        print(refresh_token)
         refresh_session = await self.refresh_token_repository.get(
             refresh_token=refresh_token,
         )
-        print(refresh_session)
         if not refresh_session:
             raise RefreshTokenNotFoundException
         try:
@@ -161,6 +186,7 @@ class AuthService(AuthServiceInterface):
         new_refresh_session = RefreshSession.create(
             refresh_token=new_refresh_token,
             user_id=user.id,
+            user_agent=refresh_session.user_agent,
         )
         await self.refresh_token_repository.delete_by_token(
             refresh_token=refresh_session.refresh_token,
@@ -181,6 +207,7 @@ class AuthService(AuthServiceInterface):
         hashed_password = self.password_hasher.hash(password=new_password)
         user.hashed_password = hashed_password
         await self.user_repository.update(user=user)
+        await self.refresh_token_repository.delete_by_user_id(user_id=user.id)
         return None
 
     async def send_recovery_email(self, email: str) -> None:

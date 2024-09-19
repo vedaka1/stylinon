@@ -16,6 +16,7 @@ class LoginUseCase:
         user, token = await self.auth_service.login(
             username=command.username,
             password=command.password,
+            user_agent=command.user_agent,
         )
         user_out = UserOut(
             id=str(user.id),

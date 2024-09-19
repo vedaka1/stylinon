@@ -48,7 +48,7 @@ class UserSession:
     user_id: UUID
     created_at: datetime
     expires_in: datetime
-    user_agent: str
+    user_agent: str | None
 
     user: User | None = None
 

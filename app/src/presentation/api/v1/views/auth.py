@@ -3,6 +3,7 @@ from typing import Annotated
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 from src.application.auth.commands import (
     LoginCommand,
     LogoutCommand,
@@ -65,10 +66,18 @@ async def register(
 )
 async def login(
     login_interactor: FromDishka[LoginUseCase],
+    request: Request,
     response: Response,
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> APIResponse[UserOut]:
-    command = LoginCommand(password=credentials.password, username=credentials.username)
+    user_agent = request.headers.get("user-agent")
+    if not user_agent:
+        user_agent = "none"
+    command = LoginCommand(
+        password=credentials.password,
+        username=credentials.username,
+        user_agent=user_agent,
+    )
     user, token = await login_interactor.execute(command=command)
     response.set_cookie(
         "access_token",
@@ -142,13 +151,11 @@ async def logout(
 
 @router.post("/password-recovery/{email}", summary="Отправить email для сброса пароля")
 async def password_recovery(
-    request: Request,
-    email: str,
+    email: EmailStr,
     password_recovery_interactor: FromDishka[PasswordRecoveryUseCase],
 ) -> APIResponse[None]:
-    data = request.headers.items()
-    # await password_recovery_interactor.execute(email=email)
-    return APIResponse(data=data)
+    await password_recovery_interactor.execute(email=email)
+    return APIResponse()
 
 
 @router.post("/reset-password", summary="")

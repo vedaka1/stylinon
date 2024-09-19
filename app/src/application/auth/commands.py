@@ -17,6 +17,7 @@ class RegisterCommand:
 class LoginCommand:
     password: str
     username: str
+    user_agent: str
 
 
 @dataclass

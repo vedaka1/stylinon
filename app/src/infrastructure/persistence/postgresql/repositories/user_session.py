@@ -40,6 +40,11 @@ class SqlalchemyUserSessionRepository(UserSessionRepositoryInterface):
         await self.session.execute(query)
         return None
 
+    async def delete_by_user_id(self, user_id: UUID) -> None:
+        query = delete(UserSessionModel).where(UserSessionModel.user_id == user_id)
+        await self.session.execute(query)
+        return None
+
     async def get_by_id(self, session_id: UUID) -> UserSession | None:
         query = (
             select(UserSessionModel)
