@@ -13,6 +13,7 @@ from src.application.users.usecases import (
     GetUsersListUseCase,
     GetUserUseCase,
 )
+from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import get_current_user_data
 
 router = APIRouter(
@@ -38,7 +39,7 @@ async def get_users(
     get_users_list_interactor: FromDishka[GetUsersListUseCase],
     user_data: Annotated[
         UserTokenData,
-        Security(get_current_user_data, scopes=["admin"]),
+        Security(get_current_user_data, scopes=[UserRole.USER.value]),
     ],
     command: GetUsersListCommand = Depends(get_users_list_command),
 ) -> APIResponse[ListPaginatedResponse[UserOut]]:

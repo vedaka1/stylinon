@@ -65,6 +65,16 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
             payload=payload,
         )
 
+    def create_reset_password_token(self, email: str) -> str:
+        payload: dict[str, Any] = {
+            "email": str(email),
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=5),
+        }
+        return self._generate_token(
+            token_type=TokenType.RESET,
+            payload=payload,
+        )
+
     def _generate_token(self, token_type: TokenType, payload: dict[str, Any]) -> str:
         payload["type"] = token_type.value
         encoded_jwt = jwt.encode(
@@ -129,9 +139,19 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         except (jwt.DecodeError, ValueError, KeyError):
             raise ApplicationException
 
+    def validate_reset_password_token(self, token: str) -> dict[str, Any]:
+        try:
+            payload = jwt.decode(
+                jwt=token,
+                key=settings.jwt.PUBLIC_KEY,
+                algorithms=[settings.jwt.ALGORITHM],
+            )
+            return cast(dict[str, Any], payload)
+        except (jwt.DecodeError, ValueError, KeyError):
+            raise ApplicationException
+
     def validate_acquiring_token(self, token: str) -> dict[str, Any]:
         try:
-
             payload = jwt.decode(
                 jwt=token,
                 key=self.jwk_key,

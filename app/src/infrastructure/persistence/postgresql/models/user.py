@@ -53,6 +53,7 @@ class UserSessionModel(Base):
         TIMESTAMP(timezone=False),
         nullable=False,
     )
+    user_agent: Mapped[str] = mapped_column(nullable=False)
 
     user: Mapped["UserModel"] = relationship(back_populates="sessions")
 
@@ -66,6 +67,7 @@ def map_to_user_session(
         user_id=entity.user_id,
         created_at=entity.created_at,
         expires_in=entity.expires_in,
+        user_agent=entity.user_agent,
     )
     if with_relations:
         session.user = map_to_user(entity.user)

@@ -48,12 +48,14 @@ class UserSession:
     user_id: UUID
     created_at: datetime
     expires_in: datetime
+    user_agent: str
 
     user: User | None = None
 
     @staticmethod
     def create(
         user_id: UUID,
+        user_agent: str,
         expires_in: datetime = datetime.now() + timedelta(days=30),
     ) -> "UserSession":
         return UserSession(
@@ -61,4 +63,5 @@ class UserSession:
             user_id=user_id,
             created_at=datetime.now(),
             expires_in=expires_in,
+            user_agent=user_agent,
         )

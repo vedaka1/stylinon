@@ -47,11 +47,20 @@ class JwtSettings:
     )
 
 
+class SmtpSettings:
+    HOST: str = get_env_var("SMTP_HOST", to_cast=str, default="smtp.yandex.ru")
+    PORT: int = get_env_var("SMTP_PORT", to_cast=int, default=465)
+    USER: str = get_env_var("SMTP_EMAIL", to_cast=str)
+    PASSWORD: str = get_env_var("SMTP_PASSWORD", to_cast=str)
+    FROM_EMAIL: str = get_env_var("SMTP_EMAIL", to_cast=str)
+    EMAIL_SUBJECT: str = get_env_var("SMTP_SUBJECT", to_cast=str)
+
+
 class Settings:
     db: DatabaseSettings = DatabaseSettings()
     jwt: JwtSettings = JwtSettings()
     tochka: TochkaBankSettings = TochkaBankSettings()
-
+    smtp: SmtpSettings = SmtpSettings()
     SESSION_MAX_AGE_DAYS: int = get_env_var(
         "SESSION_MAX_AGE_DAYS",
         to_cast=int,

@@ -1,25 +1,11 @@
-from abc import ABC, abstractmethod
-from uuid import UUID
-
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.application.auth.dto import RefreshSession
+from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
 from src.infrastructure.persistence.postgresql.models.auth import (
     RefreshSessionModel,
     map_to_refresh_session,
 )
-
-
-class RefreshTokenRepositoryInterface(ABC):
-
-    @abstractmethod
-    async def create(self, refresh_session: RefreshSession) -> None: ...
-
-    @abstractmethod
-    async def delete_by_token(self, refresh_token: str) -> None: ...
-
-    @abstractmethod
-    async def get(self, refresh_token: str) -> RefreshSession | None: ...
 
 
 class RefreshTokenRepository(RefreshTokenRepositoryInterface):

@@ -10,6 +10,7 @@ from src.domain.users.entities import UserRole
 class TokenType(Enum):
     ACCESS = "access_token"
     REFRESH = "refresh_token"
+    RESET = "reset_token"
 
 
 class JwtTokenProcessorInterface(ABC):
@@ -26,6 +27,9 @@ class JwtTokenProcessorInterface(ABC):
     def create_refresh_token(self, user_id: UUID) -> str: ...
 
     @abstractmethod
+    def create_reset_password_token(self, email: str) -> str: ...
+
+    @abstractmethod
     def _generate_token(
         self,
         token_type: TokenType,
@@ -40,3 +44,6 @@ class JwtTokenProcessorInterface(ABC):
 
     @abstractmethod
     def validate_acquiring_token(self, token: str) -> dict[str, Any]: ...
+
+    @abstractmethod
+    def validate_reset_password_token(self, token: str) -> dict[str, Any]: ...

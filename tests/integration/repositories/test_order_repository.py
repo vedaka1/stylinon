@@ -4,7 +4,7 @@ import pytest
 from dishka import AsyncContainer
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from src.application.common.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,

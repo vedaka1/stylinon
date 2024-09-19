@@ -4,6 +4,7 @@ from functools import lru_cache
 from typing import AsyncGenerator
 
 import aiohttp
+import aiosmtplib
 from dishka import AsyncContainer, Provider, Scope, make_async_container, provide
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.acquiring.interface import AcquiringGatewayInterface
@@ -12,12 +13,16 @@ from src.application.auth.service import AuthService, AuthServiceInterface
 from src.application.auth.usecases import (
     LoginUseCase,
     LogoutUseCase,
+    PasswordRecoveryUseCase,
     RefreshTokenUseCase,
     RegisterUseCase,
+    ResetPasswordUseCase,
 )
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
 from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
+from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
+from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.service import OrderItemService, OrderService
 from src.application.orders.usecases import (
@@ -51,6 +56,7 @@ from src.domain.users.service import UserServiceInterface
 from src.infrastructure.acquiring.main import TochkaAcquiringGateway
 from src.infrastructure.authentication.jwt_processor import JwtTokenProcessor
 from src.infrastructure.authentication.password_hasher import PasswordHasher
+from src.infrastructure.integrations.smtp.server import SyncSMTPServer
 from src.infrastructure.logging_config import logger_config_dict
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
@@ -65,7 +71,6 @@ from src.infrastructure.persistence.postgresql.repositories.product import (
 )
 from src.infrastructure.persistence.postgresql.repositories.refresh import (
     RefreshTokenRepository,
-    RefreshTokenRepositoryInterface,
 )
 from src.infrastructure.persistence.postgresql.repositories.user import (
     SqlalchemyUserRepository,
@@ -93,6 +98,14 @@ class SettingsProvider(Provider):
     def acquiring_session(self) -> aiohttp.ClientSession:
         headers = {"Authorization": f"Bearer {settings.tochka.TOKEN}"}
         return aiohttp.ClientSession(headers=headers)
+
+    @provide(scope=Scope.APP)
+    def smtp_server(self) -> SyncSMTPServerInterface:
+        return SyncSMTPServer(
+            from_address=settings.smtp.FROM_EMAIL,
+            password=settings.smtp.PASSWORD,
+            subject=settings.smtp.EMAIL_SUBJECT,
+        )
 
 
 class SecurityProvider(Provider):
@@ -166,6 +179,8 @@ class UseCasesProvider(Provider):
     get_product = provide(GetProductUseCase)
     create_product = provide(CreateProductUseCase)
     get_many_products = provide(GetManyProductsUseCase)
+    send_recovery_email = provide(PasswordRecoveryUseCase)
+    reset_password = provide(ResetPasswordUseCase)
 
 
 class ServiceProvider(Provider):

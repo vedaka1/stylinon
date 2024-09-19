@@ -1,26 +1,28 @@
 from typing import Annotated
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from src.application.auth.commands import (
     LoginCommand,
     LogoutCommand,
     RefreshTokenCommand,
     RegisterCommand,
+    ResetPasswordCommand,
 )
 from src.application.auth.exceptions import (
     NotAuthorizedException,
     TokenExpiredException,
     WrongTokenTypeException,
 )
-from src.application.auth.usecases import (  # UserConfirmationUseCase,
+from src.application.auth.usecases import (
     LoginUseCase,
     LogoutUseCase,
+    PasswordRecoveryUseCase,
     RefreshTokenUseCase,
     RegisterUseCase,
+    ResetPasswordUseCase,
 )
-from src.application.auth.usecases.login import LogoutUseCase
 from src.application.common.response import APIResponse
 from src.application.users.responses import UserOut
 from src.domain.users.exceptions import (
@@ -138,10 +140,21 @@ async def logout(
     return APIResponse()
 
 
-# @router.get("/confirmation", summary="Confirms the user by the code from email")
-# async def confirmation(
-#     confirmation_interactor: FromDishka[UserConfirmationUseCase],
-#     command: UserConfirmationCommand = Depends(),
-# ) -> APIResponse:
-#     await confirmation_interactor.execute(command)
-#     return APIResponse()
+@router.post("/password-recovery/{email}", summary="Отправить email для сброса пароля")
+async def password_recovery(
+    request: Request,
+    email: str,
+    password_recovery_interactor: FromDishka[PasswordRecoveryUseCase],
+) -> APIResponse[None]:
+    data = request.headers.items()
+    # await password_recovery_interactor.execute(email=email)
+    return APIResponse(data=data)
+
+
+@router.post("/reset-password", summary="")
+async def reset_password(
+    command: ResetPasswordCommand,
+    reset_password_interactor: FromDishka[ResetPasswordUseCase],
+) -> APIResponse[None]:
+    await reset_password_interactor.execute(command=command)
+    return APIResponse()

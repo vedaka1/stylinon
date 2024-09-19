@@ -25,5 +25,11 @@ class LogoutCommand:
 
 
 @dataclass
+class ResetPasswordCommand:
+    reset_token: str
+    new_password: str
+
+
+@dataclass
 class RefreshTokenCommand:
     refresh_token: str

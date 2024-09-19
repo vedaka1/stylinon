@@ -32,6 +32,7 @@ class SqlalchemyUserRepository(UserRepositoryInterface):
             update(UserModel)
             .where(UserModel.id == user.id)
             .values(
+                hashed_password=user.hashed_password,
                 first_name=user.first_name,
                 last_name=user.last_name,
                 is_verified=user.is_verified,

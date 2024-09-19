@@ -1,12 +1,21 @@
+import asyncio
+import logging
 from abc import ABC, abstractmethod
+from concurrent.futures import ThreadPoolExecutor
+from email.mime.multipart import MIMEMultipart
+from smtplib import SMTP, SMTP_SSL
 
 from src.application.auth.dto import RefreshSession, Token
 from src.application.auth.exceptions import (
     RefreshTokenNotFoundException,
     TokenExpiredException,
 )
+from src.application.common.email.templates import get_reset_password_template
 from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
+from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
+from src.application.common.interfaces.smtp import SyncSMTPServerInterface
+from src.domain.common.exceptions.base import ApplicationException
 from src.domain.users.entities import User
 from src.domain.users.exceptions import (
     UserAlreadyExistsException,
@@ -14,10 +23,9 @@ from src.domain.users.exceptions import (
     UserNotFoundException,
 )
 from src.domain.users.repository import UserRepositoryInterface
-from src.infrastructure.persistence.postgresql.repositories.refresh import (
-    RefreshTokenRepositoryInterface,
-)
 from src.infrastructure.settings import settings
+
+logger = logging.getLogger()
 
 
 class AuthServiceInterface(ABC):
@@ -41,6 +49,12 @@ class AuthServiceInterface(ABC):
     @abstractmethod
     async def refresh(self, refresh_token: str) -> Token: ...
 
+    @abstractmethod
+    async def reset_password(self, reset_token: str, new_password: str) -> None: ...
+
+    @abstractmethod
+    async def send_recovery_email(self, email: str) -> None: ...
+
 
 class AuthService(AuthServiceInterface):
     __slots__ = (
@@ -48,6 +62,7 @@ class AuthService(AuthServiceInterface):
         "password_hasher",
         "jwt_processor",
         "refresh_token_repository",
+        "smtp_server",
     )
 
     def __init__(
@@ -56,11 +71,13 @@ class AuthService(AuthServiceInterface):
         user_repository: UserRepositoryInterface,
         password_hasher: PasswordHasherInterface,
         jwt_processor: JwtTokenProcessorInterface,
+        smtp_server: SyncSMTPServerInterface,
     ) -> None:
         self.refresh_token_repository = refresh_token_repository
         self.user_repository = user_repository
         self.password_hasher = password_hasher
         self.jwt_processor = jwt_processor
+        self.smtp_server = smtp_server
 
     async def login(self, username: str, password: str) -> tuple[User, Token]:
         user = await self.user_repository.get_by_email(email=username)
@@ -155,3 +172,24 @@ class AuthService(AuthServiceInterface):
             access_max_age=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
             refresh_max_age=settings.jwt.REFRESH_TOKEN_EXPIRE_DAYS * 60 * 60 * 24,
         )
+
+    async def reset_password(self, reset_token: str, new_password: str) -> None:
+        token_data = self.jwt_processor.validate_reset_password_token(token=reset_token)
+        user = await self.user_repository.get_by_email(email=token_data["email"])
+        if not user:
+            raise UserNotFoundException
+        hashed_password = self.password_hasher.hash(password=new_password)
+        user.hashed_password = hashed_password
+        await self.user_repository.update(user=user)
+        return None
+
+    async def send_recovery_email(self, email: str) -> None:
+        reset_token = self.jwt_processor.create_reset_password_token(email=email)
+        reset_link = f"http://localhost/api/v1/reset-password/{reset_token}"
+        email_content = get_reset_password_template(reset_link=reset_link)
+        message = self.smtp_server.create_message(
+            content=email_content,
+            to_address=email,
+        )
+        await self.smtp_server.send_email(message=message)
+        return None
