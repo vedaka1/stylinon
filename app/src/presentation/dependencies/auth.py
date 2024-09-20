@@ -88,6 +88,6 @@ async def get_current_user_data(
         jwt_processor = await di_container.get(JwtTokenProcessorInterface)
         user_data = jwt_processor.validate_access_token(token=token)
         for scope in security_scopes.scopes:
-            if scope != user_data.role:
+            if scope not in user_data.scopes:
                 raise NotEnoughPermissionsException
         return user_data

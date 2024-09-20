@@ -22,14 +22,6 @@ class ProductServiceInterface(ABC):
     async def get_by_id(self, product_id: UUID) -> Product: ...
 
     @abstractmethod
-    async def get_by_category(
-        self,
-        category: str,
-        offset: int,
-        limit: int,
-    ) -> list[Product]: ...
-
-    @abstractmethod
     async def get_many(
         self,
         name: str | None = None,

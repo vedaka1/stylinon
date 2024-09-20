@@ -5,9 +5,9 @@ from uuid import UUID, uuid4
 
 
 class UserRole(Enum):
-    ADMIN = "admin"
     USER = "user"
     MANAGER = "manager"
+    ADMIN = "admin"
 
 
 @dataclass

@@ -45,4 +45,4 @@ class RefreshSession:
 class UserTokenData:
     user_id: UUID
     email: str
-    role: str
+    scopes: str

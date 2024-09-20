@@ -149,7 +149,11 @@ async def logout(
     return APIResponse()
 
 
-@router.post("/password-recovery/{email}", summary="Отправить email для сброса пароля")
+@router.post(
+    "/password-recovery/{email}",
+    summary="Отправка письма для восстановления пароля через email",
+    responses={200: {"model": APIResponse[None]}},
+)
 async def password_recovery(
     email: EmailStr,
     password_recovery_interactor: FromDishka[PasswordRecoveryUseCase],
@@ -158,10 +162,17 @@ async def password_recovery(
     return APIResponse()
 
 
-@router.post("/reset-password", summary="")
+@router.post(
+    "/reset-password",
+    summary="Сброс пароля",
+    responses={200: {"model": APIResponse[None]}},
+)
 async def reset_password(
     command: ResetPasswordCommand,
+    response: Response,
     reset_password_interactor: FromDishka[ResetPasswordUseCase],
 ) -> APIResponse[None]:
     await reset_password_interactor.execute(command=command)
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
     return APIResponse()

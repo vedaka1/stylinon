@@ -11,6 +11,7 @@ from src.application.auth.exceptions import (
     TokenExpiredException,
     WrongTokenTypeException,
 )
+from src.application.auth.roles import get_role_restrictions
 from src.application.common.interfaces.jwt_processor import (
     JwtTokenProcessorInterface,
     TokenType,
@@ -42,9 +43,10 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         user_role: UserRole,
         email: str,
     ) -> str:
+        user_scopes = get_role_restrictions(role=user_role)
         payload: dict[str, Any] = {
             "sub": str(user_id),
-            "role": str(user_role.value),
+            "scopes": user_scopes,
             "email": str(email),
             "exp": datetime.now(timezone.utc)
             + timedelta(minutes=settings.jwt.ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -84,18 +86,6 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
         )
         return encoded_jwt
 
-        # try:
-        #     with ThreadPoolExecutor(max_workers=7) as executor:
-        #         token = executor.submit(
-        #             jwt.encode,
-        #             payload=payload,
-        #             key=self.key,
-        #             algorithm=settings.jwt.ALGORITHM,
-        #         ).result(5)
-        #         return token
-        # except:
-        #     raise ApplicationException
-
     def validate_access_token(self, token: str) -> UserTokenData:
         """Returns a user id from token."""
         try:
@@ -104,16 +94,16 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
                 key=settings.jwt.PUBLIC_KEY,
                 algorithms=[settings.jwt.ALGORITHM],
             )
-            user_id = payload.get("sub")
-            user_role = payload.get("role")
-            user_email = payload.get("email")
-            token_type = payload.get("type")
+            user_id: str = payload.get("sub")
+            user_scopes: str = payload.get("scopes")
+            user_email: str = payload.get("email")
+            token_type: str = payload.get("type")
             if token_type == TokenType.REFRESH.value:
                 raise WrongTokenTypeException
             return UserTokenData(
                 user_id=UUID(user_id),
                 email=user_email,
-                role=user_role,
+                scopes=user_scopes,
             )
         except jwt.ExpiredSignatureError:
             raise TokenExpiredException

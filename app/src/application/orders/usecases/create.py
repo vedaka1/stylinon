@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from src.application.acquiring.interface import AcquiringGatewayInterface
@@ -10,7 +11,7 @@ from src.domain.orders.service import OrderItemServiceInterface, OrderServiceInt
 from src.domain.products.exceptions import ManyProductsNotFoundException
 from src.domain.products.service import ProductServiceInterface
 
-# from src.infrastructure.acquiring.interface import AcquiringGatewayInterface
+logger = logging.getLogger()
 
 
 @dataclass
@@ -59,6 +60,10 @@ class CreateOrderUseCase:
         await self.order_service.create(order=order)
         await self.order_item_service.create_many(order_items)
         await self.transaction_manager.commit()
+        logger.info(
+            "Order created",
+            extra={"order_id": order.id, "customer_email": command.customer_email},
+        )
         return CreateOrderResponse(
             id=order.id,
             customer_email=order.user_email,

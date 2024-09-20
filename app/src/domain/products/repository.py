@@ -22,14 +22,6 @@ class ProductRepositoryInterface(ABC):
     async def get_by_id(self, product_id: UUID) -> Product | None: ...
 
     @abstractmethod
-    async def get_by_category(
-        self,
-        category: str,
-        offset: int = 0,
-        limit: int = 100,
-    ) -> list[Product]: ...
-
-    @abstractmethod
     async def get_many(
         self,
         name: str | None = None,

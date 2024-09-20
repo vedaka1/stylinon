@@ -1,4 +1,5 @@
 from datetime import date
+from enum import Enum
 from uuid import UUID
 
 from sqlalchemy import delete, insert, select, update
@@ -7,6 +8,7 @@ from sqlalchemy.orm import joinedload, selectinload
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
+    OrderPrimaryKey,
     OrderRepositoryInterface,
 )
 from src.infrastructure.persistence.postgresql.models.order import (
@@ -55,29 +57,45 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         await self.session.execute(query)
         return None
 
-    async def get_by_id(self, order_id: UUID) -> Order | None:
-        query = select(OrderModel).where(OrderModel.id == order_id)
-        cursor = await self.session.execute(query)
-        entity = cursor.scalar_one_or_none()
-        return map_to_order(entity) if entity else None
-
-    async def get_by_id_with_products(self, order_id: UUID) -> Order | None:
-        query = (
-            select(OrderModel)
-            .options(
+    async def _get_by(
+        self,
+        key: OrderPrimaryKey,
+        value: UUID | str,
+        with_relations: bool = False,
+    ) -> Order | None:
+        query = select(OrderModel)
+        if key == OrderPrimaryKey.ID:
+            query = query.where(OrderModel.id == value)
+        if key == OrderPrimaryKey.OPERATION_ID:
+            query = query.where(OrderModel.operation_id == value)
+        if with_relations:
+            query = query.options(
                 selectinload(OrderModel.order_items).joinedload(OrderItemModel.product),
             )
-            .where(OrderModel.id == order_id)
-        )
         cursor = await self.session.execute(query)
         entity = cursor.scalar_one_or_none()
-        return map_to_order(entity, with_relations=True) if entity else None
+        return map_to_order(entity, with_relations=with_relations) if entity else None
+
+    async def get_by_id(self, order_id: UUID) -> Order | None:
+        return await self._get_by(
+            key=OrderPrimaryKey.ID,
+            value=order_id,
+            with_relations=False,
+        )
+
+    async def get_by_id_with_products(self, order_id: UUID) -> Order | None:
+        return await self._get_by(
+            key=OrderPrimaryKey.ID,
+            value=order_id,
+            with_relations=True,
+        )
 
     async def get_by_operation_id(self, operation_id: UUID) -> Order | None:
-        query = select(OrderModel).where(OrderModel.operation_id == operation_id)
-        cursor = await self.session.execute(query)
-        entity = cursor.scalar_one_or_none()
-        return map_to_order(entity) if entity else None
+        return await self._get_by(
+            key=OrderPrimaryKey.OPERATION_ID,
+            value=operation_id,
+            with_relations=True,
+        )
 
     async def get_by_user_email(self, user_email: str) -> list[Order]:
         query = (
@@ -106,7 +124,6 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
             query = query.where(OrderModel.created_at <= date_to)
         if status:
             query = query.where(OrderModel.status == status)
-
         cursor = await self.session.execute(query)
         entities = cursor.scalars().all()
         return [map_to_order(entity, with_relations=True) for entity in entities]

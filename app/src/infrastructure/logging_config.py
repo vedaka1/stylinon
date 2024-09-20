@@ -1,4 +1,4 @@
-import logging
+import logging.handlers
 from typing import Any
 
 logger_config_dict: dict[str, Any] = {
@@ -12,13 +12,15 @@ logger_config_dict: dict[str, Any] = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "detailed",
-            "level": logging.INFO,
+            "level": "INFO",
         },
         "file": {
-            "class": "logging.FileHandler",
-            "filename": "app.log",
-            "formatter": "simple",
-            "level": logging.ERROR,
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "INFO",
+            "formatter": "detailed",
+            "filename": "my_app.log",
+            "maxBytes": 10000,
+            "backupCount": 3,
         },
     },
     # "loggers": {
@@ -26,5 +28,5 @@ logger_config_dict: dict[str, Any] = {
     #     "fastapi": {"handlers": ["console"], "level": "INFO", "propagate": False},
     #     "app": {"handlers": ["console", "file"], "level": "DEBUG", "propagate": True},
     # },
-    "loggers": {"root": {"level": "DEBUG", "handlers": ["console"]}},
+    "loggers": {"root": {"level": "DEBUG", "handlers": ["console", "file"]}},
 }

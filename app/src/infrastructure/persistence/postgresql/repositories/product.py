@@ -71,22 +71,6 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         entity = cursor.scalar_one_or_none()
         return map_to_product(entity) if entity else None
 
-    async def get_by_category(
-        self,
-        category: str,
-        offset: int = 0,
-        limit: int = 100,
-    ) -> list[Product]:
-        query = (
-            select(ProductModel)
-            .where(ProductModel.category.ilike(f"%{category}%"))
-            .limit(limit)
-            .offset(offset)
-        )
-        cursor = await self.session.execute(query)
-        entities = cursor.scalars().all()
-        return [map_to_product(entity) for entity in entities]
-
     async def get_many(
         self,
         name: str | None = None,

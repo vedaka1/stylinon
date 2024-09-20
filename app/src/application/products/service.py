@@ -35,19 +35,6 @@ class ProductService(ProductServiceInterface):
             raise ProductNotFoundException
         return product
 
-    async def get_by_category(
-        self,
-        category: str,
-        offset: int,
-        limit: int,
-    ) -> list[Product]:
-        products = await self.product_repository.get_by_category(
-            category=category,
-            offset=offset,
-            limit=limit,
-        )
-        return products
-
     async def get_many(
         self,
         name: str | None = None,

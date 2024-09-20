@@ -1,10 +1,6 @@
-import asyncio
 import logging
 from abc import ABC, abstractmethod
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from email.mime.multipart import MIMEMultipart
-from smtplib import SMTP, SMTP_SSL
 
 from src.application.auth.dto import RefreshSession, Token
 from src.application.auth.exceptions import (
@@ -16,7 +12,6 @@ from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInt
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
 from src.application.common.interfaces.smtp import SyncSMTPServerInterface
-from src.domain.common.exceptions.base import ApplicationException
 from src.domain.users.entities import User
 from src.domain.users.exceptions import (
     UserAlreadyExistsException,
@@ -173,7 +168,6 @@ class AuthService(AuthServiceInterface):
                 refresh_token=refresh_session.refresh_token,
             )
             raise
-
         user = await self.user_repository.get_by_id(user_id=user_id)
         if not user:
             raise UserNotFoundException
@@ -208,6 +202,7 @@ class AuthService(AuthServiceInterface):
         user.hashed_password = hashed_password
         await self.user_repository.update(user=user)
         await self.refresh_token_repository.delete_by_user_id(user_id=user.id)
+        logger.info("Password reset", extra={"user_email": user.email})
         return None
 
     async def send_recovery_email(self, email: str) -> None:
@@ -219,4 +214,5 @@ class AuthService(AuthServiceInterface):
             to_address=email,
         )
         await self.smtp_server.send_email(message=message)
+        logger.info("Password recovery email sent", extra={"sent_to": email})
         return None
