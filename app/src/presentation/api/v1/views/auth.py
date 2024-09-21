@@ -84,14 +84,14 @@ async def login(
         value=token.type + token.access_token,
         max_age=token.access_max_age,
         httponly=True,
-        secure=True,
+        # secure=True,
     )
     response.set_cookie(
         "refresh_token",
         value=token.type + token.refresh_token,
         max_age=token.refresh_max_age,
         httponly=True,
-        secure=True,
+        # secure=True,
     )
     return APIResponse(data=user)
 
@@ -117,14 +117,14 @@ async def refresh(
         value=token.type + token.access_token,
         max_age=token.access_max_age,
         httponly=True,
-        secure=True,
+        # secure=True,
     )
     response.set_cookie(
         "refresh_token",
         value=token.type + token.refresh_token,
         max_age=token.refresh_max_age,
         httponly=True,
-        secure=True,
+        # secure=True,
     )
     return APIResponse()
 

@@ -17,6 +17,7 @@ from src.application.products.usecases import (
 )
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
+from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
 router = APIRouter(
@@ -60,14 +61,22 @@ async def get_many_products(
     return APIResponse(data=response)
 
 
-@router.post("", summary="Создает новый товар")
+@router.post(
+    "",
+    summary="Создает новый товар",
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
+)
 async def create_product(
     create_product_interactor: FromDishka[CreateProductUseCase],
     command: CreateProductCommand,
-    user_data: Annotated[
-        UserTokenData,
-        Security(get_current_user_data, scopes=["admin"]),
-    ],
 ) -> APIResponse[None]:
     await create_product_interactor.execute(command=command)
     return APIResponse()

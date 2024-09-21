@@ -25,6 +25,7 @@ class UpdateOrderUseCase:
             status=command.status,
         )
         await self.transaction_manager.commit()
+        logger.info("Order updated", extra={"order_id": command.order_id})
         return None
 
 
@@ -37,6 +38,7 @@ class UpdateOrderByWebhookUseCase:
     async def execute(self, token: str) -> None:
         data = self.acquiring_service.handle_webhook(token=token)
         if data.get("webhookType") != AcquiringWebhookType.acquiringInternetPayment:
+            logger.error("Incorrect acquiring webhook type", extra={"data": data})
             raise IncorrectAcqioringWebhookTypeException
         order = await self.order_service.get_by_operation_id(
             operation_id=data["operationId"],
@@ -46,4 +48,5 @@ class UpdateOrderByWebhookUseCase:
             status=OrderStatus.APPROVED,
         )
         await self.transaction_manager.commit()
+        logger.info("Order updated by webhook", extra={"order_id": order.id})
         return None

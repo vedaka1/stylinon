@@ -13,6 +13,7 @@ from fastapi.responses import ORJSONResponse
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.application.common.response import ErrorAPIResponse
 from src.domain.common.exceptions.base import ApplicationException
 from src.infrastructure.di.container import (
@@ -23,6 +24,7 @@ from src.infrastructure.di.container import (
     ServiceProvider,
     UseCasesProvider,
 )
+from src.infrastructure.integrations.smtp.server import SyncSMTPServer
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
     get_async_sessionmaker,
@@ -90,6 +92,14 @@ async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
             engine: AsyncEngine,
         ) -> async_sessionmaker[AsyncSession]:
             return get_async_sessionmaker(engine)
+
+        @provide(scope=Scope.APP)
+        def smtp_server(self) -> SyncSMTPServerInterface:
+            return SyncSMTPServer(
+                from_address=settings.smtp.FROM_EMAIL,
+                password=settings.smtp.PASSWORD,
+                subject=settings.smtp.EMAIL_SUBJECT,
+            )
 
         @provide(scope=Scope.APP)
         async def acquiring_session(

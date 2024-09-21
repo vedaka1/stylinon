@@ -99,7 +99,6 @@ class SyncSMTPServer(SyncSMTPServerInterface):
                     message["To"],
                     message.as_string(),
                 )
-                print(response)
             except Exception as e:
                 logger.error(f"Error while sending email: {e}")
                 raise ApplicationException

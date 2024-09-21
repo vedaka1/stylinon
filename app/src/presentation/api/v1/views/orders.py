@@ -2,7 +2,7 @@ import logging
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Security
 from src.application.common.response import APIResponse
 from src.application.orders.commands import (
     CreateOrderCommand,
@@ -22,6 +22,7 @@ from src.domain.orders.exceptions import (
     OrderItemIncorrectQuantityException,
     OrderNotFoundException,
 )
+from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
 
 router = APIRouter(
@@ -34,7 +35,15 @@ router = APIRouter(
 @router.get(
     "",
     summary="Возвращает список заказов",
-    dependencies=[Depends(auth_required)],
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
 )
 async def get_many_orders(
     get_orders_list_interactor: FromDishka[GetManyOrdersUseCase],
@@ -68,7 +77,15 @@ async def create_order(
         200: {"model": APIResponse[Order]},
         404: {"model": OrderNotFoundException},
     },
-    dependencies=[Depends(auth_required)],
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
 )
 async def get_order(
     order_id: UUID,
@@ -85,7 +102,15 @@ async def get_order(
         200: {"model": APIResponse[Order]},
         404: {"model": OrderNotFoundException},
     },
-    dependencies=[Depends(auth_required)],
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
 )
 async def update_order(
     update_order_interactor: FromDishka[UpdateOrderUseCase],

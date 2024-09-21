@@ -1,8 +1,11 @@
+from string import Template
+
+
 def get_reset_password_template(reset_link: str) -> str:
     """
-    Returns the reset password template
+    Returns the reset password html template
     """
-    content = (
+    html_code = Template(
         """
     <!DOCTYPE html>
     <html lang="en">
@@ -62,18 +65,14 @@ def get_reset_password_template(reset_link: str) -> str:
             <div class="message">
                 Мы получили запрос на восстановление пароля для вашей учетной записи. Пожалуйста, нажмите кнопку ниже, чтобы сбросить пароль.
             </div>
-"""
-        + """
-            <a href="{reset_link}" class="button">Сбросить пароль</a>""".format(
-            reset_link=reset_link,
-        )
-        + """
+            <a href="$reset_link" class="button">Сбросить пароль</a>
             <div class="message">
                 Если вы не запрашивали восстановление пароля, просто игнорируйте это сообщение.
             </div>
         </div>
     </body>
     </html>
-    """
+    """,
     )
-    return content
+    сontent = html_code.substitute(reset_link=reset_link)
+    return сontent

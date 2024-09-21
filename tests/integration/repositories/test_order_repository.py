@@ -50,6 +50,21 @@ class TestOrderRepository:
                 await session.commit()
                 await session.close()
 
+    async def test_update_order(self, container: AsyncContainer) -> None:
+        async with container() as di_container:
+            order_repository = await di_container.get(OrderRepositoryInterface)
+            order = Order.create(
+                user_email="test@test.com",
+                operation_id=uuid4(),
+                shipping_address="test_address",
+            )
+            await order_repository.create(order)
+            order.status = OrderStatus.PROCESSING
+            await order_repository.update(order)
+            order_data = await order_repository.get_by_id(order.id)
+            assert order_data
+            assert order_data.status == OrderStatus.PROCESSING
+
     async def test_get_order_by_id(self, container: AsyncContainer) -> None:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)

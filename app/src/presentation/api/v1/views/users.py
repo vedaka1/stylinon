@@ -34,13 +34,21 @@ def get_users_list_command(
     return GetUsersListCommand(search=search, pagiantion=pagination)
 
 
-@router.get("", summary="Возвращает список пользователей")
+@router.get(
+    "",
+    summary="Возвращает список пользователей",
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
+)
 async def get_users(
     get_users_list_interactor: FromDishka[GetUsersListUseCase],
-    user_data: Annotated[
-        UserTokenData,
-        Security(get_current_user_data, scopes=[UserRole.USER.value]),
-    ],
     command: GetUsersListCommand = Depends(get_users_list_command),
 ) -> APIResponse[ListPaginatedResponse[UserOut]]:
     response = await get_users_list_interactor.execute(command=command)
