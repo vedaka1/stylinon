@@ -1,8 +1,8 @@
 from typing import Annotated
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Depends, Form, Security, UploadFile
 from src.application.auth.dto import UserTokenData
 from src.application.common.pagination import ListPaginatedResponse, PaginationQuery
 from src.application.common.response import APIResponse
@@ -15,6 +15,7 @@ from src.application.products.usecases import (
     GetManyProductsUseCase,
     GetProductUseCase,
 )
+from src.domain.common.exceptions.base import ApplicationException
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.users.entities import UserRole
@@ -76,8 +77,32 @@ async def get_many_products(
 )
 async def create_product(
     create_product_interactor: FromDishka[CreateProductUseCase],
-    command: CreateProductCommand,
+    name: str = Form(...),
+    category: str = Form(...),
+    description: str = Form(...),
+    price: int = Form(...),
+    units_of_measurement: UnitsOfMesaurement = Form(...),
+    photo: UploadFile | None = None,
 ) -> APIResponse[None]:
+    if photo:
+        try:
+            content_type = "jpg"
+            if photo.filename:
+                content_type = photo.filename.split(".")[1]
+            photo_id = str(uuid4())
+            with open(f"images/{photo_id}.{content_type}", "wb+") as f:
+                f.write(photo.file.read())
+        except Exception:
+            raise ApplicationException
+        finally:
+            await photo.close()
+    command = CreateProductCommand(
+        name=name,
+        category=category,
+        description=description,
+        price=price,
+        units_of_measurement=units_of_measurement,
+    )
     await create_product_interactor.execute(command=command)
     return APIResponse()
 

@@ -36,12 +36,18 @@ class UpdateOrderByWebhookUseCase:
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, token: str) -> None:
-        data = self.acquiring_service.handle_webhook(token=token)
-        if data.get("webhookType") != AcquiringWebhookType.acquiringInternetPayment:
-            logger.error("Incorrect acquiring webhook type", extra={"data": data})
+        webhook_data = self.acquiring_service.handle_webhook(token=token)
+        if (
+            webhook_data.get("webhookType")
+            != AcquiringWebhookType.acquiringInternetPayment
+        ):
+            logger.error(
+                "Incorrect acquiring webhook type",
+                extra={"data": webhook_data},
+            )
             raise IncorrectAcqioringWebhookTypeException
         order = await self.order_service.get_by_operation_id(
-            operation_id=data["operationId"],
+            operation_id=webhook_data["operationId"],
         )
         await self.order_service.update(
             order_id=order.id,

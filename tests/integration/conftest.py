@@ -182,3 +182,13 @@ async def clean_users_table(container: AsyncContainer) -> AsyncGenerator[None, N
         async with sessionmaker() as session:
             await session.execute(text("DELETE FROM users"))
             await session.commit()
+
+
+@pytest.fixture
+async def clean_orders_table(container: AsyncContainer) -> AsyncGenerator[None, None]:
+    yield
+    async with container() as di_container:
+        sessionmaker = await di_container.get(async_sessionmaker[AsyncSession])
+        async with sessionmaker() as session:
+            await session.execute(text("DELETE FROM orders"))
+            await session.commit()

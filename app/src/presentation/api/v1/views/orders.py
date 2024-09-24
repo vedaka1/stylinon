@@ -1,8 +1,14 @@
-import logging
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import APIRouter, Depends, Request, Security
+from fastapi import (
+    APIRouter,
+    Depends,
+    Request,
+    Security,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from src.application.common.response import APIResponse
 from src.application.orders.commands import (
     CreateOrderCommand,
@@ -60,7 +66,6 @@ async def get_many_orders(
         200: {"model": APIResponse[CreateOrderResponse]},
         400: {"model": OrderItemIncorrectQuantityException},
     },
-    dependencies=[Depends(auth_required)],
 )
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],

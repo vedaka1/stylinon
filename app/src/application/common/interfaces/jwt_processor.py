@@ -13,7 +13,7 @@ class TokenType(Enum):
     RESET = "reset_token"
 
 
-class JwtTokenProcessorInterface(ABC):
+class JWTProcessorInterface(ABC):
 
     @abstractmethod
     def create_access_token(

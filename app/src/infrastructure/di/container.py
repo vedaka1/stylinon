@@ -4,7 +4,6 @@ from functools import lru_cache
 from typing import AsyncGenerator
 
 import aiohttp
-import aiosmtplib
 from dishka import AsyncContainer, Provider, Scope, make_async_container, provide
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.acquiring.interface import AcquiringGatewayInterface
@@ -18,8 +17,10 @@ from src.application.auth.usecases import (
     RegisterUseCase,
     ResetPasswordUseCase,
 )
+from src.application.chats.interface import WebsocketManagerInterface
+from src.application.chats.usecases.post import SendMessageUseCase
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
-from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
 from src.application.common.interfaces.smtp import SyncSMTPServerInterface
@@ -53,9 +54,9 @@ from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.service import ProductServiceInterface
 from src.domain.users.repository import UserRepositoryInterface
 from src.domain.users.service import UserServiceInterface
-from src.infrastructure.acquiring.main import TochkaAcquiringGateway
-from src.infrastructure.authentication.jwt_processor import JwtTokenProcessor
+from src.infrastructure.authentication.jwt_processor import JWTProcessor
 from src.infrastructure.authentication.password_hasher import PasswordHasher
+from src.infrastructure.integrations.acquiring.main import TochkaAcquiringGateway
 from src.infrastructure.integrations.smtp.server import SyncSMTPServer
 from src.infrastructure.logging_config import logger_config_dict
 from src.infrastructure.persistence.postgresql.database import (
@@ -77,6 +78,7 @@ from src.infrastructure.persistence.postgresql.repositories.user import (
 )
 from src.infrastructure.persistence.postgresql.transaction import TransactionManager
 from src.infrastructure.settings import settings
+from src.infrastructure.websockets.manager import WebsocketManager
 
 
 @lru_cache(1)
@@ -107,6 +109,10 @@ class SettingsProvider(Provider):
             subject=settings.smtp.EMAIL_SUBJECT,
         )
 
+    @provide(scope=Scope.APP)
+    def websocker_manager(self) -> WebsocketManagerInterface:
+        return WebsocketManager()
+
 
 class SecurityProvider(Provider):
     password_hasher = provide(
@@ -115,8 +121,8 @@ class SecurityProvider(Provider):
         scope=Scope.APP,
     )
     jwt_processor = provide(
-        JwtTokenProcessor,
-        provides=JwtTokenProcessorInterface,
+        JWTProcessor,
+        provides=JWTProcessorInterface,
         scope=Scope.APP,
     )
 
@@ -181,6 +187,7 @@ class UseCasesProvider(Provider):
     get_many_products = provide(GetManyProductsUseCase)
     send_recovery_email = provide(PasswordRecoveryUseCase)
     reset_password = provide(ResetPasswordUseCase)
+    send_message = provide(SendMessageUseCase)
 
 
 class ServiceProvider(Provider):

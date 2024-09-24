@@ -8,7 +8,7 @@ from src.application.auth.exceptions import (
     TokenExpiredException,
 )
 from src.application.common.email.templates import get_reset_password_template
-from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
 from src.application.common.interfaces.smtp import SyncSMTPServerInterface
@@ -64,6 +64,7 @@ class AuthService(AuthServiceInterface):
         "jwt_processor",
         "refresh_token_repository",
         "smtp_server",
+        "frontend_url",
     )
 
     def __init__(
@@ -71,7 +72,7 @@ class AuthService(AuthServiceInterface):
         refresh_token_repository: RefreshTokenRepositoryInterface,
         user_repository: UserRepositoryInterface,
         password_hasher: PasswordHasherInterface,
-        jwt_processor: JwtTokenProcessorInterface,
+        jwt_processor: JWTProcessorInterface,
         smtp_server: SyncSMTPServerInterface,
     ) -> None:
         self.refresh_token_repository = refresh_token_repository
@@ -79,6 +80,7 @@ class AuthService(AuthServiceInterface):
         self.password_hasher = password_hasher
         self.jwt_processor = jwt_processor
         self.smtp_server = smtp_server
+        self.frontend_url = "http://localhost/api/v1/reset-password"
 
     async def login(
         self,
@@ -207,7 +209,7 @@ class AuthService(AuthServiceInterface):
 
     async def send_recovery_email(self, email: str) -> None:
         reset_token = self.jwt_processor.create_reset_password_token(email=email)
-        reset_link = f"http://localhost/api/v1/reset-password/{reset_token}"
+        reset_link = f"{self.frontend_url}/{reset_token}"
         email_content = get_reset_password_template(reset_link=reset_link)
         message = self.smtp_server.create_message(
             content=email_content,

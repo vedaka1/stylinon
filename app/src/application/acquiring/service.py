@@ -2,7 +2,7 @@ from typing import Any
 
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
-from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.products.dto import ProductInPaymentDTO
 
 
@@ -12,7 +12,7 @@ class AcquiringService(AcquiringServiceInterface):
     def __init__(
         self,
         acquiring_gateway: AcquiringGatewayInterface,
-        jwt_processor: JwtTokenProcessorInterface,
+        jwt_processor: JWTProcessorInterface,
     ):
         self.acquiring_gateway = acquiring_gateway
         self.jwt_processor = jwt_processor

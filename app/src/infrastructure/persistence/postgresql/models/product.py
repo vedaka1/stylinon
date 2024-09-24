@@ -18,6 +18,7 @@ class ProductModel(Base):
     description: Mapped[str] = mapped_column(nullable=False)
     price: Mapped[int] = mapped_column(nullable=False)
     units_of_measurement: Mapped[UnitsOfMesaurement] = mapped_column(nullable=False)
+    photo_url: Mapped[str] = mapped_column(nullable=True)
 
     order_item: Mapped["OrderItemModel"] = relationship(
         back_populates="product",
@@ -35,4 +36,5 @@ def map_to_product(entity: ProductModel) -> Product:
         description=entity.description,
         price=entity.price,
         units_of_measurement=entity.units_of_measurement,
+        photo_url=entity.photo_url,
     )

@@ -21,6 +21,7 @@ class Product:
     description: str
     price: int  # в копейках
     units_of_measurement: UnitsOfMesaurement
+    photo_url: str | None = None
 
     @staticmethod
     def create(

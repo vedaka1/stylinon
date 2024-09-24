@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from pydantic import BaseModel
 from src.application.common.pagination import PaginationQuery
 from src.domain.products.entities import UnitsOfMesaurement
 
 
-@dataclass
-class CreateProductCommand:
+class CreateProductCommand(BaseModel):
     name: str
     category: str
     description: str

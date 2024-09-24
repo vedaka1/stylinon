@@ -2,7 +2,9 @@ import pytest
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.products.entities import UnitsOfMesaurement
-from src.infrastructure.acquiring.mappers import map_product_in_payment_to_dict
+from src.infrastructure.integrations.acquiring.mappers import (
+    map_product_in_payment_to_dict,
+)
 
 test_products_params_1 = (
     [

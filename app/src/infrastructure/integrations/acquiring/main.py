@@ -3,10 +3,12 @@ from typing import Any, cast
 import aiohttp
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.products.dto import ProductInPaymentDTO
-from src.infrastructure.acquiring.exceptions import (
+from src.infrastructure.integrations.acquiring.exceptions import (
     CreatePaymentOperationWithReceiptException,
 )
-from src.infrastructure.acquiring.mappers import map_product_in_payment_to_dict
+from src.infrastructure.integrations.acquiring.mappers import (
+    map_product_in_payment_to_dict,
+)
 
 
 class TochkaAcquiringGateway(AcquiringGatewayInterface):
@@ -53,7 +55,7 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
                 "Client": {
                     "email": client_email,
                 },
-                "Items": [map_product_in_payment_to_dict(item=item) for item in items],
+                "Items": [map_product_in_payment_to_dict(item) for item in items],
             },
         }
         if consumerId:

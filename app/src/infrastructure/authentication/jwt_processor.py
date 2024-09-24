@@ -13,7 +13,7 @@ from src.application.auth.exceptions import (
 )
 from src.application.auth.roles import get_role_restrictions
 from src.application.common.interfaces.jwt_processor import (
-    JwtTokenProcessorInterface,
+    JWTProcessorInterface,
     TokenType,
 )
 from src.domain.common.exceptions.base import ApplicationException
@@ -32,7 +32,7 @@ def load_rsa_private_key() -> RSAPrivateKey:
     return cast(RSAPrivateKey, rsa_key)
 
 
-class JwtTokenProcessor(JwtTokenProcessorInterface):
+class JWTProcessor(JWTProcessorInterface):
 
     private_key: RSAPrivateKey = load_rsa_private_key()
     jwk_key: jwt.PyJWK = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
@@ -137,6 +137,7 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
                 algorithms=[settings.jwt.ALGORITHM],
             )
             return cast(dict[str, Any], payload)
+
         except (jwt.DecodeError, ValueError, KeyError):
             raise ApplicationException
 
@@ -148,5 +149,6 @@ class JwtTokenProcessor(JwtTokenProcessorInterface):
                 algorithms=[settings.tochka.ALGORITHM],
             )
             return cast(dict[str, Any], payload)
+
         except (jwt.DecodeError, ValueError, KeyError):
             raise ApplicationException

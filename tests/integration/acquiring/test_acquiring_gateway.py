@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import pytest
 from dishka import AsyncContainer
 from src.application.acquiring.interface import AcquiringGatewayInterface

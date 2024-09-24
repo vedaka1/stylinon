@@ -1,7 +1,8 @@
+import logging
 from typing import Annotated, Dict, Optional
 
 from dishka import AsyncContainer
-from fastapi import Depends, Request
+from fastapi import Depends, Request, WebSocket
 from fastapi.openapi.models import OAuthFlowPassword
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security import OAuth2, SecurityScopes
@@ -11,8 +12,10 @@ from src.application.auth.exceptions import (
     NotAuthorizedException,
     NotEnoughPermissionsException,
 )
-from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.infrastructure.di.container import get_container
+
+logger = logging.getLogger()
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -84,10 +87,28 @@ async def get_current_user_data(
 ) -> UserTokenData:
     if not token:
         raise NotAuthorizedException
-    async with container() as di_container:
-        jwt_processor = await di_container.get(JwtTokenProcessorInterface)
-        user_data = jwt_processor.validate_access_token(token=token)
-        for scope in security_scopes.scopes:
-            if scope not in user_data.scopes:
-                raise NotEnoughPermissionsException
-        return user_data
+
+    jwt_processor = await container.get(JWTProcessorInterface)
+    user_data = jwt_processor.validate_access_token(token=token)
+
+    for scope in security_scopes.scopes:
+        if scope not in user_data.scopes:
+            raise NotEnoughPermissionsException
+
+    return user_data
+
+
+async def get_current_user_from_websocket(
+    websocket: WebSocket,
+    container: AsyncContainer,
+) -> UserTokenData:
+    authorization: str | None = websocket.cookies.get("access_token")
+    scheme, param = get_authorization_scheme_param(authorization)
+
+    if not authorization or scheme.lower() != "bearer":
+        raise NotAuthorizedException
+
+    jwt_processor = await container.get(JWTProcessorInterface)
+    user_data = jwt_processor.validate_access_token(token=param)
+
+    return user_data

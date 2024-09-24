@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from src.application.common.interfaces.jwt_processor import JwtTokenProcessorInterface
+from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.exceptions import OrderNotFoundException
 from src.domain.orders.repository import (
@@ -20,7 +20,7 @@ class OrderService(OrderServiceInterface):
     def __init__(
         self,
         order_repository: OrderRepositoryInterface,
-        jwt_processor: JwtTokenProcessorInterface,
+        jwt_processor: JWTProcessorInterface,
     ) -> None:
         self.order_repository = order_repository
         self.jwt_processor = jwt_processor

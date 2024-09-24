@@ -24,6 +24,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             description=product.description,
             price=product.price,
             units_of_measurement=product.units_of_measurement,
+            photo_url=product.photo_url,
         )
         await self.session.execute(query)
         return None
@@ -38,6 +39,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                     "description": product.description,
                     "price": product.price,
                     "units_of_measurement": product.units_of_measurement,
+                    "photo_url": product.photo_url,
                 }
                 for product in products
             ],
@@ -55,6 +57,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 description=product.description,
                 price=product.price,
                 units_of_measurement=product.units_of_measurement,
+                photo_url=product.photo_url,
             )
         )
         await self.session.execute(query)
