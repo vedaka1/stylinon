@@ -90,7 +90,7 @@ async def create_product(
             if photo.filename:
                 content_type = photo.filename.split(".")[1]
             photo_id = str(uuid4())
-            with open(f"images/{photo_id}.{content_type}", "wb+") as f:
+            with open(f"./images/{photo_id}.{content_type}", "wb+") as f:
                 f.write(photo.file.read())
         except Exception:
             raise ApplicationException

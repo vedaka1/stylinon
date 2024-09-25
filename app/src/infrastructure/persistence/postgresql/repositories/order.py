@@ -52,6 +52,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
                 shipping_address=order.shipping_address,
                 tracking_number=order.tracking_number,
                 status=order.status,
+                updated_at=order.updated_at,
             )
         )
         await self.session.execute(query)

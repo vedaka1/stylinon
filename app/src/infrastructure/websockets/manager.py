@@ -18,12 +18,14 @@ class WebsocketManager(WebsocketManagerInterface):
 
     async def remove_connection(self, websocket: WebSocket, key: UUID) -> None:
         async with asyncio.Lock():
-            await websocket.close()
             self.connections_map[key].remove(websocket)
 
     async def send_all(self, key: UUID, data: dict[str, Any]) -> None:
-        for websocket in self.connections_map[key]:
-            await websocket.send_json(data)
+        if key not in self.connections_map:
+            return None
+        async with asyncio.Lock():
+            for websocket in self.connections_map[key]:
+                await websocket.send_json(data)
 
     async def disconnect_all(self, key: UUID) -> None:
         for websocket in self.connections_map[key]:

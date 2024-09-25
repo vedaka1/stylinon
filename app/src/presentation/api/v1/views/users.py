@@ -3,6 +3,7 @@ from typing import Annotated
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Security
 from src.application.auth.dto import UserTokenData
+from src.application.chats.usecases.get import GetUserChatsUseCase
 from src.application.common.pagination import ListPaginatedResponse, PaginationQuery
 from src.application.common.response import APIResponse
 from src.application.orders.responses import OrderOut
@@ -13,6 +14,7 @@ from src.application.users.usecases import (
     GetUsersListUseCase,
     GetUserUseCase,
 )
+from src.domain.chats.entities import Chat
 from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import get_current_user_data
 
@@ -73,4 +75,13 @@ async def get_current_user_orders(
     user_data: UserTokenData = Depends(get_current_user_data),
 ) -> APIResponse[OrderOut]:
     response = await get_user_orders_interactor.execute(email=user_data.email)
+    return APIResponse(data=response)
+
+
+@router.get("/me/chats", summary="Возвращает чаты текущего пользователя")
+async def get_current_user_chats(
+    get_user_chats_interactor: FromDishka[GetUserChatsUseCase],
+    user_data: UserTokenData = Depends(get_current_user_data),
+) -> APIResponse[Chat]:
+    response = await get_user_chats_interactor.execute(user_id=user_data.user_id)
     return APIResponse(data=response)

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
@@ -45,6 +45,7 @@ class OrderService(OrderServiceInterface):
             order.tracking_number = tracking_number
         if status:
             order.status = status
+        order.updated_at = datetime.now()
         return await self.order_repository.update(order)
 
     async def get_by_id(self, order_id: UUID) -> Order:

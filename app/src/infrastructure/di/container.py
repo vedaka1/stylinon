@@ -18,7 +18,12 @@ from src.application.auth.usecases import (
     ResetPasswordUseCase,
 )
 from src.application.chats.interface import WebsocketManagerInterface
-from src.application.chats.usecases.post import SendMessageUseCase
+from src.application.chats.service import ChatService, MessageService
+from src.application.chats.usecases.create import (
+    CreateChatUseCase,
+    CreateMessageUseCase,
+)
+from src.application.chats.usecases.get import GetChatUseCase, GetUserChatsUseCase
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
@@ -45,6 +50,11 @@ from src.application.users.usecases import (
     GetUsersListUseCase,
     GetUserUseCase,
 )
+from src.domain.chats.repository import (
+    ChatRepositoryInterface,
+    MessageRepositoryInterface,
+)
+from src.domain.chats.service import ChatServiceInterface, MessageServiceInterface
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
@@ -62,6 +72,12 @@ from src.infrastructure.logging_config import logger_config_dict
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
     get_async_sessionmaker,
+)
+from src.infrastructure.persistence.postgresql.repositories.chat import (
+    SqlalchemyChatRepository,
+)
+from src.infrastructure.persistence.postgresql.repositories.message import (
+    SqlalchemyMessageRepository,
 )
 from src.infrastructure.persistence.postgresql.repositories.order import (
     SqlalchemyOrderItemRepository,
@@ -165,6 +181,14 @@ class DatabaseAdaptersProvider(Provider):
         RefreshTokenRepository,
         provides=RefreshTokenRepositoryInterface,
     )
+    chat_repository = provide(
+        SqlalchemyChatRepository,
+        provides=ChatRepositoryInterface,
+    )
+    message_repository = provide(
+        SqlalchemyMessageRepository,
+        provides=MessageRepositoryInterface,
+    )
 
 
 class UseCasesProvider(Provider):
@@ -187,7 +211,10 @@ class UseCasesProvider(Provider):
     get_many_products = provide(GetManyProductsUseCase)
     send_recovery_email = provide(PasswordRecoveryUseCase)
     reset_password = provide(ResetPasswordUseCase)
-    send_message = provide(SendMessageUseCase)
+    create_message = provide(CreateMessageUseCase)
+    create_chat = provide(CreateChatUseCase)
+    get_user_chats = provide(GetUserChatsUseCase)
+    get_chat = provide(GetChatUseCase)
 
 
 class ServiceProvider(Provider):
@@ -199,6 +226,8 @@ class ServiceProvider(Provider):
     order_service = provide(OrderService, provides=OrderServiceInterface)
     order_item_service = provide(OrderItemService, provides=OrderItemServiceInterface)
     product_service = provide(ProductService, provides=ProductServiceInterface)
+    chat_service = provide(ChatService, provides=ChatServiceInterface)
+    message_service = provide(MessageService, provides=MessageServiceInterface)
 
 
 class GatewayProvider(Provider):

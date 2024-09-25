@@ -54,14 +54,18 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(
 )
 
 
+def _get_token_data(value: str | None) -> str:
+    scheme, param = get_authorization_scheme_param(value)
+    if not value or scheme.lower() != "bearer":
+        raise NotAuthorizedException
+    return param
+
+
 async def get_refresh_token(
     request: Request,
 ) -> str:
     refresh_token: str | None = request.cookies.get("refresh_token")
-    scheme, param = get_authorization_scheme_param(refresh_token)
-    if not refresh_token or scheme.lower() != "bearer":
-        raise NotAuthorizedException
-    return param
+    return _get_token_data(value=refresh_token)
 
 
 async def auth_required(
@@ -73,7 +77,6 @@ async def auth_required(
 ) -> None:
     if not token:
         raise NotAuthorizedException
-
     request.scope["auth"] = token
 
 
@@ -102,13 +105,10 @@ async def get_current_user_from_websocket(
     websocket: WebSocket,
     container: AsyncContainer,
 ) -> UserTokenData:
-    authorization: str | None = websocket.cookies.get("access_token")
-    scheme, param = get_authorization_scheme_param(authorization)
-
-    if not authorization or scheme.lower() != "bearer":
-        raise NotAuthorizedException
+    access_token: str | None = websocket.cookies.get("access_token")
+    token_data = _get_token_data(value=access_token)
 
     jwt_processor = await container.get(JWTProcessorInterface)
-    user_data = jwt_processor.validate_access_token(token=param)
+    user_data = jwt_processor.validate_access_token(token=token_data)
 
     return user_data
