@@ -9,6 +9,7 @@ from src.infrastructure.integrations.acquiring.exceptions import (
 from src.infrastructure.integrations.acquiring.mappers import (
     map_product_in_payment_to_dict,
 )
+from src.infrastructure.settings import settings
 
 
 class TochkaAcquiringGateway(AcquiringGatewayInterface):
@@ -20,6 +21,7 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
         self.session = session
         self.base_url = "https://enter.tochka.com/sandbox/v2"
         self.api_version = "v1.0"
+        self.redirect_url = settings.DOMAIN_URL
 
     async def get_customer_info(self) -> dict[str, Any]:
         response = await self.session.get(

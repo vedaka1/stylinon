@@ -24,8 +24,9 @@ class OrderItemAdmin(ModelView, model=OrderItemModel):
         OrderItemModel.quantity,
     ]
     column_details_list = [
-        OrderItemModel.order_id,
-        OrderItemModel.product_id,
+        # OrderItemModel.order_id,
+        # OrderItemModel.product_id,
+        "order",
         "quantity",
     ]
     column_labels = {

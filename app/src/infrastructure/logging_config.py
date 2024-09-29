@@ -12,11 +12,11 @@ logger_config_dict: dict[str, Any] = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "detailed",
-            "level": "INFO",
+            "level": "ERROR",
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "level": "INFO",
+            "level": "ERROR",
             "formatter": "detailed",
             "filename": "my_app.log",
             "maxBytes": 10000,
@@ -28,5 +28,14 @@ logger_config_dict: dict[str, Any] = {
     #     "fastapi": {"handlers": ["console"], "level": "INFO", "propagate": False},
     #     "app": {"handlers": ["console", "file"], "level": "DEBUG", "propagate": True},
     # },
-    "loggers": {"root": {"level": "DEBUG", "handlers": ["console", "file"]}},
+    "loggers": {
+        "root": {
+            "level": "ERROR",
+            "handlers": ["file"],
+        },
+        "uvicorn": {
+            "handlers": ["console"],
+            "level": "ERROR",
+        },
+    },
 }

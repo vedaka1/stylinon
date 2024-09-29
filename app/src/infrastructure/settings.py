@@ -38,7 +38,7 @@ class JwtSettings:
     ACCESS_TOKEN_EXPIRE_MINUTES: int = get_env_var(
         "ACCESS_TOKEN_EXPIRE_MINUTES",
         to_cast=int,
-        default=5,
+        default=15,
     )
     REFRESH_TOKEN_EXPIRE_DAYS: int = get_env_var(
         "REFRESH_TOKEN_EXPIRE_DAYS",
@@ -65,6 +65,12 @@ class Settings:
         "SESSION_MAX_AGE_DAYS",
         to_cast=int,
         default=30,
+    )
+
+    DOMAIN_URL: str = get_env_var(
+        "DOMAIN_URL",
+        to_cast=str,
+        default="https://localhost",
     )
 
 

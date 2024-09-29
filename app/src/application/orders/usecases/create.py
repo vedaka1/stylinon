@@ -4,27 +4,29 @@ from dataclasses import dataclass
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import CreateOrderCommand
-from src.application.orders.responses import CreateOrderResponse
+from src.application.orders.dto import CreateOrderResponse
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.exceptions import DuplicateOrderPositionsException
-from src.domain.orders.service import OrderItemServiceInterface, OrderServiceInterface
+from src.domain.orders.repository import (
+    OrderItemRepositoryInterface,
+    OrderRepositoryInterface,
+)
 from src.domain.products.exceptions import ManyProductsNotFoundException
-from src.domain.products.service import ProductServiceInterface
+from src.domain.products.repository import ProductRepositoryInterface
 
 logger = logging.getLogger()
 
 
 @dataclass
 class CreateOrderUseCase:
-    order_service: OrderServiceInterface
-    order_item_service: OrderItemServiceInterface
-    products_service: ProductServiceInterface
+    order_repository: OrderRepositoryInterface
+    order_item_repository: OrderItemRepositoryInterface
+    products_repository: ProductRepositoryInterface
     acquiring_gateway: AcquiringGatewayInterface
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateOrderCommand) -> CreateOrderResponse:
-
         products_set = set()
         for product in command.items:
             if product.id not in products_set:
@@ -33,7 +35,7 @@ class CreateOrderUseCase:
                 logger.info(product)
                 raise DuplicateOrderPositionsException(product.id)
 
-        products, missing_products = await self.products_service.get_many_by_ids(
+        products, missing_products = await self.products_repository.get_many_by_ids(
             product_ids=[item.id for item in command.items],
         )
         if missing_products:
@@ -56,6 +58,7 @@ class CreateOrderUseCase:
                 items=products_in_payment,
             )
         )
+
         order = Order.create(
             user_email=command.customer_email,
             operation_id=payment_data["operationId"],
@@ -73,8 +76,8 @@ class CreateOrderUseCase:
             for item in command.items
         ]
 
-        await self.order_service.create(order=order)
-        await self.order_item_service.create_many(order_items)
+        await self.order_repository.create(order=order)
+        await self.order_item_repository.create_many(order_items)
         await self.transaction_manager.commit()
 
         logger.info(

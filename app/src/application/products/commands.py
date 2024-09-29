@@ -30,9 +30,9 @@ class GetManyProductsCommand:
 @dataclass
 class UpdateProductCommand:
     product_id: UUID
-    name: str
-    category: str
-    description: str
-    price: int
-    units_of_measurement: UnitsOfMesaurement
+    name: str | None = None
+    category: str | None = None
+    description: str | None = None
+    price: int | None = None
+    units_of_measurement: UnitsOfMesaurement | None = None
     photo_url: str | None = None

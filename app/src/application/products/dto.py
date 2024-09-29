@@ -4,6 +4,7 @@ from uuid import UUID
 
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import UnitsOfMesaurement
+from src.domain.products.value_objects import ProductPrice
 
 
 class VatType(Enum):
@@ -32,9 +33,27 @@ class ProductOut:
     name: str
     category: str
     description: str
-    price: int  # в копейках
+    price: float
     units_of_measurement: UnitsOfMesaurement
     photo_url: str | None = None
+
+    def __init__(
+        self,
+        id: UUID,
+        name: str,
+        category: str,
+        description: str,
+        price: int,
+        units_of_measurement: UnitsOfMesaurement,
+        photo_url: str | None = None,
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.category = category
+        self.description = description
+        self.price = ProductPrice(price).to_rubles()
+        self.units_of_measurement = units_of_measurement
+        self.photo_url = photo_url
 
 
 @dataclass

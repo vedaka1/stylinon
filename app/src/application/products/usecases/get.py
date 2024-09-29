@@ -2,21 +2,21 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from src.application.common.pagination import ListPaginatedResponse, PaginationOutSchema
-from src.application.products.commands import (
-    CreateProductCommand,
-    GetManyProductsCommand,
-)
+from src.application.products.commands import GetManyProductsCommand
 from src.application.products.dto import ProductOut
-from src.domain.products.entities import Product
-from src.domain.products.service import ProductServiceInterface
+from src.domain.products.exceptions import ProductNotFoundException
+from src.domain.products.repository import ProductRepositoryInterface
 
 
 @dataclass
 class GetProductUseCase:
-    product_service: ProductServiceInterface
+
+    product_repository: ProductRepositoryInterface
 
     async def execute(self, product_id: UUID) -> ProductOut:
-        product = await self.product_service.get_by_id(product_id=product_id)
+        product = await self.product_repository.get_by_id(product_id=product_id)
+        if not product:
+            raise ProductNotFoundException
         return ProductOut(
             id=product.id,
             name=product.name,
@@ -30,13 +30,14 @@ class GetProductUseCase:
 
 @dataclass
 class GetManyProductsUseCase:
-    product_service: ProductServiceInterface
+
+    product_repository: ProductRepositoryInterface
 
     async def execute(
         self,
         command: GetManyProductsCommand,
     ) -> ListPaginatedResponse[ProductOut]:
-        products = await self.product_service.get_many(
+        products = await self.product_repository.get_many(
             name=command.name,
             category=command.category,
             description=command.description,
@@ -46,7 +47,7 @@ class GetManyProductsUseCase:
             offset=command.pagination.offset,
             limit=command.pagination.limit,
         )
-        total = await self.product_service.count(
+        total = await self.product_repository.count(
             name=command.name,
             category=command.category,
             description=command.description,

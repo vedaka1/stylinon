@@ -12,3 +12,6 @@ class ProductPrice:
             raise ValueError("Value must be a integer")
         if self.value <= 0:
             raise ProductIncorrectPriceException
+
+    def to_rubles(self) -> float:
+        return self.value / 100

@@ -4,6 +4,7 @@
 .env.production
 .mypy_cache
 .pytest_cache
+.VSCodeCounter
 __pycache__
 *.pyc
 *.key

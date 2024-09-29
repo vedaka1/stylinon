@@ -3,12 +3,13 @@ from dataclasses import dataclass
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.products.commands import CreateProductCommand
 from src.domain.products.entities import Product
-from src.domain.products.service import ProductServiceInterface
+from src.domain.products.repository import ProductRepositoryInterface
 
 
 @dataclass
 class CreateProductUseCase:
-    product_service: ProductServiceInterface
+
+    product_repository: ProductRepositoryInterface
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateProductCommand) -> None:
@@ -20,6 +21,6 @@ class CreateProductUseCase:
             units_of_measurement=command.units_of_measurement,
             photo_url=command.photo_url,
         )
-        await self.product_service.create(product)
+        await self.product_repository.create(product)
         await self.transaction_manager.commit()
         return None

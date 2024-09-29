@@ -9,13 +9,13 @@ from src.domain.products.entities import Product
 
 # fmt: off
 class OrderStatus(str, Enum):
-    CREATED = "CREATED"         # Заказ создан и ожидает оплаты
-    APPROVED = "APPROVED"       # Заказ оплачен
-    PROCESSING = "PROCESSING"   # Заказ в обработке
-    SHIPPED = "SHIPPED"         # Заказ отправлен
-    COMPLETED = "COMPLETED"     # Заказ доставлен
-    CANCELLED = "CANCELLED"     # Заказ отменен
-    FAILED = "FAILED"           # Заказ не выполнен
+    CREATED = "Создан"         # Заказ создан и ожидает оплаты
+    APPROVED = "Оплачен"       # Заказ оплачен
+    PROCESSING = "В обработке"   # Заказ в обработке
+    SHIPPED = "Отправлен"         # Заказ отправлен
+    COMPLETED = "Завершен"     # Заказ доставлен
+    CANCELLED = "Отменен"     # Заказ отменен
+    FAILED = "Не выполнен"           # Заказ не выполнен
 # fmt: on
 
 

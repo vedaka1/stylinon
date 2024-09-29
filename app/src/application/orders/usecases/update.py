@@ -1,45 +1,62 @@
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 
 from src.application.acquiring.dto import AcquiringWebhookType
 from src.application.acquiring.exceptions import IncorrectAcqioringWebhookTypeException
-from src.application.common.email.service import EmailServiceInterface
 from src.application.common.email.utils import get_new_order_template
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
+from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import UpdateOrderCommand
 from src.domain.orders.entities import OrderStatus
-from src.domain.orders.service import OrderServiceInterface
+from src.domain.orders.exceptions import OrderNotFoundException
+from src.domain.orders.repository import OrderRepositoryInterface
 
 logger = logging.getLogger()
 
 
 @dataclass
 class UpdateOrderUseCase:
-    order_service: OrderServiceInterface
+
+    order_repository: OrderRepositoryInterface
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: UpdateOrderCommand) -> None:
-        await self.order_service.update(
-            order_id=command.order_id,
-            shipping_address=command.shipping_address,
-            tracking_number=command.tracking_number,
-            status=command.status,
-        )
+        order = await self.order_repository.get_by_id(command.order_id)
+
+        if not order:
+            raise OrderNotFoundException
+
+        if command.shipping_address:
+            order.shipping_address = command.shipping_address
+        if command.tracking_number:
+            order.tracking_number = command.tracking_number
+        if command.status:
+            order.status = command.status
+
+        order.updated_at = datetime.now()
+
+        await self.order_repository.update(order=order)
+
         await self.transaction_manager.commit()
+
         logger.info("Order updated", extra={"order_id": command.order_id})
+
         return None
 
 
 @dataclass
 class UpdateOrderByWebhookUseCase:
-    order_service: OrderServiceInterface
+
+    order_repository: OrderRepositoryInterface
     acquiring_service: AcquiringServiceInterface
     transaction_manager: TransactionManagerInterface
-    email_service: EmailServiceInterface
+    smtp_server: SyncSMTPServerInterface
 
     async def execute(self, token: str) -> None:
         webhook_data = self.acquiring_service.handle_webhook(token=token)
+
         if (
             webhook_data.get("webhookType")
             != AcquiringWebhookType.acquiringInternetPayment
@@ -49,22 +66,29 @@ class UpdateOrderByWebhookUseCase:
                 extra={"data": webhook_data},
             )
             raise IncorrectAcqioringWebhookTypeException
-        order = await self.order_service.get_by_operation_id(
+
+        order = await self.order_repository.get_by_operation_id(
             operation_id=webhook_data["operationId"],
         )
-        await self.order_service.update(
-            order_id=order.id,
-            status=OrderStatus.APPROVED,
-        )
-        await self.transaction_manager.commit()
+
+        if not order:
+            raise OrderNotFoundException
+
+        order.status = OrderStatus.APPROVED
+
+        await self.order_repository.update(order=order)
 
         email_content = get_new_order_template(order)
 
-        await self.email_service.send_email(
-            email="vedaka13@yandex.com",
-            body=email_content,
+        message = self.smtp_server.create_message(
+            content=email_content,
+            to_address="vedaka13@yandex.com",
         )
 
+        await self.smtp_server.send_email(message=message)
+
         logger.info("Order updated by webhook", extra={"order_id": order.id})
+
+        await self.transaction_manager.commit()
 
         return None

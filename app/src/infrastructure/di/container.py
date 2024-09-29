@@ -23,7 +23,11 @@ from src.application.chats.usecases.create import (
     CreateChatUseCase,
     CreateMessageUseCase,
 )
-from src.application.chats.usecases.get import GetChatUseCase, GetUserChatsUseCase
+from src.application.chats.usecases.get import (
+    GetChatsListUseCase,
+    GetChatUseCase,
+    GetUserChatsUseCase,
+)
 from src.application.common.email.service import EmailService, EmailServiceInterface
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
@@ -206,6 +210,7 @@ class UseCasesProvider(Provider):
     create_chat = provide(CreateChatUseCase)
     get_user_chats = provide(GetUserChatsUseCase)
     get_chat = provide(GetChatUseCase)
+    get_chats_list = provide(GetChatsListUseCase)
 
 
 class ServiceProvider(Provider):
@@ -227,7 +232,7 @@ class ServiceProvider(Provider):
 
 
 class GatewayProvider(Provider):
-    scope = Scope.REQUEST
+    scope = Scope.APP
 
     acquiring_gateway = provide(
         TochkaAcquiringGateway,

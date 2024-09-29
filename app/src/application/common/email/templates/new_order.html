@@ -63,17 +63,17 @@
     <h2>Товары в заказе:</h2>
     {% for item in order.items %}
     <div class="order-item">
-        <p class="product-name">{{ item.product.name }} ({{ item.quantity }} шт.)</p>
-        <p><strong>Цена:</strong> {{ item.product.price.value / 100 }} ₽</p>
+        <p class="product-name">{{ item.product.name }} ({{ item.quantity }} {{ item.product.units_of_measurement.value }} * {{ item.product.price.to_rubles() }} ₽)</p>
+        <p><strong>Сумма:</strong> {{ item.product.price.value * item.quantity / 100 }} ₽</p>
     </div>
     {% endfor %}
 
     <div class="total-price">
-        <strong>Итого:</strong> {{ order.total_price / 100 }}
+        <strong>Итого:</strong> {{ order.total_price / 100 }} ₽
     </div>
 
     <div class="footer">
-        <p>Спасибо за ваш заказ!</p>
+        <!-- <p>Спасибо за ваш заказ!</p> -->
     </div>
 </div>
 

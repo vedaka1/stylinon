@@ -1,14 +1,7 @@
 from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
-from fastapi import (
-    APIRouter,
-    Depends,
-    Request,
-    Security,
-    WebSocket,
-    WebSocketDisconnect,
-)
+from fastapi import APIRouter, Depends, Request, Security
 from src.application.common.response import APIResponse
 from src.application.orders.commands import (
     CreateOrderCommand,
@@ -23,7 +16,6 @@ from src.application.orders.usecases import (
     UpdateOrderByWebhookUseCase,
     UpdateOrderUseCase,
 )
-from src.domain.orders.entities import Order
 from src.domain.orders.exceptions import (
     OrderItemIncorrectQuantityException,
     OrderNotFoundException,
@@ -79,7 +71,7 @@ async def create_order(
     "/{order_id}",
     summary="Возвращает данные о заказе",
     responses={
-        200: {"model": APIResponse[Order]},
+        200: {"model": APIResponse[OrderOut]},
         404: {"model": OrderNotFoundException},
     },
     dependencies=[
@@ -95,7 +87,7 @@ async def create_order(
 async def get_order(
     order_id: UUID,
     get_order_interactor: FromDishka[GetOrderUseCase],
-) -> APIResponse[Order]:
+) -> APIResponse[OrderOut]:
     response = await get_order_interactor.execute(order_id=order_id)
     return APIResponse(data=response)
 
@@ -104,7 +96,7 @@ async def get_order(
     "/{order_id}",
     summary="Обновить данные о заказе",
     responses={
-        200: {"model": APIResponse[Order]},
+        200: {"model": APIResponse[OrderOut]},
         404: {"model": OrderNotFoundException},
     },
     dependencies=[

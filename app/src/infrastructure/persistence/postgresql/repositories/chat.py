@@ -69,6 +69,8 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
             )
             cursor = await self.session.execute(query_with_relations)
             entities = cursor.all()
+            if not entities or not entities[0]:
+                return None
             chat = entities[0][0]
             messages = [row[1] for row in entities]
             return map_to_chat_with_messages(entity=chat, messages=messages)

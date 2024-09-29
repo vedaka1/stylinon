@@ -5,13 +5,15 @@ from src.application.chats.commands import CreateChatCommand, CreateMessageComma
 from src.application.chats.interface import WebsocketManagerInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.domain.chats.entities import Chat, Message
-from src.domain.chats.service import ChatServiceInterface, MessageServiceInterface
+from src.domain.chats.repository import (
+    ChatRepositoryInterface,
+    MessageRepositoryInterface,
+)
 
 
 @dataclass
 class CreateChatUseCase:
-
-    chat_service: ChatServiceInterface
+    chat_repository: ChatRepositoryInterface
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateChatCommand, user_id: UUID) -> None:
@@ -19,15 +21,17 @@ class CreateChatUseCase:
             owner_id=user_id,
             title=command.title,
         )
-        await self.chat_service.create(chat=chat)
+        await self.chat_repository.create(chat=chat)
+
         await self.transaction_manager.commit()
+
         return None
 
 
 @dataclass
 class CreateMessageUseCase:
     websocket_manager: WebsocketManagerInterface
-    message_service: MessageServiceInterface
+    message_repository: MessageRepositoryInterface
     transaction_manager: TransactionManagerInterface
 
     async def execute(
@@ -41,8 +45,12 @@ class CreateMessageUseCase:
             chat_id=chat_id,
             content=command.message,
         )
-        await self.message_service.create(message=message)
+        await self.message_repository.create(message=message)
+
         data = {"user_id": str(user_id), "message": command.message}
+
         await self.websocket_manager.send_all(key=chat_id, data=data)
+
         await self.transaction_manager.commit()
+
         return None

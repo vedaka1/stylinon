@@ -2,19 +2,22 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from src.application.common.pagination import ListPaginatedResponse, PaginationOutSchema
-from src.application.orders.responses import OrderItemOut, OrderOut
+from src.application.orders.dto import OrderItemOut, OrderOut
 from src.application.users.commands import GetUsersListCommand
-from src.application.users.responses import UserOut
-from src.domain.orders.service import OrderServiceInterface
-from src.domain.users.service import UserServiceInterface
+from src.application.users.dto import UserOut
+from src.domain.orders.repository import OrderRepositoryInterface
+from src.domain.users.exceptions import UserNotFoundException
+from src.domain.users.repository import UserRepositoryInterface
 
 
 @dataclass
 class GetUserUseCase:
-    user_service: UserServiceInterface
+    user_repository: UserRepositoryInterface
 
     async def execute(self, user_id: UUID) -> UserOut:
-        user = await self.user_service.get_by_id(user_id=user_id)
+        user = await self.user_repository.get_by_id(user_id=user_id)
+        if not user:
+            raise UserNotFoundException
         return UserOut(
             id=str(user.id),
             email=user.email,
@@ -28,18 +31,18 @@ class GetUserUseCase:
 
 @dataclass
 class GetUsersListUseCase:
-    user_service: UserServiceInterface
+    user_repository: UserRepositoryInterface
 
     async def execute(
         self,
         command: GetUsersListCommand,
     ) -> ListPaginatedResponse[UserOut]:
-        users = await self.user_service.get_many(
+        users = await self.user_repository.get_many(
             offset=command.pagiantion.offset,
             limit=command.pagiantion.limit,
             search=command.search,
         )
-        total = await self.user_service.count(search=command.search)
+        total = await self.user_repository.count(search=command.search)
         return ListPaginatedResponse(
             items=[
                 UserOut(
@@ -63,10 +66,10 @@ class GetUsersListUseCase:
 
 @dataclass
 class GetUserOrdersUseCase:
-    order_service: OrderServiceInterface
+    order_repository: OrderRepositoryInterface
 
     async def execute(self, email: str) -> list[OrderOut]:
-        orders = await self.order_service.get_by_user_email(user_email=email)
+        orders = await self.order_repository.get_by_user_email(user_email=email)
         return [
             OrderOut(
                 id=order.id,
@@ -80,6 +83,7 @@ class GetUserOrdersUseCase:
                 status=order.status,
                 items=[
                     OrderItemOut(
+                        product_id=order_item.product.id,
                         name=order_item.product.name,
                         category=order_item.product.category,
                         description=order_item.product.description,
