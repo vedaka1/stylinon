@@ -34,6 +34,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
             shipping_address=order.shipping_address,
             operation_id=order.operation_id,
             tracking_number=order.tracking_number,
+            total_price=order.total_price,
             status=order.status,
         )
         await self.session.execute(query)
@@ -81,7 +82,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         return await self._get_by(
             key=OrderPrimaryKey.ID,
             value=order_id,
-            with_relations=False,
+            with_relations=True,
         )
 
     async def get_by_id_with_products(self, order_id: UUID) -> Order | None:

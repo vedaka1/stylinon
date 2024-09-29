@@ -31,6 +31,7 @@ class TestOrderRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             await order_repository.create(order)
             await transaction_manager.commit()
@@ -57,6 +58,7 @@ class TestOrderRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             await order_repository.create(order)
             order.status = OrderStatus.PROCESSING
@@ -73,6 +75,7 @@ class TestOrderRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             await order_repository.create(order)
             # Check it
@@ -91,6 +94,7 @@ class TestOrderRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             await order_repository.create(order)
             # Delete order
@@ -107,6 +111,7 @@ class TestOrderRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             await order_repository.create(order)
             # Check it and get it
@@ -122,6 +127,7 @@ class TestOrderRepository:
                     user_email=f"test{i}@test.com",
                     operation_id=uuid4(),
                     shipping_address=f"test{i}_address",
+                    total_price=1234,
                 )
                 for i in range(3)
             ]
@@ -156,6 +162,7 @@ class TestOrderRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             order_item = OrderItem.create(
                 order_id=order.id,
@@ -178,5 +185,5 @@ class TestOrderRepository:
             assert order_item.product.name == product.name
             assert order_item.product.description == product.description
             assert order_item.product.category == product.category
-            assert order_item.product.price == product.price
+            assert order_item.product.price.value == product.price.value
             assert order_item.quantity == 1

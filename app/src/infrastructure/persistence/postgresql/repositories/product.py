@@ -22,7 +22,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             name=product.name,
             category=product.category,
             description=product.description,
-            price=product.price,
+            price=product.price.value,
             units_of_measurement=product.units_of_measurement,
             photo_url=product.photo_url,
         )
@@ -37,7 +37,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                     "name": product.name,
                     "category": product.category,
                     "description": product.description,
-                    "price": product.price,
+                    "price": product.price.value,
                     "units_of_measurement": product.units_of_measurement,
                     "photo_url": product.photo_url,
                 }
@@ -55,7 +55,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 name=product.name,
                 category=product.category,
                 description=product.description,
-                price=product.price,
+                price=product.price.value,
                 units_of_measurement=product.units_of_measurement,
                 photo_url=product.photo_url,
             )

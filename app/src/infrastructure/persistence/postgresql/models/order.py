@@ -28,6 +28,7 @@ class OrderModel(Base):
     shipping_address: Mapped[str] = mapped_column(nullable=False)
     operation_id: Mapped[UUID] = mapped_column(nullable=False)
     tracking_number: Mapped[str] = mapped_column(nullable=True)
+    total_price: Mapped[int] = mapped_column(nullable=False)
     status: Mapped[OrderStatus] = mapped_column(nullable=False)
 
     order_items: Mapped[list["OrderItemModel"]] = relationship(
@@ -47,6 +48,7 @@ def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
         shipping_address=entity.shipping_address,
         operation_id=entity.operation_id,
         tracking_number=entity.tracking_number,
+        total_price=entity.total_price,
         status=entity.status,
     )
     if with_relations:
@@ -80,7 +82,7 @@ class OrderItemModel(Base):
     )
 
     def __repr__(self) -> str:
-        return f"OrderItemModel({self.__dict__})"
+        return f"OrderItemModel: {self.__dict__})"
 
 
 def map_to_order_item(entity: OrderItemModel, with_product: bool = False) -> OrderItem:

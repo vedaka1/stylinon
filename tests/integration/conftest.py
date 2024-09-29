@@ -13,6 +13,7 @@ from fastapi.responses import ORJSONResponse
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from src.application.chats.interface import WebsocketManagerInterface
 from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.application.common.response import ErrorAPIResponse
 from src.domain.common.exceptions.base import ApplicationException
@@ -31,6 +32,7 @@ from src.infrastructure.persistence.postgresql.database import (
 )
 from src.infrastructure.persistence.postgresql.models import Base
 from src.infrastructure.settings import settings
+from src.infrastructure.websockets.manager import WebsocketManager
 from src.presentation.api.v1.router import api_router as api_router_v1
 from starlette.types import ExceptionHandler
 from testcontainers.postgres import PostgresContainer
@@ -109,6 +111,10 @@ async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
             acquiring_session = aiohttp.ClientSession(headers=headers)
             yield acquiring_session
             await acquiring_session.close()
+
+        @provide(scope=Scope.APP)
+        def websocker_manager(self) -> WebsocketManagerInterface:
+            return WebsocketManager()
 
     def get_container() -> AsyncContainer:
         return make_async_container(

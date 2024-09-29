@@ -76,13 +76,14 @@ class GetUserOrdersUseCase:
                 shipping_address=order.shipping_address,
                 operation_id=order.operation_id,
                 tracking_number=order.tracking_number,
+                total_price=order.total_price,
                 status=order.status,
                 items=[
                     OrderItemOut(
                         name=order_item.product.name,
                         category=order_item.product.category,
                         description=order_item.product.description,
-                        price=order_item.product.price,
+                        price=order_item.product.price.value,
                         quantity=order_item.quantity,
                         units_of_measurement=order_item.product.units_of_measurement,
                     )

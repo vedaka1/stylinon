@@ -81,7 +81,6 @@ async def websocket_endpoint(
     container: Annotated[AsyncContainer, Depends(get_container)],
 ) -> None:
     websocket_manager = await container.get(WebsocketManagerInterface)
-
     await websocket_manager.accept_connection(websocket=websocket, key=chat_id)
 
     try:
@@ -89,7 +88,7 @@ async def websocket_endpoint(
         while True:
             await websocket.receive_text()
     except (NotAuthorizedException, TokenExpiredException) as exc:
-        await websocket.send_json(data={"error": exc.message})
+        await websocket.send_json(data={"message": exc.message})
         await websocket_manager.remove_connection(websocket=websocket, key=chat_id)
         await websocket.close()
 

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новое уведомление о заказе</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .order-details {
+            margin-bottom: 20px;
+        }
+        .order-item {
+            border-top: 1px solid #eaeaea;
+            padding: 10px 0;
+        }
+        .order-item:first-child {
+            border-top: none;
+        }
+        .product-name {
+            font-weight: bold;
+        }
+        .total-price {
+            font-size: 1.2em;
+            color: #e67e22;
+            margin-top: 10px;
+        }
+        .footer {
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Новый заказ!</h1>
+    <div class="order-details">
+        <p><strong>ID Заказа:</strong> {{ order.id }}</p>
+        <p><strong>Пользователь:</strong> {{ order.user_email }}</p>
+        <p><strong>Дата создания:</strong> {{ order.created_at }}</p>
+        <p><strong>Адрес доставки:</strong> {{ order.shipping_address }}</p>
+        <p><strong>Статус:</strong> {{ order.status.value }}</p>
+    </div>
+
+    <h2>Товары в заказе:</h2>
+    {% for item in order.items %}
+    <div class="order-item">
+        <p class="product-name">{{ item.product.name }} ({{ item.quantity }} шт.)</p>
+        <p><strong>Цена:</strong> {{ item.product.price.value / 100 }} ₽</p>
+    </div>
+    {% endfor %}
+
+    <div class="total-price">
+        <strong>Итого:</strong> {{ order.total_price / 100 }}
+    </div>
+
+    <div class="footer">
+        <p>Спасибо за ваш заказ!</p>
+    </div>
+</div>
+
+</body>
+</html>

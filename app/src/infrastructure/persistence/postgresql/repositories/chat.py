@@ -3,10 +3,17 @@ from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import aliased, joinedload, selectinload, subqueryload
 from src.domain.chats.entities import Chat
 from src.domain.chats.repository import ChatPrimaryKey, ChatRepositoryInterface
-from src.infrastructure.persistence.postgresql.models.chat import ChatModel, map_to_chat
+from src.infrastructure.persistence.postgresql.models.chat import (
+    ChatModel,
+    MessageModel,
+    map_to_chat,
+)
+from src.infrastructure.persistence.postgresql.repositories.mappers import (
+    map_to_chat_with_messages,
+)
 
 
 class SqlalchemyChatRepository(ChatRepositoryInterface):
@@ -53,14 +60,23 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
         value: UUID,
         with_relations: bool = False,
     ) -> Chat | None:
-        query = select(ChatModel)
-        if key == ChatPrimaryKey.ID:
-            query = query.where(ChatModel.id == value)
         if with_relations:
-            query = query.options(selectinload(ChatModel.last_messages))
-        cursor = await self.session.execute(query)
-        entity = cursor.scalar_one_or_none()
-        return map_to_chat(entity, with_relations=with_relations) if entity else None
+            query_with_relations = (
+                select(ChatModel, MessageModel)
+                .join(ChatModel, ChatModel.id == MessageModel.chat_id)
+                .where(ChatModel.id == value)
+                .limit(10)
+            )
+            cursor = await self.session.execute(query_with_relations)
+            entities = cursor.all()
+            chat = entities[0][0]
+            messages = [row[1] for row in entities]
+            return map_to_chat_with_messages(entity=chat, messages=messages)
+        else:
+            query = select(ChatModel).where(ChatModel.id == value)
+            cursor = await self.session.execute(query)
+            entity = cursor.scalar_one_or_none()
+            return map_to_chat(entity=entity) if entity else None
 
     async def get_by_id(self, chat_id: UUID) -> Chat | None:
         return await self._get_by(

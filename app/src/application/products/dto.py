@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from enum import Enum
+from uuid import UUID
 
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import UnitsOfMesaurement
@@ -23,6 +24,17 @@ class PaymentObject(Enum):
     GOODS = "goods"
     SERVICE = "service"
     WORK = "work"
+
+
+@dataclass
+class ProductOut:
+    id: UUID
+    name: str
+    category: str
+    description: str
+    price: int  # в копейках
+    units_of_measurement: UnitsOfMesaurement
+    photo_url: str | None = None
 
 
 @dataclass

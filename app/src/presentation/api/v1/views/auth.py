@@ -124,6 +124,7 @@ async def refresh(
         value=token.type + token.refresh_token,
         max_age=token.refresh_max_age,
         httponly=True,
+        # samesite="none"
         # secure=True,
     )
     return APIResponse()

@@ -10,7 +10,7 @@ from src.infrastructure.persistence.postgresql.models.auth import (
 )
 
 
-class RefreshTokenRepository(RefreshTokenRepositoryInterface):
+class SqlalchemyRefreshTokenRepository(RefreshTokenRepositoryInterface):
 
     slots = ("session",)
 

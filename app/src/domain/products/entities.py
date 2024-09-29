@@ -3,6 +3,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 
 from src.domain.products.exceptions import ProductIncorrectPriceException
+from src.domain.products.value_objects import ProductPrice
 
 
 class UnitsOfMesaurement(str, Enum):
@@ -19,7 +20,7 @@ class Product:
     name: str
     category: str
     description: str
-    price: int  # в копейках
+    price: ProductPrice  # в копейках
     units_of_measurement: UnitsOfMesaurement
     photo_url: str | None = None
 
@@ -30,16 +31,16 @@ class Product:
         description: str,
         price: int,
         units_of_measurement: UnitsOfMesaurement,
+        photo_url: str | None = "/images/no_image.png",
     ) -> "Product":
-        if price <= 0:
-            raise ProductIncorrectPriceException
         return Product(
             id=uuid4(),
             name=name,
             category=category,
             description=description,
-            price=price,
+            price=ProductPrice(price),
             units_of_measurement=units_of_measurement,
+            photo_url=photo_url,
         )
 
     def __hash__(self) -> int:

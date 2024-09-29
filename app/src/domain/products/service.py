@@ -16,7 +16,16 @@ class ProductServiceInterface(ABC):
     async def delete(self, product_id: UUID) -> None: ...
 
     @abstractmethod
-    async def update(self, product: Product) -> None: ...
+    async def update(
+        self,
+        product_id: UUID,
+        name: str,
+        category: str,
+        description: str,
+        price: int,
+        units_of_measurement: UnitsOfMesaurement,
+        photo_url: str | None = None,
+    ) -> None: ...
 
     @abstractmethod
     async def get_by_id(self, product_id: UUID) -> Product: ...

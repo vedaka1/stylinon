@@ -6,6 +6,7 @@ from src.application.products.commands import (
     CreateProductCommand,
     GetManyProductsCommand,
 )
+from src.application.products.dto import ProductOut
 from src.domain.products.entities import Product
 from src.domain.products.service import ProductServiceInterface
 
@@ -14,9 +15,17 @@ from src.domain.products.service import ProductServiceInterface
 class GetProductUseCase:
     product_service: ProductServiceInterface
 
-    async def execute(self, product_id: UUID) -> Product:
+    async def execute(self, product_id: UUID) -> ProductOut:
         product = await self.product_service.get_by_id(product_id=product_id)
-        return product
+        return ProductOut(
+            id=product.id,
+            name=product.name,
+            category=product.category,
+            description=product.description,
+            price=product.price.value,
+            units_of_measurement=product.units_of_measurement,
+            photo_url=product.photo_url,
+        )
 
 
 @dataclass
@@ -26,7 +35,7 @@ class GetManyProductsUseCase:
     async def execute(
         self,
         command: GetManyProductsCommand,
-    ) -> ListPaginatedResponse[Product]:
+    ) -> ListPaginatedResponse[ProductOut]:
         products = await self.product_service.get_many(
             name=command.name,
             category=command.category,
@@ -46,7 +55,18 @@ class GetManyProductsUseCase:
             units_of_measurement=command.units_of_measurement,
         )
         return ListPaginatedResponse(
-            items=products,
+            items=[
+                ProductOut(
+                    id=product.id,
+                    name=product.name,
+                    category=product.category,
+                    description=product.description,
+                    price=product.price.value,
+                    units_of_measurement=product.units_of_measurement,
+                    photo_url=product.photo_url,
+                )
+                for product in products
+            ],
             pagination=PaginationOutSchema(
                 limit=command.pagination.limit,
                 page=command.pagination.page,

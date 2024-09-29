@@ -25,7 +25,13 @@ class ChatModel(Base):
         TIMESTAMP(timezone=False),
         nullable=False,
     )
-    last_messages: Mapped[list["MessageModel"]] = relationship(back_populates="chat")
+    last_messages: Mapped[list["MessageModel"]] = relationship(
+        back_populates="chat",
+        order_by="MessageModel.created_at",
+    )
+
+    def __repr__(self) -> str:
+        return f"ChatModel(id={self.id}, owner_id={self.owner_id}, title={self.title}, created_at={self.created_at}, updated_at={self.updated_at})"
 
 
 def map_to_chat(entity: ChatModel, with_relations: bool = False) -> Chat:
@@ -65,6 +71,9 @@ class MessageModel(Base):
     )
 
     chat: Mapped["ChatModel"] = relationship(back_populates="last_messages")
+
+    def __repr__(self) -> str:
+        return f"MessageModel(id={self.id}, user_id={self.user_id}, chat_id={self.chat_id}, content={self.content}, created_at={self.created_at}, updated_at={self.updated_at})"
 
 
 def map_to_message(entity: MessageModel) -> Message:

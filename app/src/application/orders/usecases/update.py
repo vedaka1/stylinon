@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 from src.application.acquiring.dto import AcquiringWebhookType
 from src.application.acquiring.exceptions import IncorrectAcqioringWebhookTypeException
+from src.application.common.email.service import EmailServiceInterface
+from src.application.common.email.utils import get_new_order_template
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import UpdateOrderCommand
@@ -34,6 +36,7 @@ class UpdateOrderByWebhookUseCase:
     order_service: OrderServiceInterface
     acquiring_service: AcquiringServiceInterface
     transaction_manager: TransactionManagerInterface
+    email_service: EmailServiceInterface
 
     async def execute(self, token: str) -> None:
         webhook_data = self.acquiring_service.handle_webhook(token=token)
@@ -54,5 +57,14 @@ class UpdateOrderByWebhookUseCase:
             status=OrderStatus.APPROVED,
         )
         await self.transaction_manager.commit()
+
+        email_content = get_new_order_template(order)
+
+        await self.email_service.send_email(
+            email="vedaka13@yandex.com",
+            body=email_content,
+        )
+
         logger.info("Order updated by webhook", extra={"order_id": order.id})
+
         return None

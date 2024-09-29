@@ -31,6 +31,7 @@ class TestOrderItemRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             order_item = OrderItem.create(
                 order_id=order.id,
@@ -67,6 +68,7 @@ class TestOrderItemRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             order_items = [
                 OrderItem.create(
@@ -102,6 +104,7 @@ class TestOrderItemRepository:
                 user_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
+                total_price=1234,
             )
             order_item = OrderItem.create(
                 order_id=order.id,

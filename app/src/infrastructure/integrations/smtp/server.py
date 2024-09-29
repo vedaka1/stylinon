@@ -104,10 +104,9 @@ class SyncSMTPServer(SyncSMTPServerInterface):
                 raise ApplicationException
 
     async def send_email(self, message: MIMEMultipart) -> None:
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            await asyncio.get_event_loop().run_in_executor(
-                executor,
-                self._send,
-                message,
-            )
+        asyncio.get_event_loop().run_in_executor(
+            None,
+            self._send,
+            message,
+        )
         return None

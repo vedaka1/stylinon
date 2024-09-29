@@ -7,7 +7,7 @@ from src.domain.chats.entities import Chat, Message
 
 class ChatPrimaryKey(Enum):
     ID = "id"
-    OWNER_ID = "owner_id"
+    # OWNER_ID = "owner_id"
 
 
 class MessagePrimaryKey(Enum):

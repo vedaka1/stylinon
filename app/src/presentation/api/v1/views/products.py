@@ -1,22 +1,21 @@
-from typing import Annotated
 from uuid import UUID, uuid4
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Form, Security, UploadFile
-from src.application.auth.dto import UserTokenData
 from src.application.common.pagination import ListPaginatedResponse, PaginationQuery
 from src.application.common.response import APIResponse
 from src.application.products.commands import (
     CreateProductCommand,
     GetManyProductsCommand,
 )
+from src.application.products.dto import ProductOut
 from src.application.products.usecases import (
     CreateProductUseCase,
     GetManyProductsUseCase,
     GetProductUseCase,
 )
 from src.domain.common.exceptions.base import ApplicationException
-from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.domain.products.entities import UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import auth_required, get_current_user_data
@@ -25,7 +24,6 @@ router = APIRouter(
     tags=["Products"],
     prefix="/products",
     route_class=DishkaRoute,
-    dependencies=[Depends(auth_required)],
 )
 
 
@@ -57,7 +55,7 @@ def get_products_list_command(
 async def get_many_products(
     get_products_list_interactor: FromDishka[GetManyProductsUseCase],
     command: GetManyProductsCommand = Depends(get_products_list_command),
-) -> APIResponse[ListPaginatedResponse[Product]]:
+) -> APIResponse[ListPaginatedResponse[ProductOut]]:
     response = await get_products_list_interactor.execute(command=command)
     return APIResponse(data=response)
 
@@ -84,6 +82,7 @@ async def create_product(
     units_of_measurement: UnitsOfMesaurement = Form(...),
     photo: UploadFile | None = None,
 ) -> APIResponse[None]:
+    photo_url = "/images/no_image.png"
     if photo:
         try:
             content_type = "jpg"
@@ -92,6 +91,7 @@ async def create_product(
             photo_id = str(uuid4())
             with open(f"./images/{photo_id}.{content_type}", "wb+") as f:
                 f.write(photo.file.read())
+            photo_url = f"/images/{photo_id}.{content_type}"
         except Exception:
             raise ApplicationException
         finally:
@@ -102,6 +102,7 @@ async def create_product(
         description=description,
         price=price,
         units_of_measurement=units_of_measurement,
+        photo_url=photo_url,
     )
     await create_product_interactor.execute(command=command)
     return APIResponse()
@@ -111,13 +112,13 @@ async def create_product(
     "/{product_id}",
     summary="Возвращает данные о товаре",
     responses={
-        200: {"model": APIResponse[Product]},
+        200: {"model": APIResponse[ProductOut]},
         404: {"model": ProductNotFoundException},
     },
 )
 async def get_product(
     product_id: UUID,
     get_product_interactor: FromDishka[GetProductUseCase],
-) -> APIResponse[Product]:
+) -> APIResponse[ProductOut]:
     response = await get_product_interactor.execute(product_id=product_id)
     return APIResponse(data=response)

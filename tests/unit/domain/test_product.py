@@ -3,6 +3,7 @@ from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductIncorrectPriceException
+from src.domain.products.value_objects import ProductPrice
 
 
 def test_success_create_product() -> None:
@@ -16,7 +17,7 @@ def test_success_create_product() -> None:
     assert product.name == "Test Product"
     assert product.category == "Test Category"
     assert product.description == "This is a test product"
-    assert product.price == 900
+    assert product.price == ProductPrice(900)
     assert product.units_of_measurement == UnitsOfMesaurement.PIECES
 
 

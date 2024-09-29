@@ -12,6 +12,7 @@ class CreateProductCommand(BaseModel):
     description: str
     price: int
     units_of_measurement: UnitsOfMesaurement
+    photo_url: str | None = None
 
 
 @dataclass
@@ -24,3 +25,14 @@ class GetManyProductsCommand:
     units_of_measurement: UnitsOfMesaurement | None
 
     pagination: PaginationQuery
+
+
+@dataclass
+class UpdateProductCommand:
+    product_id: UUID
+    name: str
+    category: str
+    description: str
+    price: int
+    units_of_measurement: UnitsOfMesaurement
+    photo_url: str | None = None

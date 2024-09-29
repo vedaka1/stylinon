@@ -24,6 +24,7 @@ from src.application.chats.usecases.create import (
     CreateMessageUseCase,
 )
 from src.application.chats.usecases.get import GetChatUseCase, GetUserChatsUseCase
+from src.application.common.email.service import EmailService, EmailServiceInterface
 from src.application.common.interfaces.acquiring import AcquiringServiceInterface
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
@@ -73,23 +74,13 @@ from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
     get_async_sessionmaker,
 )
-from src.infrastructure.persistence.postgresql.repositories.chat import (
+from src.infrastructure.persistence.postgresql.repositories import (
     SqlalchemyChatRepository,
-)
-from src.infrastructure.persistence.postgresql.repositories.message import (
     SqlalchemyMessageRepository,
-)
-from src.infrastructure.persistence.postgresql.repositories.order import (
     SqlalchemyOrderItemRepository,
     SqlalchemyOrderRepository,
-)
-from src.infrastructure.persistence.postgresql.repositories.product import (
     SqlalchemyProductRepository,
-)
-from src.infrastructure.persistence.postgresql.repositories.refresh import (
-    RefreshTokenRepository,
-)
-from src.infrastructure.persistence.postgresql.repositories.user import (
+    SqlalchemyRefreshTokenRepository,
     SqlalchemyUserRepository,
 )
 from src.infrastructure.persistence.postgresql.transaction import TransactionManager
@@ -178,7 +169,7 @@ class DatabaseAdaptersProvider(Provider):
         provides=ProductRepositoryInterface,
     )
     refresh_session_repository = provide(
-        RefreshTokenRepository,
+        SqlalchemyRefreshTokenRepository,
         provides=RefreshTokenRepositoryInterface,
     )
     chat_repository = provide(
@@ -228,6 +219,11 @@ class ServiceProvider(Provider):
     product_service = provide(ProductService, provides=ProductServiceInterface)
     chat_service = provide(ChatService, provides=ChatServiceInterface)
     message_service = provide(MessageService, provides=MessageServiceInterface)
+    email_service = provide(
+        EmailService,
+        provides=EmailServiceInterface,
+        scope=Scope.APP,
+    )
 
 
 class GatewayProvider(Provider):

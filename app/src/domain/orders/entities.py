@@ -28,6 +28,7 @@ class Order:
     shipping_address: str
     operation_id: UUID
     tracking_number: str | None
+    total_price: int
     status: OrderStatus
 
     items: list["OrderItem"] = field(default_factory=list)
@@ -37,6 +38,7 @@ class Order:
         user_email: str,
         operation_id: UUID,
         shipping_address: str,
+        total_price: int,
         *,
         status: OrderStatus = OrderStatus.CREATED,
     ) -> "Order":
@@ -49,6 +51,7 @@ class Order:
             shipping_address=shipping_address,
             operation_id=operation_id,
             tracking_number=None,
+            total_price=total_price,
             status=status,
         )
 

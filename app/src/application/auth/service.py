@@ -7,11 +7,9 @@ from src.application.auth.exceptions import (
     RefreshTokenNotFoundException,
     TokenExpiredException,
 )
-from src.application.common.email.templates import get_reset_password_template
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
-from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.domain.users.entities import User
 from src.domain.users.exceptions import (
     UserAlreadyExistsException,
@@ -53,9 +51,6 @@ class AuthServiceInterface(ABC):
     @abstractmethod
     async def reset_password(self, reset_token: str, new_password: str) -> None: ...
 
-    @abstractmethod
-    async def send_recovery_email(self, email: str) -> None: ...
-
 
 class AuthService(AuthServiceInterface):
     __slots__ = (
@@ -63,8 +58,6 @@ class AuthService(AuthServiceInterface):
         "password_hasher",
         "jwt_processor",
         "refresh_token_repository",
-        "smtp_server",
-        "frontend_url",
     )
 
     def __init__(
@@ -73,14 +66,11 @@ class AuthService(AuthServiceInterface):
         user_repository: UserRepositoryInterface,
         password_hasher: PasswordHasherInterface,
         jwt_processor: JWTProcessorInterface,
-        smtp_server: SyncSMTPServerInterface,
     ) -> None:
         self.refresh_token_repository = refresh_token_repository
         self.user_repository = user_repository
         self.password_hasher = password_hasher
         self.jwt_processor = jwt_processor
-        self.smtp_server = smtp_server
-        self.frontend_url = "http://localhost/api/v1/reset-password"
 
     async def login(
         self,
@@ -107,6 +97,7 @@ class AuthService(AuthServiceInterface):
                 user_agent=user_agent,
             )
         )
+        # returns an exisiting refresh session, if any
         if current_session:
             max_age = current_session.expires_at - datetime.now()
             token = Token(
@@ -205,16 +196,4 @@ class AuthService(AuthServiceInterface):
         await self.user_repository.update(user=user)
         await self.refresh_token_repository.delete_by_user_id(user_id=user.id)
         logger.info("Password reset", extra={"user_email": user.email})
-        return None
-
-    async def send_recovery_email(self, email: str) -> None:
-        reset_token = self.jwt_processor.create_reset_password_token(email=email)
-        reset_link = f"{self.frontend_url}/{reset_token}"
-        email_content = get_reset_password_template(reset_link=reset_link)
-        message = self.smtp_server.create_message(
-            content=email_content,
-            to_address=email,
-        )
-        await self.smtp_server.send_email(message=message)
-        logger.info("Password recovery email sent", extra={"sent_to": email})
         return None

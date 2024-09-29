@@ -5,6 +5,7 @@ from src.domain.products.entities import Product, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.service import ProductServiceInterface
+from src.domain.products.value_objects import ProductPrice
 
 
 class ProductService(ProductServiceInterface):
@@ -24,8 +25,29 @@ class ProductService(ProductServiceInterface):
         await self.product_repository.delete(product_id=product_id)
         return None
 
-    async def update(self, product: Product) -> None:
-        await self.get_by_id(product.id)
+    async def update(
+        self,
+        product_id: UUID,
+        name: str,
+        category: str,
+        description: str,
+        price: int,
+        units_of_measurement: UnitsOfMesaurement,
+        photo_url: str | None = None,
+    ) -> None:
+        product = await self.get_by_id(product_id)
+        if name:
+            product.name = name
+        if category:
+            product.category = category
+        if description:
+            product.description = description
+        if price:
+            product.price = ProductPrice(price)
+        if units_of_measurement:
+            product.units_of_measurement = units_of_measurement
+        if photo_url:
+            product.photo_url = photo_url
         await self.product_repository.update(product=product)
         return None
 

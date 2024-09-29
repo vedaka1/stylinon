@@ -3,6 +3,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.domain.products.value_objects import ProductPrice
 from src.infrastructure.persistence.postgresql.models.base import Base
 
 if TYPE_CHECKING:
@@ -34,7 +35,7 @@ def map_to_product(entity: ProductModel) -> Product:
         name=entity.name,
         category=entity.category,
         description=entity.description,
-        price=entity.price,
+        price=ProductPrice(entity.price),
         units_of_measurement=entity.units_of_measurement,
         photo_url=entity.photo_url,
     )

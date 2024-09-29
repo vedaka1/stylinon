@@ -28,6 +28,7 @@ class TestOrders:
                 user_email="test@test.com",
                 operation_id=test_operation_id,
                 shipping_address="test_address",
+                total_price=1234,
             )
             await order_repository.create(order)
             await commiter.commit()

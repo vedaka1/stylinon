@@ -22,7 +22,7 @@ class TestProduct:
         assert product_data
         assert product_data.name == "test_product"
         assert product_data.description == "test_description"
-        assert product_data.price == 100
+        assert product_data.price.value == 100
         assert product_data.category == "test_category"
         assert product_data.units_of_measurement == UnitsOfMesaurement.PIECES
 

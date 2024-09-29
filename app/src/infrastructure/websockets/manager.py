@@ -1,9 +1,12 @@
 import asyncio
+import logging
 from typing import Any
 from uuid import UUID
 
 from fastapi import WebSocket
 from src.application.chats.interface import WebsocketManagerInterface
+
+logger = logging.getLogger()
 
 
 class WebsocketManager(WebsocketManagerInterface):
@@ -14,13 +17,18 @@ class WebsocketManager(WebsocketManagerInterface):
             self.connections_map[key] = set()
         async with asyncio.Lock():
             self.connections_map[key].add(websocket)
-        await websocket.send_text("You are now connected!")
+            await websocket.send_json(
+                {
+                    "message": "Connected",
+                },
+            )
 
     async def remove_connection(self, websocket: WebSocket, key: UUID) -> None:
         async with asyncio.Lock():
             self.connections_map[key].remove(websocket)
 
     async def send_all(self, key: UUID, data: dict[str, Any]) -> None:
+        logger.info(self.connections_map)
         if key not in self.connections_map:
             return None
         async with asyncio.Lock():

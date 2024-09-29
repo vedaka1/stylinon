@@ -9,6 +9,7 @@ __pycache__
 *.key
 *.key.pub
 *.crt
-test.py
+test.*
 restats
 *.log*
+images/*
