@@ -10,7 +10,7 @@ from src.domain.products.value_objects import ProductPrice
 @dataclass
 class OrderOut:
     id: UUID
-    user_email: str
+    customer_email: str
     created_at: datetime
     updated_at: datetime
     shipping_address: str
@@ -23,7 +23,7 @@ class OrderOut:
     def __init__(
         self,
         id: UUID,
-        user_email: str,
+        customer_email: str,
         created_at: datetime,
         updated_at: datetime,
         shipping_address: str,
@@ -34,13 +34,13 @@ class OrderOut:
         items: list["OrderItemOut"] = field(default_factory=list),
     ) -> None:
         self.id = id
-        self.user_email = user_email
+        self.customer_email = customer_email
         self.created_at = created_at
         self.updated_at = updated_at
         self.shipping_address = shipping_address
         self.operation_id = operation_id
         self.tracking_number = tracking_number
-        self.total_price = ProductPrice(total_price).to_rubles()
+        self.total_price = ProductPrice(total_price).in_rubles()
         self.status = status
         self.items = items
 
@@ -71,7 +71,7 @@ class OrderItemOut:
         self.name = name
         self.category = category
         self.description = description
-        self.price = ProductPrice(price).to_rubles()
+        self.price = ProductPrice(price).in_rubles()
         self.units_of_measurement = units_of_measurement
         self.quantity = quantity
         self.photo_url = photo_url
@@ -85,4 +85,5 @@ class CreateOrderResponse:
     payment_link: str
     shipping_address: str
     operation_id: UUID
+    total_price: float
     status: OrderStatus

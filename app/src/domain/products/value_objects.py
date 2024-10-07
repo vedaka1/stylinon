@@ -13,5 +13,10 @@ class ProductPrice:
         if self.value <= 0:
             raise ProductIncorrectPriceException
 
-    def to_rubles(self) -> float:
+    def in_rubles(self) -> float:
         return self.value / 100
+
+    @staticmethod
+    def from_rubles(value: int) -> "ProductPrice":
+        value *= 100
+        return ProductPrice(value)

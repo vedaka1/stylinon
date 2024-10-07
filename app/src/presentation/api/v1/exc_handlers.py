@@ -22,7 +22,7 @@ async def application_exception_handler(
     request: Request,
     exc: ApplicationException,
 ) -> ORJSONResponse:
-    logger.error(msg="Handle error", exc_info=exc, extra={"error": exc})
+    logger.error(msg="handle error", exc_info=exc, extra={"error": exc})
     return ErrorAPIResponse(details=exc.message, status_code=exc.status_code)
 
 
@@ -30,7 +30,8 @@ async def unknown_exception_handler(
     request: Request,
     exc: Exception,
 ) -> ORJSONResponse:
-    logger.error(msg="Handle error", exc_info=exc, extra={"error": exc})
+    logger.error(msg="handle error", exc_info=exc, extra={"error": exc})
+    logger.exception("Unknown error occurred", exc_info=exc, extra={"error": exc})
     return ErrorAPIResponse(details="Unknown error occured", status_code=500)
 
 

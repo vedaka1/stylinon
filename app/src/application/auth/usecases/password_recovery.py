@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from src.application.auth.commands import ResetPasswordCommand
-from src.application.auth.service import AuthServiceInterface
+from src.application.common.email.types import ResetPasswordLink, SenderName
 from src.application.common.email.utils import get_reset_password_template
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
@@ -17,29 +17,37 @@ logger = logging.getLogger()
 
 @dataclass
 class PasswordRecoveryUseCase:
+
     jwt_processor: JWTProcessorInterface
     smtp_server: SyncSMTPServerInterface
+    sender_name: SenderName
 
     async def execute(self, email: str) -> None:
         frontend_url = "https://localhost/api/v1/reset-password"
+
         reset_token = self.jwt_processor.create_reset_password_token(email=email)
+
         reset_link = f"{frontend_url}/{reset_token}"
+
         email_content = get_reset_password_template(reset_link=reset_link)
 
         message = self.smtp_server.create_message(
             content=email_content,
+            sender_name=self.sender_name,
             to_address=email,
+            subject="Восстановление пароля",
         )
 
         await self.smtp_server.send_email(message=message)
 
-        logger.info("Password recovery email sent", extra={"sent_to": email})
+        logger.info("PasswordRecoveryUseCase", extra={"sent_to": email})
 
         return None
 
 
 @dataclass
 class ResetPasswordUseCase:
+
     jwt_processor: JWTProcessorInterface
     user_repository: UserRepositoryInterface
     password_hasher: PasswordHasherInterface
@@ -56,6 +64,7 @@ class ResetPasswordUseCase:
             raise UserNotFoundException
 
         hashed_password = self.password_hasher.hash(password=command.new_password)
+
         user.hashed_password = hashed_password
 
         await self.user_repository.update(user=user)
@@ -64,6 +73,6 @@ class ResetPasswordUseCase:
 
         await self.transaction_manager.commit()
 
-        logger.info("Password reset", extra={"user_email": user.email})
+        logger.info("ResetPasswordUseCase", extra={"user_email": user.email})
 
         return None

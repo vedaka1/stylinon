@@ -57,7 +57,7 @@ class ProductServiceInterface(ABC):
     @abstractmethod
     async def get_many_by_ids(
         self,
-        product_ids: list[UUID],
+        product_ids: set[UUID],
     ) -> tuple[list[Product], set[UUID]]:
         """Returns a tuple with a list of existing products and a set of missing products, if any"""
         ...

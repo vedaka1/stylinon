@@ -20,16 +20,18 @@ class TestOrders:
         container: AsyncContainer,
     ) -> None:
         async with container() as container:
-            test_operation_id = UUID("beeac8a4-6047-3f38-8922-a664e6b5c43b")
             order_repository = await container.get(OrderRepositoryInterface)
             commiter = await container.get(TransactionManagerInterface)
 
+            test_operation_id = UUID("beeac8a4-6047-3f38-8922-a664e6b5c43b")
+
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=test_operation_id,
                 shipping_address="test_address",
                 total_price=1234,
             )
+
             await order_repository.create(order)
             await commiter.commit()
 
@@ -37,7 +39,10 @@ class TestOrders:
                 "/orders/webhooks/payment",
                 content=webhook_token,
             )
+
             assert response.status_code == 200
+
             order_data = await order_repository.get_by_id(order.id)
+
             assert order_data
             assert order_data.status == OrderStatus.APPROVED

@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -7,7 +8,7 @@ from src.application.common.interfaces.jwt_processor import JWTProcessorInterfac
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
-from src.application.users.responses import UserOut
+from src.application.users.dto import UserOut
 from src.domain.users.exceptions import (
     UserInvalidCredentialsException,
     UserNotFoundException,
@@ -15,9 +16,12 @@ from src.domain.users.exceptions import (
 from src.domain.users.repository import UserRepositoryInterface
 from src.infrastructure.settings import settings
 
+logger = logging.getLogger()
+
 
 @dataclass
 class LoginUseCase:
+
     user_repository: UserRepositoryInterface
     password_hasher: PasswordHasherInterface
     refresh_token_repository: RefreshTokenRepositoryInterface
@@ -25,7 +29,6 @@ class LoginUseCase:
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: LoginCommand) -> tuple[UserOut, Token]:
-
         user = await self.user_repository.get_by_email(email=command.username)
 
         if not user:
@@ -92,6 +95,7 @@ class LoginUseCase:
 
 @dataclass
 class LogoutUseCase:
+
     refresh_token_repository: RefreshTokenRepositoryInterface
     transaction_manager: TransactionManagerInterface
 

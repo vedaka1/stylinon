@@ -15,8 +15,10 @@ class GetProductUseCase:
 
     async def execute(self, product_id: UUID) -> ProductOut:
         product = await self.product_repository.get_by_id(product_id=product_id)
+
         if not product:
             raise ProductNotFoundException
+
         return ProductOut(
             id=product.id,
             name=product.name,
@@ -47,6 +49,7 @@ class GetManyProductsUseCase:
             offset=command.pagination.offset,
             limit=command.pagination.limit,
         )
+
         total = await self.product_repository.count(
             name=command.name,
             category=command.category,
@@ -55,6 +58,7 @@ class GetManyProductsUseCase:
             price_to=command.price_to,
             units_of_measurement=command.units_of_measurement,
         )
+
         return ListPaginatedResponse(
             items=[
                 ProductOut(

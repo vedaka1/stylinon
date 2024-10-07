@@ -4,8 +4,10 @@ from datetime import datetime
 
 from src.application.acquiring.dto import AcquiringWebhookType
 from src.application.acquiring.exceptions import IncorrectAcqioringWebhookTypeException
+from src.application.acquiring.interface import AcquiringGatewayInterface
+from src.application.common.email.types import SenderName
 from src.application.common.email.utils import get_new_order_template
-from src.application.common.interfaces.acquiring import AcquiringServiceInterface
+from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import UpdateOrderCommand
@@ -28,12 +30,9 @@ class UpdateOrderUseCase:
         if not order:
             raise OrderNotFoundException
 
-        if command.shipping_address:
-            order.shipping_address = command.shipping_address
-        if command.tracking_number:
-            order.tracking_number = command.tracking_number
-        if command.status:
-            order.status = command.status
+        for key, value in command.__dict__.items():
+            if value:
+                setattr(order, key, value)
 
         order.updated_at = datetime.now()
 
@@ -50,12 +49,14 @@ class UpdateOrderUseCase:
 class UpdateOrderByWebhookUseCase:
 
     order_repository: OrderRepositoryInterface
-    acquiring_service: AcquiringServiceInterface
+    acquiring_gateway: AcquiringGatewayInterface
     transaction_manager: TransactionManagerInterface
     smtp_server: SyncSMTPServerInterface
+    jwt_processor: JWTProcessorInterface
+    sender_name: SenderName
 
     async def execute(self, token: str) -> None:
-        webhook_data = self.acquiring_service.handle_webhook(token=token)
+        webhook_data = self.jwt_processor.validate_acquiring_token(token=token)
 
         if (
             webhook_data.get("webhookType")
@@ -82,7 +83,9 @@ class UpdateOrderByWebhookUseCase:
 
         message = self.smtp_server.create_message(
             content=email_content,
+            sender_name=self.sender_name,
             to_address="vedaka13@yandex.com",
+            subject="Новый заказ",
         )
 
         await self.smtp_server.send_email(message=message)

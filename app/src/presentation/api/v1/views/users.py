@@ -7,9 +7,9 @@ from src.application.chats.dto import ChatOut
 from src.application.chats.usecases.get import GetUserChatsUseCase
 from src.application.common.pagination import ListPaginatedResponse, PaginationQuery
 from src.application.common.response import APIResponse
-from src.application.orders.responses import OrderOut
+from src.application.orders.dto import OrderOut
 from src.application.users.commands import GetUsersListCommand
-from src.application.users.responses import UserOut
+from src.application.users.dto import UserOut
 from src.application.users.usecases import (
     GetUserOrdersUseCase,
     GetUsersListUseCase,

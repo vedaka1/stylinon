@@ -17,6 +17,7 @@ from src.infrastructure.settings import settings
 
 @dataclass
 class RefreshTokenUseCase:
+
     jwt_processor: JWTProcessorInterface
     user_repository: UserRepositoryInterface
     password_hasher: PasswordHasherInterface

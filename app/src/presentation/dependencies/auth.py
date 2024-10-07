@@ -1,5 +1,6 @@
 import logging
 from typing import Annotated, Dict, Optional
+from uuid import UUID
 
 from dishka import AsyncContainer
 from fastapi import Depends, Request, WebSocket
@@ -11,6 +12,9 @@ from src.application.auth.dto import UserTokenData
 from src.application.auth.exceptions import (
     NotAuthorizedException,
     NotEnoughPermissionsException,
+)
+from src.application.common.interfaces.identity_provider import (
+    IdentityProviderInterface,
 )
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.infrastructure.di.container import get_container
@@ -56,8 +60,10 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(
 
 def _get_token_data(value: str | None) -> str:
     scheme, param = get_authorization_scheme_param(value)
+
     if not value or scheme.lower() != "bearer":
         raise NotAuthorizedException
+
     return param
 
 
@@ -65,34 +71,37 @@ async def get_refresh_token(
     request: Request,
 ) -> str:
     refresh_token: str | None = request.cookies.get("refresh_token")
+
     return _get_token_data(value=refresh_token)
 
 
 async def auth_required(
     request: Request,
-    token: Annotated[
+    authorization: Annotated[
         str,
         Depends(oauth2_scheme),
     ],
 ) -> None:
-    if not token:
+    if not authorization:
         raise NotAuthorizedException
-    request.scope["auth"] = token
+
+    request.scope["auth"] = authorization
 
 
 async def get_current_user_data(
     security_scopes: SecurityScopes,
-    token: Annotated[
+    authorization: Annotated[
         str,
         Depends(oauth2_scheme),
     ],
     container: AsyncContainer = Depends(get_container),
 ) -> UserTokenData:
-    if not token:
+    if not authorization:
         raise NotAuthorizedException
 
-    jwt_processor = await container.get(JWTProcessorInterface)
-    user_data = jwt_processor.validate_access_token(token=token)
+    identity_provider = await container.get(IdentityProviderInterface)
+
+    user_data = await identity_provider.get_current_user(authorization=authorization)
 
     for scope in security_scopes.scopes:
         if scope not in user_data.scopes:
@@ -106,9 +115,11 @@ async def get_current_user_from_websocket(
     container: AsyncContainer,
 ) -> UserTokenData:
     access_token: str | None = websocket.cookies.get("access_token")
-    token_data = _get_token_data(value=access_token)
 
-    jwt_processor = await container.get(JWTProcessorInterface)
-    user_data = jwt_processor.validate_access_token(token=token_data)
+    authorization = _get_token_data(value=access_token)
+
+    identity_provider = await container.get(IdentityProviderInterface)
+
+    user_data = await identity_provider.get_current_user(authorization=authorization)
 
     return user_data

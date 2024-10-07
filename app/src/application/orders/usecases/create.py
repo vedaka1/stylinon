@@ -14,12 +14,14 @@ from src.domain.orders.repository import (
 )
 from src.domain.products.exceptions import ManyProductsNotFoundException
 from src.domain.products.repository import ProductRepositoryInterface
+from src.domain.products.value_objects import ProductPrice
 
 logger = logging.getLogger()
 
 
 @dataclass
 class CreateOrderUseCase:
+
     order_repository: OrderRepositoryInterface
     order_item_repository: OrderItemRepositoryInterface
     products_repository: ProductRepositoryInterface
@@ -28,16 +30,17 @@ class CreateOrderUseCase:
 
     async def execute(self, command: CreateOrderCommand) -> CreateOrderResponse:
         products_set = set()
+
         for product in command.items:
             if product.id not in products_set:
                 products_set.add(product.id)
             else:
-                logger.info(product)
                 raise DuplicateOrderPositionsException(product.id)
 
         products, missing_products = await self.products_repository.get_many_by_ids(
-            product_ids=[item.id for item in command.items],
+            product_ids=products_set,
         )
+
         if missing_products:
             raise ManyProductsNotFoundException(missing_products)
 
@@ -60,7 +63,7 @@ class CreateOrderUseCase:
         )
 
         order = Order.create(
-            user_email=command.customer_email,
+            customer_email=command.customer_email,
             operation_id=payment_data["operationId"],
             shipping_address=command.shipping_address,
             total_price=AcquiringGatewayInterface._calculate_order_amount(
@@ -81,16 +84,17 @@ class CreateOrderUseCase:
         await self.transaction_manager.commit()
 
         logger.info(
-            "Order created",
+            "CreateOrderUseCase",
             extra={"order_id": order.id, "customer_email": command.customer_email},
         )
 
         return CreateOrderResponse(
             id=order.id,
-            customer_email=order.user_email,
+            customer_email=order.customer_email,
             created_at=order.created_at,
             payment_link=payment_data["paymentLink"],
             shipping_address=order.shipping_address,
             operation_id=order.operation_id,
+            total_price=ProductPrice(order.total_price).in_rubles(),
             status=order.status,
         )

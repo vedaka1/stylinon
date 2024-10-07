@@ -26,7 +26,13 @@ class SMTPServerInterface(ABC):
 class SyncSMTPServerInterface(ABC):
 
     @abstractmethod
-    def create_message(self, content: str, to_address: str) -> MIMEMultipart: ...
+    def create_message(
+        self,
+        content: str,
+        sender_name: str,
+        to_address: str,
+        subject: str,
+    ) -> MIMEMultipart: ...
 
     @abstractmethod
     def _send(self, message: MIMEMultipart) -> None: ...

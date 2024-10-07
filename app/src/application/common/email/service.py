@@ -42,10 +42,12 @@ class EmailService:
         self.frontend_url = "http://localhost/api/v1/reset-password"
         self.admin_email = "vedaka13@yandex.ru"
 
-    async def send_email(self, email: str, body: str) -> None:
+    async def send_email(self, email: str, body: str, subject: str) -> None:
         message = self.smtp_server.create_message(
             content=body,
+            sender_name=email,
             to_address=email,
+            subject=subject,
         )
         await self.smtp_server.send_email(message=message)
 
@@ -55,7 +57,9 @@ class EmailService:
         email_content = get_reset_password_template(reset_link=reset_link)
         message = self.smtp_server.create_message(
             content=email_content,
+            sender_name="OOO ТехСтрой-Сити",
             to_address=email,
+            subject="Восстановление пароля",
         )
         await self.smtp_server.send_email(message=message)
         logger.info("Password recovery email sent", extra={"sent_to": email})

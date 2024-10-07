@@ -51,7 +51,7 @@ class ProductOut:
         self.name = name
         self.category = category
         self.description = description
-        self.price = ProductPrice(price).to_rubles()
+        self.price = ProductPrice(price).in_rubles()
         self.units_of_measurement = units_of_measurement
         self.photo_url = photo_url
 

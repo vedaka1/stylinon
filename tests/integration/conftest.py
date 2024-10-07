@@ -14,17 +14,17 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from src.application.chats.interface import WebsocketManagerInterface
+from src.application.common.email.types import SenderName
 from src.application.common.interfaces.smtp import SyncSMTPServerInterface
 from src.application.common.response import ErrorAPIResponse
 from src.domain.common.exceptions.base import ApplicationException
-from src.infrastructure.di.container import (
+from src.infrastructure.di.database import (
     DatabaseAdaptersProvider,
     DatabaseConfigurationProvider,
-    GatewayProvider,
-    SecurityProvider,
-    ServiceProvider,
-    UseCasesProvider,
 )
+from src.infrastructure.di.gateways import GatewayProvider
+from src.infrastructure.di.security import SecurityProvider
+from src.infrastructure.di.usecases import UseCasesProvider
 from src.infrastructure.integrations.smtp.server import SyncSMTPServer
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
@@ -36,6 +36,8 @@ from src.infrastructure.websockets.manager import WebsocketManager
 from src.presentation.api.v1.router import api_router as api_router_v1
 from starlette.types import ExceptionHandler
 from testcontainers.postgres import PostgresContainer
+
+from tests.integration.mocks.smtp_server import MockSyncSMTPServer
 
 _Message = typing.Dict[str, typing.Any]
 _Receive = typing.Callable[[], typing.Awaitable[_Message]]
@@ -97,11 +99,7 @@ async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
 
         @provide(scope=Scope.APP)
         def smtp_server(self) -> SyncSMTPServerInterface:
-            return SyncSMTPServer(
-                from_address=settings.smtp.FROM_EMAIL,
-                password=settings.smtp.PASSWORD,
-                subject=settings.smtp.EMAIL_SUBJECT,
-            )
+            return MockSyncSMTPServer()
 
         @provide(scope=Scope.APP)
         async def acquiring_session(
@@ -116,13 +114,16 @@ async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
         def websocker_manager(self) -> WebsocketManagerInterface:
             return WebsocketManager()
 
+        @provide(scope=Scope.APP)
+        def sender_name(self) -> SenderName:
+            return SenderName("Test")
+
     def get_container() -> AsyncContainer:
         return make_async_container(
             SettingsProvider(),
             SecurityProvider(),
             DatabaseConfigurationProvider(),
             DatabaseAdaptersProvider(),
-            ServiceProvider(),
             UseCasesProvider(),
             GatewayProvider(),
         )

@@ -8,7 +8,7 @@ from src.application.orders.commands import (
     GetManyOrdersCommand,
     UpdateOrderCommand,
 )
-from src.application.orders.responses import CreateOrderResponse, OrderOut
+from src.application.orders.dto import CreateOrderResponse, OrderOut
 from src.application.orders.usecases import (
     CreateOrderUseCase,
     GetManyOrdersUseCase,
@@ -21,7 +21,7 @@ from src.domain.orders.exceptions import (
     OrderNotFoundException,
 )
 from src.domain.users.entities import UserRole
-from src.presentation.dependencies.auth import auth_required, get_current_user_data
+from src.presentation.dependencies.auth import get_current_user_data
 
 router = APIRouter(
     tags=["Orders"],

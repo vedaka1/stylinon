@@ -13,11 +13,11 @@ class ProductAdmin(ModelView, model=ProductModel):
     can_view_details = True
 
     column_formatters = {
-        ProductModel.price: lambda m, a: ProductPrice(m.price).to_rubles(),  # type: ignore
+        ProductModel.price: lambda m, a: ProductPrice(m.price).in_rubles(),  # type: ignore
         ProductModel.description: lambda m, a: m.description[:60] + "...",  # type: ignore
     }
     column_formatters_detail = {
-        ProductModel.price: lambda m, a: ProductPrice(m.price).to_rubles(),  # type: ignore
+        ProductModel.price: lambda m, a: ProductPrice(m.price).in_rubles(),  # type: ignore
     }
     name = "Товар"
     name_plural = "Товары"

@@ -28,7 +28,7 @@ class TestOrderItemRepository:
                 units_of_measurement=UnitsOfMesaurement.PIECES,
             )
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -65,7 +65,7 @@ class TestOrderItemRepository:
                 for i in range(2)
             ]
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -101,7 +101,7 @@ class TestOrderItemRepository:
                 units_of_measurement=UnitsOfMesaurement.PIECES,
             )
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,

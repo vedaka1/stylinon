@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from sqladmin import ModelView
 from src.infrastructure.persistence.postgresql.models.order import OrderModel
 

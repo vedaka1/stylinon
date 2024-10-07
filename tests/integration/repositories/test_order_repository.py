@@ -28,7 +28,7 @@ class TestOrderRepository:
             transaction_manager = await di_container.get(TransactionManagerInterface)
             # Create order
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -42,7 +42,7 @@ class TestOrderRepository:
                 entity = cursor.scalar_one_or_none()
                 assert entity
                 order_data = map_to_order(entity)
-                assert order_data.user_email == order.user_email
+                assert order_data.customer_email == order.customer_email
                 assert order_data.operation_id == order.operation_id
                 assert order_data.shipping_address == order.shipping_address
 
@@ -55,7 +55,7 @@ class TestOrderRepository:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -72,7 +72,7 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -81,7 +81,7 @@ class TestOrderRepository:
             # Check it
             order_data = await order_repository.get_by_id(order.id)
             assert order_data
-            assert order_data.user_email == order.user_email
+            assert order_data.customer_email == order.customer_email
             assert order_data.operation_id == order.operation_id
             assert order_data.shipping_address == order.shipping_address
             assert order_data.status == order.status
@@ -91,7 +91,7 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -108,14 +108,14 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
             )
             await order_repository.create(order)
             # Check it and get it
-            orders = await order_repository.get_by_user_email(order.user_email)
+            orders = await order_repository.get_by_user_email(order.customer_email)
             assert len(orders) == 1
 
     async def test_get_all_orders(self, container: AsyncContainer) -> None:
@@ -124,7 +124,7 @@ class TestOrderRepository:
             # Create orders
             orders: list[Order] = [
                 Order.create(
-                    user_email=f"test{i}@test.com",
+                    customer_email=f"test{i}@test.com",
                     operation_id=uuid4(),
                     shipping_address=f"test{i}_address",
                     total_price=1234,
@@ -159,7 +159,7 @@ class TestOrderRepository:
                 units_of_measurement=UnitsOfMesaurement.PIECES,
             )
             order = Order.create(
-                user_email="test@test.com",
+                customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
@@ -176,7 +176,7 @@ class TestOrderRepository:
             # Check it and get it
             order_data = await order_repository.get_by_id_with_products(order.id)
             assert order_data
-            assert order_data.user_email == order.user_email
+            assert order_data.customer_email == order.customer_email
             assert order_data.operation_id == order.operation_id
             assert order_data.shipping_address == order.shipping_address
             assert len(order_data.items) == 1

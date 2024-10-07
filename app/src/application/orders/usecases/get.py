@@ -18,10 +18,11 @@ class GetManyOrdersUseCase:
             date_to=command.date_to,
             status=command.status,
         )
+
         return [
             OrderOut(
                 id=order.id,
-                user_email=order.user_email,
+                customer_email=order.customer_email,
                 created_at=order.created_at,
                 updated_at=order.updated_at,
                 shipping_address=order.shipping_address,
@@ -61,7 +62,7 @@ class GetOrderUseCase:
 
         return OrderOut(
             id=order.id,
-            user_email=order.user_email,
+            customer_email=order.customer_email,
             created_at=order.created_at,
             updated_at=order.updated_at,
             shipping_address=order.shipping_address,

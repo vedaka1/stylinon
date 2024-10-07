@@ -1,8 +1,9 @@
 import asyncio
 import logging
-from concurrent.futures import ThreadPoolExecutor
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr
 from smtplib import SMTP, SMTP_SSL
 
 import aiosmtplib
@@ -71,36 +72,52 @@ class AsyncSMTPServer(SMTPServerInterface):
 
 
 class SyncSMTPServer(SyncSMTPServerInterface):
+
     def __init__(
         self,
         from_address: str,
         password: str,
-        subject: str,
     ) -> None:
         self.from_address = from_address
         self.password = password
-        self.subject = subject
 
-    def create_message(self, content: str, to_address: str) -> MIMEMultipart:
+    def create_message(
+        self,
+        content: str,
+        sender_name: str,
+        to_address: str,
+        subject: str,
+    ) -> MIMEMultipart:
         message = MIMEMultipart()
-        message["Subject"] = self.subject
-        message["From"] = self.from_address
+
+        message["Subject"] = subject
+
+        message["From"] = formataddr(
+            (str(Header(sender_name, "utf-8")), self.from_address),
+        )
+
         message["To"] = to_address
+
         html = MIMEText(content, "html")
+
         message.attach(html)
+
         return message
 
     def _send(self, message: MIMEMultipart) -> None:
         with SMTP_SSL(settings.smtp.HOST, settings.smtp.PORT) as server:
             server.login(settings.smtp.FROM_EMAIL, settings.smtp.PASSWORD)
+
             try:
                 response = server.sendmail(
                     settings.smtp.FROM_EMAIL,
                     message["To"],
                     message.as_string(),
                 )
+
             except Exception as e:
                 logger.error(f"Error while sending email: {e}")
+
                 raise ApplicationException
 
     async def send_email(self, message: MIMEMultipart) -> None:

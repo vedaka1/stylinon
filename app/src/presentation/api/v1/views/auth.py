@@ -25,7 +25,7 @@ from src.application.auth.usecases import (
     ResetPasswordUseCase,
 )
 from src.application.common.response import APIResponse
-from src.application.users.responses import UserOut
+from src.application.users.dto import UserOut
 from src.domain.users.exceptions import (
     UserAlreadyExistsException,
     UserInvalidCredentialsException,

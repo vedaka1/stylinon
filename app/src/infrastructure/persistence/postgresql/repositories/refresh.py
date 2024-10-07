@@ -24,29 +24,38 @@ class SqlalchemyRefreshTokenRepository(RefreshTokenRepositoryInterface):
             expires_at=refresh_session.expires_at,
             user_agent=refresh_session.user_agent,
         )
+
         await self.session.execute(query)
+
         return None
 
     async def delete_by_token(self, refresh_token: str) -> None:
         query = delete(RefreshSessionModel).where(
             RefreshSessionModel.refresh_token == refresh_token,
         )
+
         await self.session.execute(query)
+
         return None
 
     async def delete_by_user_id(self, user_id: UUID) -> None:
         query = delete(RefreshSessionModel).where(
             RefreshSessionModel.user_id == user_id,
         )
+
         await self.session.execute(query)
+
         return None
 
     async def get(self, refresh_token: str) -> RefreshSession | None:
         query = select(RefreshSessionModel).where(
             RefreshSessionModel.refresh_token == refresh_token,
         )
+
         cursor = await self.session.execute(query)
+
         entity = cursor.scalar_one_or_none()
+
         return map_to_refresh_session(entity) if entity else None
 
     async def get_by_user_id_and_user_agent(
@@ -59,6 +68,9 @@ class SqlalchemyRefreshTokenRepository(RefreshTokenRepositoryInterface):
             .where(RefreshSessionModel.user_id == user_id)
             .where(RefreshSessionModel.user_agent == user_agent)
         )
+
         cursor = await self.session.execute(query)
+
         entity = cursor.scalar_one_or_none()
+
         return map_to_refresh_session(entity) if entity else None

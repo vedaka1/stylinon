@@ -15,6 +15,7 @@ logger = logging.getLogger()
 
 @dataclass
 class RegisterUseCase:
+
     jwt_processor: JWTProcessorInterface
     user_repository: UserRepositoryInterface
     password_hasher: PasswordHasherInterface
@@ -59,6 +60,3 @@ class RegisterUseCase:
         #     )
         # except Exception as e:
         #     logger.error("Failed to send message to broker: {0}".format(e))
-
-        await self.transaction_manager.commit()
-        return None

@@ -17,23 +17,12 @@ services:
       - internal
     ports:
       - 8000:8000
-    volumes:
-      - ./app/src:/app/src
-      - ./app/admin:/app/admin
-      - ./images:/app/images
-      - ./app/main.py:/app/main.py
     command: sh -c "alembic upgrade head && uvicorn main:create_app --host 0.0.0.0 --port 8000 --reload --forwarded-allow-ips='*' --proxy-headers"
 
   nginx:
     container_name: nginx
     hostname: nginx
     build: ./nginx/
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./test.html:/app/index.html
-      - ./nginx/nginx-selfsigned.crt:/etc/nginx/ssl/nginx-selfsigned.crt
-      - ./nginx/nginx-selfsigned.key:/etc/nginx/ssl/nginx-selfsigned.key
-      - ./images:/images
     depends_on:
       - app
     expose:

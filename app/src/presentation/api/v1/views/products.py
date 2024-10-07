@@ -7,6 +7,7 @@ from src.application.common.response import APIResponse
 from src.application.products.commands import (
     CreateProductCommand,
     GetManyProductsCommand,
+    UpdateProductCommand,
 )
 from src.application.products.dto import ProductOut
 from src.application.products.usecases import (
@@ -14,11 +15,12 @@ from src.application.products.usecases import (
     GetManyProductsUseCase,
     GetProductUseCase,
 )
+from src.application.products.usecases.update import UpdateProductUseCase
 from src.domain.common.exceptions.base import ApplicationException
 from src.domain.products.entities import UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.users.entities import UserRole
-from src.presentation.dependencies.auth import auth_required, get_current_user_data
+from src.presentation.dependencies.auth import get_current_user_data
 
 router = APIRouter(
     tags=["Products"],
@@ -122,3 +124,24 @@ async def get_product(
 ) -> APIResponse[ProductOut]:
     response = await get_product_interactor.execute(product_id=product_id)
     return APIResponse(data=response)
+
+
+@router.patch(
+    "/{product_id}",
+    summary="Обновляет данные о товаре",
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
+)
+async def update_product(
+    update_product_interactor: FromDishka[UpdateProductUseCase],
+    command: UpdateProductCommand = Depends(),
+) -> APIResponse[None]:
+    await update_product_interactor.execute(command=command)
+    return APIResponse()

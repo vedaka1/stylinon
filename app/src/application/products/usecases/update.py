@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 
 from src.application.common.interfaces.transaction import TransactionManagerInterface
@@ -5,6 +6,8 @@ from src.application.products.commands import UpdateProductCommand
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.products.repository import ProductRepositoryInterface
 from src.domain.products.value_objects import ProductPrice
+
+logger = logging.getLogger()
 
 
 @dataclass
@@ -19,18 +22,12 @@ class UpdateProductUseCase:
         if not product:
             raise ProductNotFoundException
 
-        if command.name:
-            product.name = command.name
-        if command.category:
-            product.category = command.category
-        if command.description:
-            product.description = command.description
-        if command.price:
-            product.price = ProductPrice(command.price)
-        if command.units_of_measurement:
-            product.units_of_measurement = command.units_of_measurement
-        if command.photo_url:
-            product.photo_url = command.photo_url
+        for key, value in command.__dict__.items():
+            if value:
+                if key == "price":
+                    setattr(product, key, ProductPrice.from_rubles(value))
+                else:
+                    setattr(product, key, value)
 
         await self.product_repository.update(product=product)
 

@@ -10,6 +10,7 @@ from src.domain.chats.repository import ChatRepositoryInterface
 
 @dataclass
 class GetUserChatsUseCase:
+
     chat_repository: ChatRepositoryInterface
 
     async def execute(self, user_id: UUID) -> list[ChatOut]:
@@ -39,6 +40,7 @@ class GetUserChatsUseCase:
 
 @dataclass
 class GetChatUseCase:
+
     chat_repository: ChatRepositoryInterface
 
     async def execute(self, chat_id: UUID) -> ChatOut:
@@ -68,6 +70,7 @@ class GetChatUseCase:
 
 @dataclass
 class GetChatsListUseCase:
+
     chat_repository: ChatRepositoryInterface
 
     async def execute(

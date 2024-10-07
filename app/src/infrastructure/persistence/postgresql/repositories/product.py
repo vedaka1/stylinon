@@ -26,7 +26,9 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             units_of_measurement=product.units_of_measurement,
             photo_url=product.photo_url,
         )
+
         await self.session.execute(query)
+
         return None
 
     async def create_many(self, products: list[Product]) -> None:
@@ -44,7 +46,9 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 for product in products
             ],
         )
+
         await self.session.execute(query)
+
         return None
 
     async def update(self, product: Product) -> None:
@@ -60,18 +64,25 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 photo_url=product.photo_url,
             )
         )
+
         await self.session.execute(query)
+
         return None
 
     async def delete(self, product_id: UUID) -> None:
         query = delete(ProductModel).where(ProductModel.id == product_id)
+
         await self.session.execute(query)
+
         return None
 
     async def get_by_id(self, product_id: UUID) -> Product | None:
         query = select(ProductModel).where(ProductModel.id == product_id)
+
         cursor = await self.session.execute(query)
+
         entity = cursor.scalar_one_or_none()
+
         return map_to_product(entity) if entity else None
 
     async def get_many(
@@ -86,6 +97,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         limit: int = 100,
     ) -> list[Product]:
         query = select(ProductModel)
+
         if name:
             query = query.where(ProductModel.name.ilike(f"%{name}%"))
         if category:
@@ -102,8 +114,11 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             )
 
         query = query.limit(limit).offset(offset)
+
         cursor = await self.session.execute(query)
+
         entities = cursor.scalars().all()
+
         return [map_to_product(entity) for entity in entities]
 
     async def count(
@@ -116,6 +131,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         units_of_measurement: UnitsOfMesaurement | None = None,
     ) -> int:
         query = select(func.count()).select_from(ProductModel)
+
         if name:
             query = query.where(ProductModel.name.ilike(f"%{name}%"))
         if category:
@@ -130,18 +146,26 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             query = query.where(
                 ProductModel.units_of_measurement == units_of_measurement,
             )
+
         cursor = await self.session.execute(query)
+
         count = cursor.scalar_one_or_none()
+
         return count if count else 0
 
     async def get_many_by_ids(
         self,
-        product_ids: list[UUID],
+        product_ids: set[UUID],
     ) -> tuple[list[Product], set[UUID]]:
         """Returns a tuple with a list of existing products and a set of missing products, if any"""
         query = select(ProductModel).filter(ProductModel.id.in_(product_ids))
+
         cursor = await self.session.execute(query)
+
         entities = cursor.scalars().all()
+
         existing_products_ids = {product.id for product in entities}
-        missing_products_ids = set(product_ids) - existing_products_ids
+
+        missing_products_ids = product_ids - existing_products_ids
+
         return [map_to_product(entity) for entity in entities], missing_products_ids

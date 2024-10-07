@@ -13,6 +13,7 @@ from src.domain.chats.repository import (
 
 @dataclass
 class CreateChatUseCase:
+
     chat_repository: ChatRepositoryInterface
     transaction_manager: TransactionManagerInterface
 
@@ -30,6 +31,7 @@ class CreateChatUseCase:
 
 @dataclass
 class CreateMessageUseCase:
+
     websocket_manager: WebsocketManagerInterface
     message_repository: MessageRepositoryInterface
     transaction_manager: TransactionManagerInterface

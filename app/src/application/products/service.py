@@ -100,6 +100,6 @@ class ProductService(ProductServiceInterface):
 
     async def get_many_by_ids(
         self,
-        product_ids: list[UUID],
+        product_ids: set[UUID],
     ) -> tuple[list[Product], set[UUID]]:
         return await self.product_repository.get_many_by_ids(product_ids=product_ids)

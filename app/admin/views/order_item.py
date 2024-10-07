@@ -1,10 +1,5 @@
-from uuid import uuid4
-
 from sqladmin import ModelView
-from src.infrastructure.persistence.postgresql.models.order import (
-    OrderItemModel,
-    OrderModel,
-)
+from src.infrastructure.persistence.postgresql.models.order import OrderItemModel
 
 
 class OrderItemAdmin(ModelView, model=OrderItemModel):
@@ -20,20 +15,24 @@ class OrderItemAdmin(ModelView, model=OrderItemModel):
     ]
     column_list = [
         OrderItemModel.order_id,
-        OrderItemModel.product_id,
+        "product.name",
         OrderItemModel.quantity,
     ]
     column_details_list = [
         # OrderItemModel.order_id,
         # OrderItemModel.product_id,
         "order",
+        "product.name",
         "quantity",
     ]
     column_labels = {
+        "order": "Заказ",
         "order_id": "ID заказа",
+        "order.id": "ID заказа",
+        "product": "Товар",
         "product_id": "ID товара",
+        "product.id": "ID товара",
+        "product.name": "Наименование товара",
         "quantity": "Количество",
-        "order.id": "Заказ",
-        "product.id": "Товар",
     }
     # column_details_exclude_list = ["order_item"]

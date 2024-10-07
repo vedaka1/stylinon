@@ -9,20 +9,20 @@ from src.domain.products.entities import Product
 
 # fmt: off
 class OrderStatus(str, Enum):
-    CREATED = "Создан"         # Заказ создан и ожидает оплаты
-    APPROVED = "Оплачен"       # Заказ оплачен
-    PROCESSING = "В обработке"   # Заказ в обработке
-    SHIPPED = "Отправлен"         # Заказ отправлен
-    COMPLETED = "Завершен"     # Заказ доставлен
-    CANCELLED = "Отменен"     # Заказ отменен
-    FAILED = "Не выполнен"           # Заказ не выполнен
+    CREATED = "CREATED"         # Заказ создан и ожидает оплаты
+    APPROVED = "APPROVED"       # Заказ оплачен
+    PROCESSING = "PROCESSING"   # Заказ в обработке
+    SHIPPED = "SHIPPED"         # Заказ отправлен
+    COMPLETED = "COMPLETED"     # Заказ доставлен
+    CANCELLED = "CANCELLED"     # Заказ отменен
+    FAILED = "FAILED"           # Заказ не выполнен
 # fmt: on
 
 
 @dataclass
 class Order:
     id: UUID
-    user_email: str
+    customer_email: str
     created_at: datetime
     updated_at: datetime
     shipping_address: str
@@ -35,7 +35,7 @@ class Order:
 
     @staticmethod
     def create(
-        user_email: str,
+        customer_email: str,
         operation_id: UUID,
         shipping_address: str,
         total_price: int,
@@ -45,7 +45,7 @@ class Order:
         current_date = datetime.now()
         return Order(
             id=uuid4(),
-            user_email=user_email,
+            customer_email=customer_email,
             created_at=current_date,
             updated_at=current_date,
             shipping_address=shipping_address,

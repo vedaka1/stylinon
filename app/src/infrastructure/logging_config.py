@@ -1,7 +1,6 @@
-import logging.handlers
 from typing import Any
 
-logger_config_dict: dict[str, Any] = {
+logger_config_dict_dev: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
@@ -12,7 +11,7 @@ logger_config_dict: dict[str, Any] = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "detailed",
-            "level": "ERROR",
+            "level": "INFO",
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
@@ -23,19 +22,45 @@ logger_config_dict: dict[str, Any] = {
             "backupCount": 3,
         },
     },
-    # "loggers": {
-    #     "uvicorn": {"handlers": ["console"], "level": "INFO", "propagate": False},
-    #     "fastapi": {"handlers": ["console"], "level": "INFO", "propagate": False},
-    #     "app": {"handlers": ["console", "file"], "level": "DEBUG", "propagate": True},
-    # },
     "loggers": {
         "root": {
-            "level": "ERROR",
-            "handlers": ["file"],
-        },
-        "uvicorn": {
+            "level": "DEBUG",
             "handlers": ["console"],
+        },
+    },
+}
+
+logger_config_dict_prod: dict[str, Any] = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {"format": "%(asctime)s - %(levelname)s - %(message)s"},
+        "detailed": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"},
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "detailed",
+            "level": "INFO",
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
             "level": "ERROR",
+            "formatter": "detailed",
+            "filename": "my_app.log",
+            "maxBytes": 100000,
+            "backupCount": 3,
+        },
+        "queue_handler": {
+            "class": "logging.handlers.QueueHandler",
+            "handlers": ["console", "file"],
+            "respect_handler_level": True,
+        },
+    },
+    "loggers": {
+        "root": {
+            "level": "INFO",
+            "handlers": ["console", "file"],
         },
     },
 }

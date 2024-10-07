@@ -42,7 +42,7 @@ class OrderModel(Base):
 def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
     order = Order(
         id=entity.id,
-        user_email=entity.user_email,
+        customer_email=entity.user_email,
         created_at=entity.created_at,
         updated_at=entity.updated_at,
         shipping_address=entity.shipping_address,

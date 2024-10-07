@@ -25,24 +25,32 @@ class SqlalchemyUserSessionRepository(UserSessionRepositoryInterface):
             created_at=session.created_at,
             expires_in=session.expires_in,
         )
+
         await self.session.execute(query)
+
         return None
 
     async def update(self, session: UserSession) -> None:
         query = update(UserSessionModel).values(
             expires_in=session.expires_in,
         )
+
         await self.session.execute(query)
+
         return None
 
     async def delete(self, session_id: UUID) -> None:
         query = delete(UserSessionModel).where(UserSessionModel.id == session_id)
+
         await self.session.execute(query)
+
         return None
 
     async def delete_by_user_id(self, user_id: UUID) -> None:
         query = delete(UserSessionModel).where(UserSessionModel.user_id == user_id)
+
         await self.session.execute(query)
+
         return None
 
     async def get_by_id(self, session_id: UUID) -> UserSession | None:
@@ -51,12 +59,18 @@ class SqlalchemyUserSessionRepository(UserSessionRepositoryInterface):
             .where(UserSessionModel.id == session_id)
             .options(joinedload(UserSessionModel.user))
         )
+
         cursor = await self.session.execute(query)
+
         entity = cursor.scalar_one_or_none()
+
         return map_to_user_session(entity, with_relations=True) if entity else None
 
     async def get_by_user_id(self, user_id: UUID) -> list[UserSession]:
         query = select(UserSessionModel).where(UserSessionModel.user_id == user_id)
+
         cursor = await self.session.execute(query)
+
         entities = cursor.scalars().all()
+
         return [map_to_user_session(entity) for entity in entities]

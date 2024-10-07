@@ -28,7 +28,6 @@ class WebsocketManager(WebsocketManagerInterface):
             self.connections_map[key].remove(websocket)
 
     async def send_all(self, key: UUID, data: dict[str, Any]) -> None:
-        logger.info(self.connections_map)
         if key not in self.connections_map:
             return None
         async with asyncio.Lock():
