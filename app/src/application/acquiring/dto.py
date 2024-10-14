@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from sqlalchemy import Enum
 
 

@@ -4,7 +4,6 @@ from src.application.common.interfaces.transaction import TransactionManagerInte
 from src.application.products.commands import CreateProductCommand
 from src.domain.products.entities import Product
 from src.domain.products.repository import ProductRepositoryInterface
-from src.domain.products.value_objects import ProductPrice
 
 
 @dataclass

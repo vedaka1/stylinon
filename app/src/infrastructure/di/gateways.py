@@ -1,6 +1,6 @@
 from dishka import Provider, Scope, provide
 from src.application.acquiring.interface import AcquiringGatewayInterface
-from src.infrastructure.integrations.acquiring.main import TochkaAcquiringGateway
+from src.infrastructure.integrations.acquiring.gateway import TochkaAcquiringGateway
 
 
 class GatewayProvider(Provider):

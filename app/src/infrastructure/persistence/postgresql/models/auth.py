@@ -1,5 +1,4 @@
 from datetime import datetime
-from math import exp
 from uuid import UUID
 
 from sqlalchemy import TIMESTAMP, ForeignKey

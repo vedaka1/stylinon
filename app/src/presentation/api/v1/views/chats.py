@@ -2,7 +2,6 @@ import logging
 from typing import Annotated
 from uuid import UUID
 
-from click import command
 from dishka import AsyncContainer
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Security, WebSocket, WebSocketDisconnect

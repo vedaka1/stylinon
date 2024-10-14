@@ -1,5 +1,4 @@
 from datetime import date
-from enum import Enum
 from uuid import UUID
 
 from sqlalchemy import delete, insert, select, update

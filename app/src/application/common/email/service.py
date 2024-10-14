@@ -66,4 +66,4 @@ class EmailService:
         return None
 
     async def send_new_order_email(self, email: str, order: Order) -> None:
-        email_content = get_new_order_template(order)
+        get_new_order_template(order)

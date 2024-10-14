@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Coroutine
 from uuid import UUID
 
 from src.domain.chats.entities import Chat, Message

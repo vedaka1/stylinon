@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from uuid import UUID
 
 from src.domain.chats.entities import Chat, Message

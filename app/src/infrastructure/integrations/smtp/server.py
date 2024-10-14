@@ -4,7 +4,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr
-from smtplib import SMTP, SMTP_SSL
+from smtplib import SMTP_SSL
 
 import aiosmtplib
 from src.application.common.interfaces.smtp import (

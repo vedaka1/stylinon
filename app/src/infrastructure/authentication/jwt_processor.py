@@ -35,7 +35,7 @@ def load_rsa_private_key() -> RSAPrivateKey:
 class JWTProcessor(JWTProcessorInterface):
 
     private_key: RSAPrivateKey = load_rsa_private_key()
-    jwk_key: jwt.PyJWK = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
+    acquiring_key: jwt.PyJWK = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
 
     def create_access_token(
         self,
@@ -145,7 +145,7 @@ class JWTProcessor(JWTProcessorInterface):
         try:
             payload = jwt.decode(
                 jwt=token,
-                key=self.jwk_key,
+                key=self.acquiring_key,
                 algorithms=[settings.tochka.ALGORITHM],
             )
             return cast(dict[str, Any], payload)

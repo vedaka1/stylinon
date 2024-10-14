@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Any
 
 from src.application.products.dto import ProductInPaymentDTO

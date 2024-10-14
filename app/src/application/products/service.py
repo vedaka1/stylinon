@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from uuid import UUID
 
 from src.domain.products.entities import Product, UnitsOfMesaurement
