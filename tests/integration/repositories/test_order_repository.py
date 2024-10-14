@@ -156,7 +156,7 @@ class TestOrderRepository:
                 description="test_description",
                 category="test_category",
                 price=100,
-                units_of_measurement=UnitsOfMesaurement.PIECES,
+                units_of_measurement=UnitsOfMesaurement.PIECE,
             )
             order = Order.create(
                 customer_email="test@test.com",

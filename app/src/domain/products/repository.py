@@ -49,4 +49,12 @@ class ProductRepositoryInterface(ABC):
     async def get_many_by_ids(
         self,
         product_ids: set[UUID],
-    ) -> tuple[list[Product], set[UUID]]: ...
+    ) -> tuple[list[Product], set[UUID]]:
+        """
+        ### Args:
+        `product_ids` - set of product ids
+
+        ### Returns:
+        `tuple[list[Product], set[UUID]]` - a tuple with a list of products and set of missing product ids
+        """
+        ...

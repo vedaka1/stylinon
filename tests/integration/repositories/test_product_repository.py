@@ -14,7 +14,7 @@ class TestProduct:
             description="test_description",
             price=100,
             category="test_category",
-            units_of_measurement=UnitsOfMesaurement.PIECES,
+            units_of_measurement=UnitsOfMesaurement.PIECE,
         )
 
     @staticmethod
@@ -24,7 +24,7 @@ class TestProduct:
         assert product_data.description == "test_description"
         assert product_data.price.value == 100
         assert product_data.category == "test_category"
-        assert product_data.units_of_measurement == UnitsOfMesaurement.PIECES
+        assert product_data.units_of_measurement == UnitsOfMesaurement.PIECE
 
 
 class TestProductRepository:
@@ -48,7 +48,7 @@ class TestProductRepository:
                     description=f"test_description{i}",
                     price=100,
                     category=f"test_category{i}",
-                    units_of_measurement=UnitsOfMesaurement.PIECES,
+                    units_of_measurement=UnitsOfMesaurement.PIECE,
                 )
                 for i in range(10)
             ]

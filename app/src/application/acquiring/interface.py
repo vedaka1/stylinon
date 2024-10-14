@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from src.application.acquiring.exceptions import IncorrectAmountException
 from src.application.products.dto import ProductInPaymentDTO
 
 
@@ -21,5 +22,5 @@ class AcquiringGatewayInterface(ABC):
     def _calculate_order_amount(products: list[ProductInPaymentDTO]) -> int:
         amount = sum([product.amount * product.quantity for product in products])
         if amount <= 0:
-            raise ValueError("Amount can't be less than 0")
+            raise IncorrectAmountException
         return amount

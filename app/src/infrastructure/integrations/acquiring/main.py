@@ -23,16 +23,6 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
         self.api_version = "v1.0"
         self.redirect_url = settings.DOMAIN_URL
 
-    async def get_customer_info(self) -> dict[str, Any]:
-        response = await self.session.get(
-            f"{self.base_url}/open-banking/{self.api_version}/customers/123456789",
-        )
-        if response.status == 200:
-            response_data = await response.json()
-            return cast(dict[str, Any], response_data["Data"])
-        else:
-            raise Exception("test")
-
     async def create_payment_operation_with_receipt(
         self,
         client_email: str,

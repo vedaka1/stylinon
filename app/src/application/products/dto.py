@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from uuid import UUID
 
-from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import UnitsOfMesaurement
 from src.domain.products.value_objects import ProductPrice
 
@@ -64,8 +63,4 @@ class ProductInPaymentDTO:
     vat_type: VatType | None = None
     payment_object: PaymentObject | None = None
     payment_method: PaymentMethod | None = None
-    measure: UnitsOfMesaurement = field(default=UnitsOfMesaurement.PIECES)
-
-    def __post_init__(self) -> None:
-        if self.quantity <= 0:
-            raise OrderItemIncorrectQuantityException
+    measure: UnitsOfMesaurement = field(default=UnitsOfMesaurement.PIECE)

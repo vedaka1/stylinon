@@ -8,7 +8,7 @@ from src.application.orders.commands import (
     GetManyOrdersCommand,
     UpdateOrderCommand,
 )
-from src.application.orders.dto import CreateOrderResponse, OrderOut
+from src.application.orders.dto import CreateOrderOut, OrderOut
 from src.application.orders.usecases import (
     CreateOrderUseCase,
     GetManyOrdersUseCase,
@@ -55,14 +55,14 @@ async def get_many_orders(
     "",
     summary="Создает новый заказ",
     responses={
-        200: {"model": APIResponse[CreateOrderResponse]},
+        200: {"model": APIResponse[CreateOrderOut]},
         400: {"model": OrderItemIncorrectQuantityException},
     },
 )
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],
     command: CreateOrderCommand,
-) -> APIResponse[CreateOrderResponse]:
+) -> APIResponse[CreateOrderOut]:
     response = await create_orders_interactor.execute(command=command)
     return APIResponse(data=response)
 

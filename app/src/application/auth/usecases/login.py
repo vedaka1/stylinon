@@ -9,10 +9,7 @@ from src.application.common.interfaces.password_hasher import PasswordHasherInte
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.users.dto import UserOut
-from src.domain.users.exceptions import (
-    UserInvalidCredentialsException,
-    UserNotFoundException,
-)
+from src.domain.users.exceptions import UserInvalidCredentialsException
 from src.domain.users.repository import UserRepositoryInterface
 from src.infrastructure.settings import settings
 
@@ -32,7 +29,7 @@ class LoginUseCase:
         user = await self.user_repository.get_by_email(email=command.username)
 
         if not user:
-            raise UserNotFoundException
+            raise UserInvalidCredentialsException
 
         if not self.password_hasher.verify(
             password=command.password,

@@ -3,6 +3,7 @@ from datetime import date
 from uuid import UUID
 
 from pydantic import EmailStr
+from src.application.orders.dto import ProductInOrder
 from src.domain.orders.entities import OrderStatus
 
 
@@ -11,12 +12,6 @@ class GetManyOrdersCommand:
     date_from: date | None = None
     date_to: date | None = None
     status: OrderStatus | None = None
-
-
-@dataclass
-class ProductInOrder:
-    id: UUID
-    quantity: int
 
 
 @dataclass

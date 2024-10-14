@@ -3,6 +3,7 @@
 .env
 .env.production
 .mypy_cache
+.idea
 .pytest_cache
 .VSCodeCounter
 __pycache__

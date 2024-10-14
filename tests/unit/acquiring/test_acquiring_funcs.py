@@ -13,14 +13,14 @@ test_products_params_1 = (
             amount=5678,
             quantity=1,
             payment_method=PaymentMethod.FULL_PAYMENT,
-            measure=UnitsOfMesaurement.PIECES,
+            measure=UnitsOfMesaurement.PIECE,
         ),
         ProductInPaymentDTO(
             name="test_item2",
             amount=1234,
             quantity=3,
             payment_method=PaymentMethod.FULL_PAYMENT,
-            measure=UnitsOfMesaurement.PIECES,
+            measure=UnitsOfMesaurement.PIECE,
         ),
     ],
     9380,
@@ -32,7 +32,7 @@ test_products_params_2 = (
             amount=5678,
             quantity=2,
             payment_method=PaymentMethod.FULL_PAYMENT,
-            measure=UnitsOfMesaurement.PIECES,
+            measure=UnitsOfMesaurement.PIECE,
         ),
     ],
     11356,
@@ -57,7 +57,7 @@ def test_map_product_in_payment_to_dict() -> None:
         amount=5678,
         quantity=2,
         payment_method=PaymentMethod.FULL_PAYMENT,
-        measure=UnitsOfMesaurement.PIECES,
+        measure=UnitsOfMesaurement.PIECE,
     )
     result = map_product_in_payment_to_dict(item=item)
     expected = {
@@ -65,6 +65,6 @@ def test_map_product_in_payment_to_dict() -> None:
         "amount": 5678,
         "quantity": 2,
         "paymentMethod": PaymentMethod.FULL_PAYMENT.value,
-        "measure": UnitsOfMesaurement.PIECES.value,
+        "measure": UnitsOfMesaurement.PIECE.value,
     }
     assert result == expected

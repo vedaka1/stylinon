@@ -115,7 +115,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
             .options(
                 selectinload(OrderModel.order_items).joinedload(OrderItemModel.product),
             )
-            .where(OrderModel.user_email == customer_email)
+            .where(OrderModel.customer_email == customer_email)
         )
 
         cursor = await self.session.execute(query)

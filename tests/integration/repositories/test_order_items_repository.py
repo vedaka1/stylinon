@@ -25,7 +25,7 @@ class TestOrderItemRepository:
                 description="test_description",
                 category="test_category",
                 price=100,
-                units_of_measurement=UnitsOfMesaurement.PIECES,
+                units_of_measurement=UnitsOfMesaurement.PIECE,
             )
             order = Order.create(
                 customer_email="test@test.com",
@@ -60,7 +60,7 @@ class TestOrderItemRepository:
                     description=f"test_description{i}",
                     category=f"test_category{i}",
                     price=100,
-                    units_of_measurement=UnitsOfMesaurement.PIECES,
+                    units_of_measurement=UnitsOfMesaurement.PIECE,
                 )
                 for i in range(2)
             ]
@@ -98,7 +98,7 @@ class TestOrderItemRepository:
                 description="test_description",
                 category="test_category",
                 price=100,
-                units_of_measurement=UnitsOfMesaurement.PIECES,
+                units_of_measurement=UnitsOfMesaurement.PIECE,
             )
             order = Order.create(
                 customer_email="test@test.com",

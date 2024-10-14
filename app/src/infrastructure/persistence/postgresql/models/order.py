@@ -16,7 +16,7 @@ class OrderModel(Base):
     __tablename__ = "orders"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
-    user_email: Mapped[str] = mapped_column(nullable=False)
+    customer_email: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=False),
         nullable=False,
@@ -42,7 +42,7 @@ class OrderModel(Base):
 def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
     order = Order(
         id=entity.id,
-        customer_email=entity.user_email,
+        customer_email=entity.customer_email,
         created_at=entity.created_at,
         updated_at=entity.updated_at,
         shipping_address=entity.shipping_address,

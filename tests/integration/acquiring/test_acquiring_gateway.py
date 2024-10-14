@@ -21,14 +21,14 @@ class TestAcquiringGateway:
                 amount=5678,
                 quantity=1,
                 payment_method=PaymentMethod.FULL_PAYMENT,
-                measure=UnitsOfMesaurement.PIECES,
+                measure=UnitsOfMesaurement.PIECE,
             ),
             ProductInPaymentDTO(
                 name="test_item2",
                 amount=1234,
                 quantity=3,
                 payment_method=PaymentMethod.FULL_PAYMENT,
-                measure=UnitsOfMesaurement.PIECES,
+                measure=UnitsOfMesaurement.PIECE,
             ),
         ]
         async with container() as di_container:

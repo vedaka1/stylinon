@@ -2,16 +2,20 @@ from dataclasses import dataclass
 from enum import Enum
 from uuid import UUID, uuid4
 
-from src.domain.products.exceptions import ProductIncorrectPriceException
 from src.domain.products.value_objects import ProductPrice
 
 
 class UnitsOfMesaurement(str, Enum):
-    KILOGRAMS = "кг."
-    GRAMS = "г."
-    LITERS = "л."
-    MILLILITERS = "мл."
-    PIECES = "шт."
+    PIECE = "шт."
+    GRAM = "г."
+    KILOGRAM = "кг."
+    TON = "т."
+    MILLILITER = "мл."
+    LITER = "л."
+    MILLIMETER = "мм."
+    CENTIMETER = "см."
+    DECIMETER = "дм."
+    METER = "м."
 
 
 @dataclass

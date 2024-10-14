@@ -3,8 +3,19 @@ from datetime import datetime
 from uuid import UUID
 
 from src.domain.orders.entities import OrderStatus
+from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import UnitsOfMesaurement
 from src.domain.products.value_objects import ProductPrice
+
+
+@dataclass
+class ProductInOrder:
+    id: UUID
+    quantity: int
+
+    def __post_init__(self) -> None:
+        if self.quantity < 1:
+            raise OrderItemIncorrectQuantityException
 
 
 @dataclass
@@ -78,7 +89,7 @@ class OrderItemOut:
 
 
 @dataclass
-class CreateOrderResponse:
+class CreateOrderOut:
     id: UUID
     customer_email: str
     created_at: datetime

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import CreateOrderCommand
-from src.application.orders.dto import CreateOrderResponse
+from src.application.orders.dto import CreateOrderOut
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.exceptions import DuplicateOrderPositionsException
@@ -28,17 +28,17 @@ class CreateOrderUseCase:
     acquiring_gateway: AcquiringGatewayInterface
     transaction_manager: TransactionManagerInterface
 
-    async def execute(self, command: CreateOrderCommand) -> CreateOrderResponse:
-        products_set = set()
+    async def execute(self, command: CreateOrderCommand) -> CreateOrderOut:
+        products_ids = set()
 
         for product in command.items:
-            if product.id not in products_set:
-                products_set.add(product.id)
+            if product.id not in products_ids:
+                products_ids.add(product.id)
             else:
                 raise DuplicateOrderPositionsException(product.id)
 
         products, missing_products = await self.products_repository.get_many_by_ids(
-            product_ids=products_set,
+            product_ids=products_ids,
         )
 
         if missing_products:
@@ -88,7 +88,7 @@ class CreateOrderUseCase:
             extra={"order_id": order.id, "customer_email": command.customer_email},
         )
 
-        return CreateOrderResponse(
+        return CreateOrderOut(
             id=order.id,
             customer_email=order.customer_email,
             created_at=order.created_at,

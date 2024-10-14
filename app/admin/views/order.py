@@ -12,13 +12,13 @@ class OrderAdmin(ModelView, model=OrderModel):
     name_plural = "Заказы"
 
     column_searchable_list = [
-        OrderModel.user_email,
+        OrderModel.customer_email,
         OrderModel.shipping_address,
         OrderModel.tracking_number,
         OrderModel.status,
     ]
     column_list = [
-        OrderModel.user_email,
+        OrderModel.customer_email,
         OrderModel.operation_id,
         OrderModel.shipping_address,
         OrderModel.tracking_number,
@@ -27,7 +27,7 @@ class OrderAdmin(ModelView, model=OrderModel):
         OrderModel.updated_at,
     ]
     column_details_list = [
-        OrderModel.user_email,
+        OrderModel.customer_email,
         OrderModel.operation_id,
         OrderModel.shipping_address,
         OrderModel.tracking_number,
