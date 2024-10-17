@@ -30,6 +30,7 @@ class TestOrders:
                 operation_id=test_operation_id,
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
 
             await order_repository.create(order)

@@ -10,9 +10,6 @@ class ProductServiceInterface(ABC):
     async def create(self, product: Product) -> None: ...
 
     @abstractmethod
-    async def create_many(self, products: list[Product]) -> None: ...
-
-    @abstractmethod
     async def delete(self, product_id: UUID) -> None: ...
 
     @abstractmethod

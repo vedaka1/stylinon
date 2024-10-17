@@ -4,7 +4,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
-from src.domain.products.entities import Product
+from src.domain.products.entities import ProductVariant
 
 
 # fmt: off
@@ -29,6 +29,7 @@ class Order:
     operation_id: UUID
     tracking_number: str | None
     total_price: int
+    is_self_pickup: bool
     status: OrderStatus
 
     items: list["OrderItem"] = field(default_factory=list)
@@ -39,6 +40,7 @@ class Order:
         operation_id: UUID,
         shipping_address: str,
         total_price: int,
+        is_self_pickup: bool,
         *,
         status: OrderStatus = OrderStatus.CREATED,
     ) -> "Order":
@@ -52,6 +54,7 @@ class Order:
             operation_id=operation_id,
             tracking_number=None,
             total_price=total_price,
+            is_self_pickup=is_self_pickup,
             status=status,
         )
 
@@ -59,23 +62,23 @@ class Order:
 @dataclass
 class OrderItem:
     order_id: UUID
-    product_id: UUID
+    product_variant_id: UUID
     quantity: int
 
-    product: Product | None
+    product: ProductVariant | None
 
     @staticmethod
     def create(
         order_id: UUID,
-        product_id: UUID,
+        product_variant_id: UUID,
         quantity: int,
-        product: Product | None = None,
+        product: ProductVariant | None = None,
     ) -> "OrderItem":
         if quantity <= 0:
             raise OrderItemIncorrectQuantityException
         return OrderItem(
             order_id=order_id,
-            product_id=product_id,
+            product_variant_id=product_variant_id,
             quantity=quantity,
             product=product,
         )

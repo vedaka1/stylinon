@@ -2,7 +2,6 @@ from typing import Any
 from uuid import uuid4
 
 from sqladmin import ModelView
-from src.domain.products.value_objects import ProductPrice
 from src.infrastructure.persistence.postgresql.models.product import ProductModel
 
 
@@ -13,12 +12,9 @@ class ProductAdmin(ModelView, model=ProductModel):
     can_view_details = True
 
     column_formatters = {
-        ProductModel.price: lambda m, a: ProductPrice(m.price).in_rubles(),  # type: ignore
         ProductModel.description: lambda m, a: m.description[:60] + "...",  # type: ignore
     }
-    column_formatters_detail = {
-        ProductModel.price: lambda m, a: ProductPrice(m.price).in_rubles(),  # type: ignore
-    }
+    # column_formatters_detail = {}
     name = "Товар"
     name_plural = "Товары"
 
@@ -31,9 +27,8 @@ class ProductAdmin(ModelView, model=ProductModel):
         ProductModel.name,
         ProductModel.category,
         ProductModel.description,
-        ProductModel.price,
         ProductModel.units_of_measurement,
-        ProductModel.photo_url,
+        ProductModel.variants,
     ]
 
     column_labels = {
@@ -43,10 +38,16 @@ class ProductAdmin(ModelView, model=ProductModel):
         "price": "Цена",
         "units_of_measurement": "Единицы измерения",
         "photo_url": "Фото",
+        "product_variants": "Варианты товара",
     }
-
-    column_details_exclude_list = ["order_item"]
-    form_excluded_columns = ["id", "order_item"]
+    form_columns = [
+        ProductModel.name,
+        ProductModel.category,
+        ProductModel.description,
+        ProductModel.units_of_measurement,
+        # ProductModel.product_variants,
+        ProductModel.status,
+    ]
 
     async def on_model_change(
         self,
@@ -57,7 +58,3 @@ class ProductAdmin(ModelView, model=ProductModel):
     ) -> None:
         if is_created:
             data["id"] = uuid4()
-            data["photo_url"] = (
-                "/images/not_found.png" if not data["photo_url"] else data["photo_url"]
-            )
-            data["price"] = int(ProductPrice(data["price"]).value * 100)

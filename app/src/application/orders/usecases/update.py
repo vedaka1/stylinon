@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
+from uuid import UUID
 
 from src.application.acquiring.dto import AcquiringWebhookType
 from src.application.acquiring.exceptions import IncorrectAcqioringWebhookTypeException
@@ -24,23 +25,23 @@ class UpdateOrderUseCase:
     order_repository: OrderRepositoryInterface
     transaction_manager: TransactionManagerInterface
 
-    async def execute(self, command: UpdateOrderCommand) -> None:
-        order = await self.order_repository.get_by_id(command.order_id)
-
+    async def execute(self, command: UpdateOrderCommand, order_id: UUID) -> None:
+        order = await self.order_repository.get_by_id(order_id)
+        print(order)
         if not order:
             raise OrderNotFoundException
 
         for key, value in command.__dict__.items():
             if value:
                 setattr(order, key, value)
-
+        print(order)
         order.updated_at = datetime.now()
 
         await self.order_repository.update(order=order)
 
         await self.transaction_manager.commit()
 
-        logger.info("Order updated", extra={"order_id": command.order_id})
+        logger.info("Order updated", extra={"order_id": order_id})
 
         return None
 
@@ -50,10 +51,10 @@ class UpdateOrderByWebhookUseCase:
 
     order_repository: OrderRepositoryInterface
     acquiring_gateway: AcquiringGatewayInterface
-    transaction_manager: TransactionManagerInterface
     smtp_server: SyncSMTPServerInterface
     jwt_processor: JWTProcessorInterface
     sender_name: SenderName
+    transaction_manager: TransactionManagerInterface
 
     async def execute(self, token: str) -> None:
         webhook_data = self.jwt_processor.validate_acquiring_token(token=token)

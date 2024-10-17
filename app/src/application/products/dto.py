@@ -2,8 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from uuid import UUID
 
-from src.domain.products.entities import UnitsOfMesaurement
-from src.domain.products.value_objects import ProductPrice
+from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
 
 
 class VatType(Enum):
@@ -18,6 +17,7 @@ class VatType(Enum):
 class PaymentMethod(Enum):
     FULL_PAYMENT = "full_payment"
     FULL_PREPAYMENT = "full_prepayment"
+    DELAYED_PAYMENT = "delayed_payment"
 
 
 class PaymentObject(Enum):
@@ -27,32 +27,43 @@ class PaymentObject(Enum):
 
 
 @dataclass
+class ProductWithoutVariantsOut:
+    id: UUID
+    name: str
+    category: str
+    description: str
+    units_of_measurement: UnitsOfMesaurement
+
+
+@dataclass
+class ProductVariantOut:
+    id: UUID
+    name: str
+    sku: str
+    bag_weight: float
+    pallet_weight: float
+    bags_per_pallet: float
+    retail_price: float
+    wholesale_delivery_price: float
+    d2_delivery_price: float
+    d2_self_pickup_price: float
+    d1_delivery_price: float
+    d1_self_pickup_price: float
+    image: str | None
+    status: ProductStatus
+
+    parent_product: "ProductWithoutVariantsOut | None" = None
+
+
+@dataclass
 class ProductOut:
     id: UUID
     name: str
     category: str
     description: str
-    price: float
     units_of_measurement: UnitsOfMesaurement
-    photo_url: str | None = None
 
-    def __init__(
-        self,
-        id: UUID,
-        name: str,
-        category: str,
-        description: str,
-        price: int,
-        units_of_measurement: UnitsOfMesaurement,
-        photo_url: str | None = None,
-    ) -> None:
-        self.id = id
-        self.name = name
-        self.category = category
-        self.description = description
-        self.price = ProductPrice(price).in_rubles()
-        self.units_of_measurement = units_of_measurement
-        self.photo_url = photo_url
+    variants: list[ProductVariantOut]
 
 
 @dataclass

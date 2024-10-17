@@ -57,14 +57,15 @@
         <p><strong>Пользователь:</strong> {{ order.user_email }}</p>
         <p><strong>Дата создания:</strong> {{ order.created_at }}</p>
         <p><strong>Адрес доставки:</strong> {{ order.shipping_address }}</p>
+        <p><strong>Самовывоз:</strong> {{ order.is_self_picked }}</p>
         <p><strong>Статус:</strong> {{ order.status.value }}</p>
     </div>
 
     <h2>Товары в заказе:</h2>
     {% for item in order.items %}
     <div class="order-item">
-        <p class="product-name">{{ item.product.name }} ({{ item.quantity }} {{ item.product.units_of_measurement.value }} * {{ item.product.price.in_rubles() }} ₽)</p>
-        <p><strong>Сумма:</strong> {{ item.product.price.value * item.quantity / 100 }} ₽</p>
+        <p class="product-name">{{ item.product.name }} ({{ item.quantity }} {{ item.product.parent_product.units_of_measurement.value }} * {{ item.product.retail_price.in_rubles() }} ₽)</p>
+        <p><strong>Сумма:</strong> {{ item.product.retail_price.value * item.quantity / 100 }} ₽</p>
     </div>
     {% endfor %}
 

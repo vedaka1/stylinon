@@ -34,10 +34,10 @@ class OrderAdmin(ModelView, model=OrderModel):
         OrderModel.status,
         OrderModel.created_at,
         OrderModel.updated_at,
-        OrderModel.order_items,
+        "order_items",
     ]
     column_labels = {
-        "user_email": "Email клиента",
+        "customer_email": "Email клиента",
         "operation_id": "ID платежной операции",
         "shipping_address": "Адрес доставки",
         "tracking_number": "Номер отправления",
@@ -48,8 +48,8 @@ class OrderAdmin(ModelView, model=OrderModel):
     }
     form_ajax_refs = {
         "order_items": {
-            "fields": ("order_id",),
-            "order_by": "id",
+            "fields": ("product_variant_id",),
+            "order_by": "product_variant_id",
         },
     }
     # column_details_exclude_list = ["order_item"]

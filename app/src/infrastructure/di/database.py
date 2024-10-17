@@ -12,7 +12,11 @@ from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
 )
-from src.domain.products.repository import ProductRepositoryInterface
+from src.domain.products.repository import (
+    CategoryRepositoryInterface,
+    ProductRepositoryInterface,
+    ProductVariantRepositoryInterface,
+)
 from src.domain.users.repository import UserRepositoryInterface
 from src.infrastructure.persistence.postgresql.repositories import (
     SqlalchemyChatRepository,
@@ -23,6 +27,16 @@ from src.infrastructure.persistence.postgresql.repositories import (
     SqlalchemyRefreshTokenRepository,
     SqlalchemyUserRepository,
 )
+from src.infrastructure.persistence.postgresql.repositories.category import (
+    SqlalchemyCategoryRepository,
+)
+from src.infrastructure.persistence.postgresql.repositories.product_variant import (
+    SqlalchemyProductVariantRepository,
+)
+
+# from src.infrastructure.persistence.postgresql.repositories.sku import (
+#     SqlalchemySkuRepository,
+# )
 from src.infrastructure.persistence.postgresql.transaction import TransactionManager
 
 
@@ -72,3 +86,15 @@ class DatabaseAdaptersProvider(Provider):
         SqlalchemyMessageRepository,
         provides=MessageRepositoryInterface,
     )
+    categories_repository = provide(
+        SqlalchemyCategoryRepository,
+        provides=CategoryRepositoryInterface,
+    )
+    product_variant_repository = provide(
+        SqlalchemyProductVariantRepository,
+        provides=ProductVariantRepositoryInterface,
+    )
+    # sku_repository = provide(
+    #     SqlalchemySkuRepository,
+    #     provides=SkuRepositoryInterface,
+    # )

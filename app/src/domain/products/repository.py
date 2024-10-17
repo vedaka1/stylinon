@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.application.products.filters import ProductFilters
+from src.domain.products.entities import Category, Product, ProductVariant, Sku
 
 
 class ProductRepositoryInterface(ABC):
@@ -9,8 +10,8 @@ class ProductRepositoryInterface(ABC):
     @abstractmethod
     async def create(self, product: Product) -> None: ...
 
-    @abstractmethod
-    async def create_many(self, products: list[Product]) -> None: ...
+    # @abstractmethod
+    # async def create_many(self, products: list[Product]) -> None: ...
 
     @abstractmethod
     async def delete(self, product_id: UUID) -> None: ...
@@ -24,12 +25,8 @@ class ProductRepositoryInterface(ABC):
     @abstractmethod
     async def get_many(
         self,
-        name: str | None = None,
-        category: str | None = None,
-        description: str | None = None,
-        price_from: int | None = None,
-        price_to: int | None = None,
-        units_of_measurement: UnitsOfMesaurement | None = None,
+        filters: ProductFilters | None = None,
+        with_relations: bool = False,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Product]: ...
@@ -37,12 +34,7 @@ class ProductRepositoryInterface(ABC):
     @abstractmethod
     async def count(
         self,
-        name: str | None = None,
-        category: str | None = None,
-        description: str | None = None,
-        price_from: int | None = None,
-        price_to: int | None = None,
-        units_of_measurement: UnitsOfMesaurement | None = None,
+        filters: ProductFilters | None = None,
     ) -> int: ...
 
     @abstractmethod
@@ -58,3 +50,98 @@ class ProductRepositoryInterface(ABC):
         `tuple[list[Product], set[UUID]]` - a tuple with a list of products and set of missing product ids
         """
         ...
+
+
+class ProductVariantRepositoryInterface(ABC):
+
+    @abstractmethod
+    async def create(self, product_variant: ProductVariant) -> None: ...
+
+    # @abstractmethod
+    # async def create_many(self, product_variants: list[ProductVariant]) -> None: ...
+
+    @abstractmethod
+    async def delete(self, product_variant_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def update(self, product_variant: ProductVariant) -> None: ...
+
+    @abstractmethod
+    async def get_by_id(self, product_variant_id: UUID) -> ProductVariant | None: ...
+
+    @abstractmethod
+    async def count(self) -> int: ...
+
+    @abstractmethod
+    async def get_many(
+        self,
+        offset: int = 0,
+        limit: int = 100,
+    ) -> list[ProductVariant]: ...
+
+    @abstractmethod
+    async def get_many_by_ids(
+        self,
+        product_variant_ids: set[UUID],
+    ) -> tuple[list[ProductVariant], set[UUID]]:
+        """
+        ### Args:
+        `product_variants_ids` - set of product variants ids
+
+        ### Returns:
+        `tuple[list[ProductVariant], set[UUID]]` - a tuple with a list of product variants and set of missing product variants ids
+        """
+        ...
+
+
+class SkuRepositoryInterface(ABC):
+
+    @abstractmethod
+    async def create(self, sku: Sku) -> None: ...
+
+    @abstractmethod
+    async def delete(self, sku_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def update(self, sku: Sku) -> None: ...
+
+    @abstractmethod
+    async def get_by_id(self, sku_id: UUID) -> Sku | None: ...
+
+    @abstractmethod
+    async def count(self) -> int: ...
+
+    @abstractmethod
+    async def get_many_by_ids(
+        self,
+        sku_ids: set[UUID],
+    ) -> tuple[list[Sku], set[UUID]]:
+        """
+        ### Args:
+        `sku_ids` - set of sku ids
+
+        ### Returns:
+        `tuple[list[Sku], set[UUID]]` - a tuple with a list of skus and set of missing sku ids
+        """
+        ...
+
+
+class CategoryRepositoryInterface(ABC):
+
+    @abstractmethod
+    async def create(self, category: Category) -> None: ...
+
+    @abstractmethod
+    async def delete(self, category_name: str) -> None: ...
+
+    @abstractmethod
+    async def update(self, category: Category) -> None: ...
+
+    @abstractmethod
+    async def get_by_name(self, category_name: str) -> Category | None: ...
+
+    @abstractmethod
+    async def get_many(self) -> list[Category]: ...
+
+    @abstractmethod
+    async def count(self) -> int: ...

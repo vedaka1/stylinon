@@ -110,10 +110,12 @@ async def get_order(
     ],
 )
 async def update_order(
+    order_id: UUID,
     update_order_interactor: FromDishka[UpdateOrderUseCase],
-    command: UpdateOrderCommand = Depends(),
+    command: UpdateOrderCommand,
 ) -> APIResponse[None]:
-    await update_order_interactor.execute(command=command)
+    await update_order_interactor.execute(command=command, order_id=order_id)
+
     return APIResponse()
 
 
@@ -123,5 +125,7 @@ async def payment_webhook(
     update_order_interactor: FromDishka[UpdateOrderByWebhookUseCase],
 ) -> APIResponse[None]:
     token = await request.body()
+
     await update_order_interactor.execute(token=token.decode())
+
     return APIResponse()

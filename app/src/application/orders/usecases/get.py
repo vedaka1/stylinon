@@ -29,20 +29,32 @@ class GetManyOrdersUseCase:
                 operation_id=order.operation_id,
                 tracking_number=order.tracking_number,
                 total_price=order.total_price,
+                is_self_pickup=order.is_self_pickup,
                 status=order.status,
                 items=[
                     OrderItemOut(
                         product_id=order_item.product.id,
                         name=order_item.product.name,
-                        category=order_item.product.category,
-                        description=order_item.product.description,
-                        price=order_item.product.price.value,
-                        units_of_measurement=order_item.product.units_of_measurement,
+                        category=order_item.product.parent_product.category,
+                        description=order_item.product.parent_product.description,
+                        units_of_measurement=order_item.product.parent_product.units_of_measurement,
                         quantity=order_item.quantity,
-                        photo_url=order_item.product.photo_url,
+                        product_name=order_item.product.name,
+                        sku=order_item.product.sku,
+                        bag_weight=order_item.product.bag_weight,
+                        pallet_weight=order_item.product.pallet_weight,
+                        bags_per_pallet=order_item.product.bags_per_pallet,
+                        retail_price=order_item.product.retail_price,
+                        wholesale_delivery_price=order_item.product.wholesale_delivery_price,
+                        d2_delivery_price=order_item.product.d2_delivery_price,
+                        d2_self_pickup_price=order_item.product.d2_self_pickup_price,
+                        d1_delivery_price=order_item.product.d1_delivery_price,
+                        d1_self_pickup_price=order_item.product.d1_self_pickup_price,
+                        status=order_item.product.status,
+                        image=order_item.product.image,
                     )
                     for order_item in order.items
-                    if order_item.product
+                    if order_item.product and order_item.product.parent_product
                 ],
             )
             for order in orders
@@ -59,7 +71,7 @@ class GetOrderUseCase:
 
         if not order:
             raise OrderNotFoundException
-
+        print(order)
         return OrderOut(
             id=order.id,
             customer_email=order.customer_email,
@@ -69,19 +81,31 @@ class GetOrderUseCase:
             operation_id=order.operation_id,
             tracking_number=order.tracking_number,
             total_price=order.total_price,
+            is_self_pickup=order.is_self_pickup,
             status=order.status,
             items=[
                 OrderItemOut(
                     product_id=order_item.product.id,
                     name=order_item.product.name,
-                    category=order_item.product.category,
-                    description=order_item.product.description,
-                    price=order_item.product.price.value,
-                    units_of_measurement=order_item.product.units_of_measurement,
+                    category=order_item.product.parent_product.category,
+                    description=order_item.product.parent_product.description,
+                    units_of_measurement=order_item.product.parent_product.units_of_measurement,
                     quantity=order_item.quantity,
-                    photo_url=order_item.product.photo_url,
+                    product_name=order_item.product.name,
+                    sku=order_item.product.sku,
+                    bag_weight=order_item.product.bag_weight,
+                    pallet_weight=order_item.product.pallet_weight,
+                    bags_per_pallet=order_item.product.bags_per_pallet,
+                    retail_price=order_item.product.retail_price,
+                    wholesale_delivery_price=order_item.product.wholesale_delivery_price,
+                    d2_delivery_price=order_item.product.d2_delivery_price,
+                    d2_self_pickup_price=order_item.product.d2_self_pickup_price,
+                    d1_delivery_price=order_item.product.d1_delivery_price,
+                    d1_self_pickup_price=order_item.product.d1_self_pickup_price,
+                    status=order_item.product.status,
+                    image=order_item.product.image,
                 )
                 for order_item in order.items
-                if order_item.product
+                if order_item.product and order_item.product.parent_product
             ],
         )

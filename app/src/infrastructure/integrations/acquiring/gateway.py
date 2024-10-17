@@ -27,16 +27,16 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
         self,
         client_email: str,
         items: list[ProductInPaymentDTO],
+        total_price: float,
         purpose: str = "Перевод за оказанные услуги",
         payment_mode: list[str] = ["sbp", "card"],
         save_card: bool = True,
         consumerId: str | None = None,
     ) -> dict[str, Any]:
-        amount = self._calculate_order_amount(products=items)
         request_data = {
             "Data": {
                 "customerCode": 123456789,
-                "amount": amount,
+                "amount": total_price,
                 "purpose": purpose,
                 "redirectUrl": "https://example.com",
                 "failRedirectUrl": "https://example.com/fail",

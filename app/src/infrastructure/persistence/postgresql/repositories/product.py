@@ -2,10 +2,13 @@ from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.domain.products.entities import Product, UnitsOfMesaurement
+from sqlalchemy.orm import joinedload, selectinload
+from src.application.products.filters import ProductFilters
+from src.domain.products.entities import Product
 from src.domain.products.repository import ProductRepositoryInterface
 from src.infrastructure.persistence.postgresql.models.product import (
     ProductModel,
+    ProductVariantModel,
     map_to_product,
 )
 
@@ -22,29 +25,8 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             name=product.name,
             category=product.category,
             description=product.description,
-            price=product.price.value,
             units_of_measurement=product.units_of_measurement,
-            photo_url=product.photo_url,
-        )
-
-        await self.session.execute(query)
-
-        return None
-
-    async def create_many(self, products: list[Product]) -> None:
-        query = insert(ProductModel).values(
-            [
-                {
-                    "id": product.id,
-                    "name": product.name,
-                    "category": product.category,
-                    "description": product.description,
-                    "price": product.price.value,
-                    "units_of_measurement": product.units_of_measurement,
-                    "photo_url": product.photo_url,
-                }
-                for product in products
-            ],
+            status=product.status,
         )
 
         await self.session.execute(query)
@@ -59,9 +41,8 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 name=product.name,
                 category=product.category,
                 description=product.description,
-                price=product.price.value,
                 units_of_measurement=product.units_of_measurement,
-                photo_url=product.photo_url,
+                status=product.status,
             )
         )
 
@@ -77,41 +58,53 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         return None
 
     async def get_by_id(self, product_id: UUID) -> Product | None:
-        query = select(ProductModel).where(ProductModel.id == product_id)
+        query = (
+            select(ProductModel)
+            .where(ProductModel.id == product_id)
+            .options(joinedload(ProductModel.variants))
+        )
 
         cursor = await self.session.execute(query)
 
-        entity = cursor.scalar_one_or_none()
+        entity = cursor.unique().scalar_one_or_none()
 
-        return map_to_product(entity) if entity else None
+        return map_to_product(entity, with_relations=True) if entity else None
 
     async def get_many(
         self,
-        name: str | None = None,
-        category: str | None = None,
-        description: str | None = None,
-        price_from: int | None = None,
-        price_to: int | None = None,
-        units_of_measurement: UnitsOfMesaurement | None = None,
+        filters: ProductFilters | None = None,
+        with_relations: bool = False,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Product]:
-        query = select(ProductModel)
+        query = select(ProductModel).join(ProductVariantModel)
 
-        if name:
-            query = query.where(ProductModel.name.ilike(f"%{name}%"))
-        if category:
-            query = query.where(ProductModel.category.ilike(f"%{category}%"))
-        if description:
-            query = query.where(ProductModel.description.ilike(f"%{description}%"))
-        if price_from:
-            query = query.where(ProductModel.price >= price_from)
-        if price_to:
-            query = query.where(ProductModel.price <= price_to)
-        if units_of_measurement:
-            query = query.where(
-                ProductModel.units_of_measurement == units_of_measurement,
-            )
+        if with_relations:
+            query = query.options(selectinload(ProductModel.variants))
+
+        if filters:
+            if filters.name:
+                query = query.where(ProductModel.name.ilike(f"%{filters.name}%"))
+            if filters.category:
+                query = query.where(
+                    ProductModel.category.ilike(f"%{filters.category}%"),
+                )
+            if filters.description:
+                query = query.where(
+                    ProductModel.description.ilike(f"%{filters.description}%"),
+                )
+            if filters.price_from:
+                query = query.where(
+                    ProductVariantModel.retail_price >= filters.price_from,
+                )
+            if filters.price_to:
+                query = query.where(
+                    ProductVariantModel.retail_price <= filters.price_to,
+                )
+            if filters.units_of_measurement:
+                query = query.where(
+                    ProductModel.units_of_measurement == filters.units_of_measurement,
+                )
 
         query = query.limit(limit).offset(offset)
 
@@ -119,33 +112,39 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
 
         entities = cursor.scalars().all()
 
-        return [map_to_product(entity) for entity in entities]
+        return [
+            map_to_product(entity, with_relations=with_relations) for entity in entities
+        ]
 
     async def count(
         self,
-        name: str | None = None,
-        category: str | None = None,
-        description: str | None = None,
-        price_from: int | None = None,
-        price_to: int | None = None,
-        units_of_measurement: UnitsOfMesaurement | None = None,
+        filters: ProductFilters | None = None,
     ) -> int:
-        query = select(func.count()).select_from(ProductModel)
+        query = select(func.count()).select_from(ProductModel).join(ProductVariantModel)
 
-        if name:
-            query = query.where(ProductModel.name.ilike(f"%{name}%"))
-        if category:
-            query = query.where(ProductModel.category.ilike(f"%{category}%"))
-        if description:
-            query = query.where(ProductModel.description.ilike(f"%{description}%"))
-        if price_from:
-            query = query.where(ProductModel.price >= price_from)
-        if price_to:
-            query = query.where(ProductModel.price <= price_to)
-        if units_of_measurement:
-            query = query.where(
-                ProductModel.units_of_measurement == units_of_measurement,
-            )
+        if filters:
+            if filters.name:
+                query = query.where(ProductModel.name.ilike(f"%{filters.name}%"))
+            if filters.category:
+                query = query.where(
+                    ProductModel.category.ilike(f"%{filters.category}%"),
+                )
+            if filters.description:
+                query = query.where(
+                    ProductModel.description.ilike(f"%{filters.description}%"),
+                )
+            if filters.price_from:
+                query = query.where(
+                    ProductVariantModel.retail_price >= filters.price_from,
+                )
+            if filters.price_to:
+                query = query.where(
+                    ProductVariantModel.retail_price <= filters.price_to,
+                )
+            if filters.units_of_measurement:
+                query = query.where(
+                    ProductModel.units_of_measurement == filters.units_of_measurement,
+                )
 
         cursor = await self.session.execute(query)
 
@@ -164,8 +163,14 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
 
         entities = cursor.scalars().all()
 
-        existing_products_ids = {product.id for product in entities}
+        existing_entities = set()
 
-        missing_products_ids = product_ids - existing_products_ids
+        for entity in entities:
+            existing_entities.add(entity.id)
 
-        return [map_to_product(entity) for entity in entities], missing_products_ids
+        missing_entities = product_ids - existing_entities
+
+        return (
+            [map_to_product(entity) for entity in entities],
+            missing_entities,
+        )

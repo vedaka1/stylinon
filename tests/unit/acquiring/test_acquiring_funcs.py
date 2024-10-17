@@ -1,5 +1,5 @@
 import pytest
-from src.application.acquiring.interface import AcquiringGatewayInterface
+from src.application.orders.usecases.create import calculate_total_price
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.products.entities import UnitsOfMesaurement
 from src.infrastructure.integrations.acquiring.mappers import (
@@ -43,12 +43,12 @@ test_products_params_2 = (
     "products,expected",
     [test_products_params_1, test_products_params_2],
 )
-async def test_success_calculate_order_amount(
+async def test_success_calculate_order_total_price(
     products: list[ProductInPaymentDTO],
     expected: int,
 ) -> None:
-    amount = AcquiringGatewayInterface._calculate_order_amount(products=products)
-    assert amount == expected
+    total_price = calculate_total_price(products=products)
+    assert total_price.value == expected
 
 
 def test_map_product_in_payment_to_dict() -> None:
@@ -62,7 +62,7 @@ def test_map_product_in_payment_to_dict() -> None:
     result = map_product_in_payment_to_dict(item=item)
     expected = {
         "name": "test_item1",
-        "amount": 5678,
+        "amount": 56.78,
         "quantity": 2,
         "paymentMethod": PaymentMethod.FULL_PAYMENT.value,
         "measure": UnitsOfMesaurement.PIECE.value,

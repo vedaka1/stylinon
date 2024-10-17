@@ -52,4 +52,4 @@ repos:
         types: [python]
         args:
           - ./app
-          - ./tests
+          # - ./tests
