@@ -25,7 +25,6 @@ from src.infrastructure.di.database import (
 from src.infrastructure.di.gateways import GatewayProvider
 from src.infrastructure.di.security import SecurityProvider
 from src.infrastructure.di.usecases import UseCasesProvider
-from src.infrastructure.integrations.smtp.server import SyncSMTPServer
 from src.infrastructure.persistence.postgresql.database import (
     get_async_engine,
     get_async_sessionmaker,

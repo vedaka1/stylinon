@@ -1,8 +1,7 @@
-from uuid import UUID
-
 import pytest
 from dishka import AsyncContainer
 from src.application.acquiring.interface import AcquiringGatewayInterface
+from src.application.orders.usecases.create import calculate_total_price
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.products.entities import UnitsOfMesaurement
 
@@ -18,24 +17,28 @@ class TestAcquiringGateway:
         products = [
             ProductInPaymentDTO(
                 name="test_item1",
-                amount=5678,
+                amount=567800,
                 quantity=1,
                 payment_method=PaymentMethod.FULL_PAYMENT,
-                measure=UnitsOfMesaurement.PIECES,
+                measure=UnitsOfMesaurement.PIECE,
             ),
             ProductInPaymentDTO(
                 name="test_item2",
-                amount=1234,
+                amount=123400,
                 quantity=3,
                 payment_method=PaymentMethod.FULL_PAYMENT,
-                measure=UnitsOfMesaurement.PIECES,
+                measure=UnitsOfMesaurement.PIECE,
             ),
         ]
         async with container() as di_container:
             acquiring_gateway = await di_container.get(AcquiringGatewayInterface)
+            total_price = calculate_total_price(products)
+            assert total_price.value == 567800 * 1 + 123400 * 3
+            assert total_price.in_rubles() == (567800 * 1 + 123400 * 3) / 100
             response = await acquiring_gateway.create_payment_operation_with_receipt(
                 client_email="test@gmail.com",
                 items=products,
+                total_price=total_price.in_rubles(),
             )
             expected = {
                 "purpose": "Тестовый платеж",
@@ -53,14 +56,14 @@ class TestAcquiringGateway:
                 "Items": [
                     {
                         "name": "test_item1",
-                        "amount": 5678,
+                        "amount": 5678.00,
                         "quantity": 1,
                         "paymentMethod": "full_payment",
                         "measure": "шт.",
                     },
                     {
                         "name": "test_item2",
-                        "amount": 1234,
+                        "amount": 1234.00,
                         "quantity": 3,
                         "paymentMethod": "full_payment",
                         "measure": "шт.",

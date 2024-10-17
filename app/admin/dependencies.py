@@ -1,3 +1,4 @@
+from admin.views.categories import CategoryAdmin
 from admin.views.order import OrderAdmin
 from admin.views.order_item import OrderItemAdmin
 from admin.views.products import ProductAdmin
@@ -13,3 +14,4 @@ def init_admin(app: FastAPI, engine: AsyncEngine) -> None:
     admin.add_view(ProductAdmin)
     admin.add_view(OrderAdmin)
     admin.add_view(OrderItemAdmin)
+    admin.add_view(CategoryAdmin)

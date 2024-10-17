@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from pydantic import EmailStr
 from src.application.common.pagination import PaginationQuery
 from src.domain.users.entities import User
 

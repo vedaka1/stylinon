@@ -1,6 +1,5 @@
 import logging
 from typing import Annotated, Dict, Optional
-from uuid import UUID
 
 from dishka import AsyncContainer
 from fastapi import Depends, Request, WebSocket
@@ -16,7 +15,6 @@ from src.application.auth.exceptions import (
 from src.application.common.interfaces.identity_provider import (
     IdentityProviderInterface,
 )
-from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.infrastructure.di.container import get_container
 
 logger = logging.getLogger()

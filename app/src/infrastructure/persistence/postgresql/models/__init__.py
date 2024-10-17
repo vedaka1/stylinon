@@ -2,7 +2,7 @@ from .auth import RefreshSessionModel
 from .base import Base
 from .chat import ChatModel, MessageModel
 from .order import OrderItemModel, OrderModel
-from .product import ProductModel
+from .product import CategoryModel, ProductModel
 from .user import UserModel
 
 __all__ = [
@@ -11,6 +11,7 @@ __all__ = [
     "OrderModel",
     "OrderItemModel",
     "ProductModel",
+    "CategoryModel",
     "RefreshSessionModel",
     # "UserSessionModel",
     "ChatModel",

@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from uuid import UUID
 
-from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
-from src.domain.products.entities import UnitsOfMesaurement
+from src.application.common.utils import convert_price
+from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
 from src.domain.products.value_objects import ProductPrice
 
 
@@ -19,6 +19,7 @@ class VatType(Enum):
 class PaymentMethod(Enum):
     FULL_PAYMENT = "full_payment"
     FULL_PREPAYMENT = "full_prepayment"
+    DELAYED_PAYMENT = "delayed_payment"
 
 
 class PaymentObject(Enum):
@@ -33,9 +34,19 @@ class ProductOut:
     name: str
     category: str
     description: str
-    price: float
+    sku: str
+    bag_weight: int
+    pallet_weight: int
+    bags_per_pallet: int
+    retail_price: float
+    wholesale_delivery_price: float | None
+    d2_delivery_price: float | None
+    d2_self_pickup_price: float | None
+    d1_delivery_price: float | None
+    d1_self_pickup_price: float | None
     units_of_measurement: UnitsOfMesaurement
-    photo_url: str | None = None
+    image: str | None
+    status: ProductStatus
 
     def __init__(
         self,
@@ -43,17 +54,37 @@ class ProductOut:
         name: str,
         category: str,
         description: str,
-        price: int,
         units_of_measurement: UnitsOfMesaurement,
-        photo_url: str | None = None,
+        sku: str,
+        bag_weight: int,
+        pallet_weight: int,
+        bags_per_pallet: int,
+        retail_price: ProductPrice,
+        wholesale_delivery_price: ProductPrice | None,
+        d2_delivery_price: ProductPrice | None,
+        d2_self_pickup_price: ProductPrice | None,
+        d1_delivery_price: ProductPrice | None,
+        d1_self_pickup_price: ProductPrice | None,
+        status: ProductStatus,
+        image: str | None = None,
     ) -> None:
         self.id = id
         self.name = name
         self.category = category
         self.description = description
-        self.price = ProductPrice(price).in_rubles()
+        self.sku = sku
+        self.bag_weight = bag_weight
+        self.pallet_weight = pallet_weight
+        self.bags_per_pallet = bags_per_pallet
+        self.retail_price = retail_price.in_rubles()
+        self.wholesale_delivery_price = convert_price(wholesale_delivery_price)
+        self.d2_delivery_price = convert_price(d2_delivery_price)
+        self.d2_self_pickup_price = convert_price(d2_self_pickup_price)
+        self.d1_delivery_price = convert_price(d1_delivery_price)
+        self.d1_self_pickup_price = convert_price(d1_self_pickup_price)
+        self.image = image
         self.units_of_measurement = units_of_measurement
-        self.photo_url = photo_url
+        self.status = status
 
 
 @dataclass
@@ -64,8 +95,4 @@ class ProductInPaymentDTO:
     vat_type: VatType | None = None
     payment_object: PaymentObject | None = None
     payment_method: PaymentMethod | None = None
-    measure: UnitsOfMesaurement = field(default=UnitsOfMesaurement.PIECES)
-
-    def __post_init__(self) -> None:
-        if self.quantity <= 0:
-            raise OrderItemIncorrectQuantityException
+    measure: UnitsOfMesaurement = field(default=UnitsOfMesaurement.PIECE)

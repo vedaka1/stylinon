@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 
 from src.application.auth.commands import ResetPasswordCommand
-from src.application.common.email.types import ResetPasswordLink, SenderName
+from src.application.common.email.types import SenderName
 from src.application.common.email.utils import get_reset_password_template
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
@@ -18,11 +18,17 @@ logger = logging.getLogger()
 @dataclass
 class PasswordRecoveryUseCase:
 
+    user_repository: UserRepositoryInterface
     jwt_processor: JWTProcessorInterface
     smtp_server: SyncSMTPServerInterface
     sender_name: SenderName
 
     async def execute(self, email: str) -> None:
+        user = await self.user_repository.get_by_email(email=email)
+
+        if not user:
+            raise UserNotFoundException
+
         frontend_url = "https://localhost/api/v1/reset-password"
 
         reset_token = self.jwt_processor.create_reset_password_token(email=email)

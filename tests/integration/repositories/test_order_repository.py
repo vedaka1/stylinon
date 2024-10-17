@@ -10,8 +10,17 @@ from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
     OrderRepositoryInterface,
 )
-from src.domain.products.entities import Product, UnitsOfMesaurement
-from src.domain.products.repository import ProductRepositoryInterface
+from src.domain.products.entities import (
+    Category,
+    Product,
+    ProductStatus,
+    UnitsOfMesaurement,
+)
+from src.domain.products.repository import (
+    CategoryRepositoryInterface,
+    ProductRepositoryInterface,
+)
+from src.domain.products.value_objects import ProductPrice
 from src.infrastructure.persistence.postgresql.models.order import (
     OrderModel,
     map_to_order,
@@ -32,6 +41,7 @@ class TestOrderRepository:
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
             await order_repository.create(order)
             await transaction_manager.commit()
@@ -59,6 +69,7 @@ class TestOrderRepository:
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
             await order_repository.create(order)
             order.status = OrderStatus.PROCESSING
@@ -76,6 +87,7 @@ class TestOrderRepository:
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
             await order_repository.create(order)
             # Check it
@@ -95,6 +107,7 @@ class TestOrderRepository:
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
             await order_repository.create(order)
             # Delete order
@@ -112,6 +125,7 @@ class TestOrderRepository:
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
             await order_repository.create(order)
             # Check it and get it
@@ -128,6 +142,7 @@ class TestOrderRepository:
                     operation_id=uuid4(),
                     shipping_address=f"test{i}_address",
                     total_price=1234,
+                    is_self_pickup=False,
                 )
                 for i in range(3)
             ]
@@ -149,26 +164,37 @@ class TestOrderRepository:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             product_repository = await di_container.get(ProductRepositoryInterface)
+            category_repository = await di_container.get(CategoryRepositoryInterface)
+            category = Category.create(name="test_category")
+            await category_repository.create(category)
             order_item_repository = await di_container.get(OrderItemRepositoryInterface)
 
             product = Product.create(
                 name="test_product",
                 description="test_description",
                 category="test_category",
-                price=100,
-                units_of_measurement=UnitsOfMesaurement.PIECES,
+                units_of_measurement=UnitsOfMesaurement.PIECE,
+                sku="test_sku",
+                bag_weight=10,
+                pallet_weight=100,
+                bags_per_pallet=10,
+                retail_price=ProductPrice(100),
+                status=ProductStatus.INSTOCK,
             )
+
             order = Order.create(
                 customer_email="test@test.com",
                 operation_id=uuid4(),
                 shipping_address="test_address",
                 total_price=1234,
+                is_self_pickup=False,
             )
+
             order_item = OrderItem.create(
                 order_id=order.id,
                 product_id=product.id,
                 quantity=1,
-                product=product,
+                price=product.retail_price,
             )
             await product_repository.create(product)
             await order_repository.create(order)
@@ -185,5 +211,5 @@ class TestOrderRepository:
             assert order_item.product.name == product.name
             assert order_item.product.description == product.description
             assert order_item.product.category == product.category
-            assert order_item.product.price.value == product.price.value
+            assert order_item.product.retail_price.value == product.retail_price.value
             assert order_item.quantity == 1

@@ -1,9 +1,7 @@
-from re import T
 from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased, joinedload, selectinload, subqueryload
 from src.domain.chats.entities import Chat
 from src.domain.chats.repository import ChatPrimaryKey, ChatRepositoryInterface
 from src.infrastructure.persistence.postgresql.models.chat import (
@@ -67,14 +65,14 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
         with_relations: bool = False,
     ) -> Chat | None:
         if with_relations:
-            query_with_relations = (
+            query_with_join = (
                 select(ChatModel, MessageModel)
                 .join(ChatModel, ChatModel.id == MessageModel.chat_id)
                 .where(ChatModel.id == value)
                 .limit(10)
             )
 
-            cursor = await self.session.execute(query_with_relations)
+            cursor = await self.session.execute(query_with_join)
 
             entities = cursor.all()
 

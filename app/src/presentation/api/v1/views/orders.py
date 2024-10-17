@@ -8,7 +8,7 @@ from src.application.orders.commands import (
     GetManyOrdersCommand,
     UpdateOrderCommand,
 )
-from src.application.orders.dto import CreateOrderResponse, OrderOut
+from src.application.orders.dto import CreateOrderOut, OrderOut
 from src.application.orders.usecases import (
     CreateOrderUseCase,
     GetManyOrdersUseCase,
@@ -48,6 +48,7 @@ async def get_many_orders(
     command: GetManyOrdersCommand = Depends(),
 ) -> APIResponse[OrderOut]:
     response = await get_orders_list_interactor.execute(command=command)
+
     return APIResponse(data=response)
 
 
@@ -55,15 +56,16 @@ async def get_many_orders(
     "",
     summary="Создает новый заказ",
     responses={
-        200: {"model": APIResponse[CreateOrderResponse]},
+        200: {"model": APIResponse[CreateOrderOut]},
         400: {"model": OrderItemIncorrectQuantityException},
     },
 )
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],
     command: CreateOrderCommand,
-) -> APIResponse[CreateOrderResponse]:
+) -> APIResponse[CreateOrderOut]:
     response = await create_orders_interactor.execute(command=command)
+
     return APIResponse(data=response)
 
 
@@ -89,6 +91,7 @@ async def get_order(
     get_order_interactor: FromDishka[GetOrderUseCase],
 ) -> APIResponse[OrderOut]:
     response = await get_order_interactor.execute(order_id=order_id)
+
     return APIResponse(data=response)
 
 
@@ -110,10 +113,12 @@ async def get_order(
     ],
 )
 async def update_order(
+    order_id: UUID,
     update_order_interactor: FromDishka[UpdateOrderUseCase],
-    command: UpdateOrderCommand = Depends(),
+    command: UpdateOrderCommand,
 ) -> APIResponse[None]:
-    await update_order_interactor.execute(command=command)
+    await update_order_interactor.execute(command=command, order_id=order_id)
+
     return APIResponse()
 
 
@@ -123,5 +128,7 @@ async def payment_webhook(
     update_order_interactor: FromDishka[UpdateOrderByWebhookUseCase],
 ) -> APIResponse[None]:
     token = await request.body()
+
     await update_order_interactor.execute(token=token.decode())
+
     return APIResponse()

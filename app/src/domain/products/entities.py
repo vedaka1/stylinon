@@ -2,16 +2,38 @@ from dataclasses import dataclass
 from enum import Enum
 from uuid import UUID, uuid4
 
-from src.domain.products.exceptions import ProductIncorrectPriceException
 from src.domain.products.value_objects import ProductPrice
 
 
 class UnitsOfMesaurement(str, Enum):
-    KILOGRAMS = "кг."
-    GRAMS = "г."
-    LITERS = "л."
-    MILLILITERS = "мл."
-    PIECES = "шт."
+    PIECE = "шт."
+    GRAM = "г."
+    KILOGRAM = "кг."
+    TON = "т."
+    MILLILITER = "мл."
+    LITER = "л."
+    MILLIMETER = "мм."
+    CENTIMETER = "см."
+    DECIMETER = "дм."
+    METER = "м."
+
+
+class ProductStatus(str, Enum):
+    INSTOCK = "in_stock"
+    OUTOFSTOCK = "out_of_stock"
+
+
+@dataclass
+class Category:
+    name: str
+    is_available: bool
+
+    @staticmethod
+    def create(name: str, is_available: bool = True) -> "Category":
+        return Category(
+            name=name,
+            is_available=is_available,
+        )
 
 
 @dataclass
@@ -20,27 +42,58 @@ class Product:
     name: str
     category: str
     description: str
-    price: ProductPrice  # в копейках
+    sku: str
+    bag_weight: int
+    pallet_weight: int
+    bags_per_pallet: int
+    retail_price: ProductPrice
+    wholesale_delivery_price: ProductPrice | None
+    d2_delivery_price: ProductPrice | None
+    d2_self_pickup_price: ProductPrice | None
+    d1_delivery_price: ProductPrice | None
+    d1_self_pickup_price: ProductPrice | None
     units_of_measurement: UnitsOfMesaurement
-    photo_url: str | None = None
+    image: str | None
+    status: ProductStatus
 
     @staticmethod
     def create(
         name: str,
         category: str,
         description: str,
-        price: int,
-        units_of_measurement: UnitsOfMesaurement,
-        photo_url: str | None = "/images/no_image.png",
+        sku: str,
+        bag_weight: int,
+        pallet_weight: int,
+        bags_per_pallet: int,
+        retail_price: ProductPrice,
+        *,
+        wholesale_delivery_price: ProductPrice | None = None,
+        d2_delivery_price: ProductPrice | None = None,
+        d2_self_pickup_price: ProductPrice | None = None,
+        d1_delivery_price: ProductPrice | None = None,
+        d1_self_pickup_price: ProductPrice | None = None,
+        units_of_measurement: UnitsOfMesaurement = UnitsOfMesaurement.PIECE,
+        image: str | None = "/images/no_image.png",
+        status: ProductStatus = ProductStatus.INSTOCK,
     ) -> "Product":
         return Product(
             id=uuid4(),
             name=name,
             category=category,
             description=description,
-            price=ProductPrice(price),
             units_of_measurement=units_of_measurement,
-            photo_url=photo_url,
+            sku=sku,
+            bag_weight=bag_weight,
+            pallet_weight=pallet_weight,
+            bags_per_pallet=bags_per_pallet,
+            image=image,
+            retail_price=retail_price,
+            wholesale_delivery_price=wholesale_delivery_price,
+            d2_delivery_price=d2_delivery_price,
+            d2_self_pickup_price=d2_self_pickup_price,
+            d1_delivery_price=d1_delivery_price,
+            d1_self_pickup_price=d1_self_pickup_price,
+            status=status,
         )
 
     def __hash__(self) -> int:

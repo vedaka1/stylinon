@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from datetime import date
-from uuid import UUID
 
 from pydantic import EmailStr
+from src.application.orders.dto import ProductInOrder
+from src.application.products.dto import PaymentMethod
 from src.domain.orders.entities import OrderStatus
 
 
@@ -14,21 +15,16 @@ class GetManyOrdersCommand:
 
 
 @dataclass
-class ProductInOrder:
-    id: UUID
-    quantity: int
-
-
-@dataclass
 class CreateOrderCommand:
     customer_email: EmailStr
     shipping_address: str
+    is_self_pickup: bool
     items: list[ProductInOrder]
+    payment_method: PaymentMethod = PaymentMethod.FULL_PREPAYMENT
 
 
 @dataclass
 class UpdateOrderCommand:
-    order_id: UUID
     shipping_address: str | None = None
     tracking_number: str | None = None
     status: OrderStatus | None = None

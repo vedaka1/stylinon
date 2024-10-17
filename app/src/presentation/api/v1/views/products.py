@@ -17,7 +17,7 @@ from src.application.products.usecases import (
 )
 from src.application.products.usecases.update import UpdateProductUseCase
 from src.domain.common.exceptions.base import ApplicationException
-from src.domain.products.entities import UnitsOfMesaurement
+from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import get_current_user_data
@@ -59,6 +59,7 @@ async def get_many_products(
     command: GetManyProductsCommand = Depends(get_products_list_command),
 ) -> APIResponse[ListPaginatedResponse[ProductOut]]:
     response = await get_products_list_interactor.execute(command=command)
+
     return APIResponse(data=response)
 
 
@@ -79,34 +80,64 @@ async def create_product(
     create_product_interactor: FromDishka[CreateProductUseCase],
     name: str = Form(...),
     category: str = Form(...),
-    description: str = Form(...),
-    price: int = Form(...),
+    description: str = Form("Описания нет"),
     units_of_measurement: UnitsOfMesaurement = Form(...),
-    photo: UploadFile | None = None,
+    sku: str = Form(...),
+    retail_price: int = Form(...),
+    wholesale_delivery_price: int | None = Form(None),
+    d2_delivery_price: int | None = Form(None),
+    d2_self_pickup_price: int | None = Form(None),
+    d1_delivery_price: int | None = Form(None),
+    d1_self_pickup_price: int | None = Form(None),
+    status: ProductStatus = Form(...),
+    bag_weight: int = Form(...),
+    pallet_weight: int = Form(...),
+    bags_per_pallet: int = Form(...),
+    image: UploadFile | None = None,
 ) -> APIResponse[None]:
-    photo_url = "/images/no_image.png"
-    if photo:
+    image_url = "/images/no_image.png"
+
+    if image:
         try:
             content_type = "jpg"
-            if photo.filename:
-                content_type = photo.filename.split(".")[1]
-            photo_id = str(uuid4())
-            with open(f"./images/{photo_id}.{content_type}", "wb+") as f:
-                f.write(photo.file.read())
-            photo_url = f"/images/{photo_id}.{content_type}"
+
+            if image.filename:
+                content_type = image.filename.split(".")[1]
+
+            image_id = str(uuid4())
+
+            with open(f"./images/{image_id}.{content_type}", "wb+") as f:
+                f.write(image.file.read())
+
+            image_url = f"/images/{image_id}.{content_type}"
+
         except Exception:
             raise ApplicationException
+
         finally:
-            await photo.close()
+            await image.close()
+
     command = CreateProductCommand(
         name=name,
         category=category,
         description=description,
-        price=price,
+        sku=sku,
+        bag_weight=bag_weight,
+        pallet_weight=pallet_weight,
+        bags_per_pallet=bags_per_pallet,
+        retail_price=retail_price,
+        wholesale_delivery_price=wholesale_delivery_price,
+        d2_delivery_price=d2_delivery_price,
+        d2_self_pickup_price=d2_self_pickup_price,
+        d1_delivery_price=d1_delivery_price,
+        d1_self_pickup_price=d1_self_pickup_price,
         units_of_measurement=units_of_measurement,
-        photo_url=photo_url,
+        image=image_url,
+        status=status,
     )
+
     await create_product_interactor.execute(command=command)
+
     return APIResponse()
 
 
@@ -123,6 +154,7 @@ async def get_product(
     get_product_interactor: FromDishka[GetProductUseCase],
 ) -> APIResponse[ProductOut]:
     response = await get_product_interactor.execute(product_id=product_id)
+
     return APIResponse(data=response)
 
 
@@ -144,4 +176,5 @@ async def update_product(
     command: UpdateProductCommand = Depends(),
 ) -> APIResponse[None]:
     await update_product_interactor.execute(command=command)
+
     return APIResponse()

@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from uuid import UUID, uuid4
+from uuid import UUID
 
-from src.domain.users.entities import UserRole
 from src.infrastructure.settings import settings
 
 

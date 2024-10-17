@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from src.domain.products.entities import Product, UnitsOfMesaurement
+from src.application.products.filters import ProductFilters
+from src.domain.products.entities import Category, Product
 
 
 class ProductRepositoryInterface(ABC):
@@ -9,8 +10,8 @@ class ProductRepositoryInterface(ABC):
     @abstractmethod
     async def create(self, product: Product) -> None: ...
 
-    @abstractmethod
-    async def create_many(self, products: list[Product]) -> None: ...
+    # @abstractmethod
+    # async def create_many(self, products: list[Product]) -> None: ...
 
     @abstractmethod
     async def delete(self, product_id: UUID) -> None: ...
@@ -24,12 +25,7 @@ class ProductRepositoryInterface(ABC):
     @abstractmethod
     async def get_many(
         self,
-        name: str | None = None,
-        category: str | None = None,
-        description: str | None = None,
-        price_from: int | None = None,
-        price_to: int | None = None,
-        units_of_measurement: UnitsOfMesaurement | None = None,
+        filters: ProductFilters | None = None,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Product]: ...
@@ -37,16 +33,40 @@ class ProductRepositoryInterface(ABC):
     @abstractmethod
     async def count(
         self,
-        name: str | None = None,
-        category: str | None = None,
-        description: str | None = None,
-        price_from: int | None = None,
-        price_to: int | None = None,
-        units_of_measurement: UnitsOfMesaurement | None = None,
+        filters: ProductFilters | None = None,
     ) -> int: ...
 
     @abstractmethod
     async def get_many_by_ids(
         self,
         product_ids: set[UUID],
-    ) -> tuple[list[Product], set[UUID]]: ...
+    ) -> tuple[list[Product], set[UUID]]:
+        """
+        ### Args:
+        `product_ids` - set of product ids
+
+        ### Returns:
+        `tuple[list[Product], set[UUID]]` - a tuple with a list of products and set of missing product ids
+        """
+        ...
+
+
+class CategoryRepositoryInterface(ABC):
+
+    @abstractmethod
+    async def create(self, category: Category) -> None: ...
+
+    @abstractmethod
+    async def delete(self, category_name: str) -> None: ...
+
+    @abstractmethod
+    async def update(self, category: Category) -> None: ...
+
+    @abstractmethod
+    async def get_by_name(self, category_name: str) -> Category | None: ...
+
+    @abstractmethod
+    async def get_many(self) -> list[Category]: ...
+
+    @abstractmethod
+    async def count(self) -> int: ...

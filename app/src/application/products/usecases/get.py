@@ -4,8 +4,13 @@ from uuid import UUID
 from src.application.common.pagination import ListPaginatedResponse, PaginationOutSchema
 from src.application.products.commands import GetManyProductsCommand
 from src.application.products.dto import ProductOut
+from src.application.products.filters import ProductFilters
+from src.domain.products.entities import Category
 from src.domain.products.exceptions import ProductNotFoundException
-from src.domain.products.repository import ProductRepositoryInterface
+from src.domain.products.repository import (
+    CategoryRepositoryInterface,
+    ProductRepositoryInterface,
+)
 
 
 @dataclass
@@ -24,9 +29,19 @@ class GetProductUseCase:
             name=product.name,
             category=product.category,
             description=product.description,
-            price=product.price.value,
+            sku=product.sku,
+            bag_weight=product.bag_weight,
+            pallet_weight=product.pallet_weight,
+            bags_per_pallet=product.bags_per_pallet,
+            retail_price=product.retail_price,
+            wholesale_delivery_price=product.d1_delivery_price,
+            d2_delivery_price=product.d2_delivery_price,
+            d2_self_pickup_price=product.d2_self_pickup_price,
+            d1_delivery_price=product.d1_delivery_price,
+            d1_self_pickup_price=product.d1_self_pickup_price,
             units_of_measurement=product.units_of_measurement,
-            photo_url=product.photo_url,
+            image=product.image,
+            status=product.status,
         )
 
 
@@ -39,25 +54,22 @@ class GetManyProductsUseCase:
         self,
         command: GetManyProductsCommand,
     ) -> ListPaginatedResponse[ProductOut]:
-        products = await self.product_repository.get_many(
+        filters = ProductFilters(
             name=command.name,
             category=command.category,
             description=command.description,
+            units_of_measurement=command.units_of_measurement,
             price_from=command.price_from,
             price_to=command.price_to,
-            units_of_measurement=command.units_of_measurement,
+        )
+
+        products = await self.product_repository.get_many(
+            filters=filters,
             offset=command.pagination.offset,
             limit=command.pagination.limit,
         )
 
-        total = await self.product_repository.count(
-            name=command.name,
-            category=command.category,
-            description=command.description,
-            price_from=command.price_from,
-            price_to=command.price_to,
-            units_of_measurement=command.units_of_measurement,
-        )
+        total = await self.product_repository.count(filters=filters)
 
         return ListPaginatedResponse(
             items=[
@@ -66,9 +78,19 @@ class GetManyProductsUseCase:
                     name=product.name,
                     category=product.category,
                     description=product.description,
-                    price=product.price.value,
+                    sku=product.sku,
+                    bag_weight=product.bag_weight,
+                    pallet_weight=product.pallet_weight,
+                    bags_per_pallet=product.bags_per_pallet,
+                    retail_price=product.retail_price,
+                    wholesale_delivery_price=product.d1_delivery_price,
+                    d2_delivery_price=product.d2_delivery_price,
+                    d2_self_pickup_price=product.d2_self_pickup_price,
+                    d1_delivery_price=product.d1_delivery_price,
+                    d1_self_pickup_price=product.d1_self_pickup_price,
                     units_of_measurement=product.units_of_measurement,
-                    photo_url=product.photo_url,
+                    image=product.image,
+                    status=product.status,
                 )
                 for product in products
             ],
@@ -78,3 +100,14 @@ class GetManyProductsUseCase:
                 total=total,
             ),
         )
+
+
+@dataclass
+class GetCategoriesListUseCase:
+
+    category_repository: CategoryRepositoryInterface
+
+    async def execute(self) -> list[Category]:
+        categories = await self.category_repository.get_many()
+
+        return categories
