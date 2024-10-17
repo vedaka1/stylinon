@@ -1,6 +1,6 @@
 from dishka import Provider, Scope, provide
 from src.application.auth.usecases import (
-    LoginUseCase,
+    LoginWithJWTUseCase,
     LogoutUseCase,
     PasswordRecoveryUseCase,
     RefreshTokenUseCase,
@@ -43,7 +43,7 @@ class UseCasesProvider(Provider):
     scope = Scope.REQUEST
 
     register = provide(RegisterUseCase)
-    login = provide(LoginUseCase)
+    login = provide(LoginWithJWTUseCase)
     logout = provide(LogoutUseCase)
     refresh_token = provide(RefreshTokenUseCase)
     send_recovery_email = provide(PasswordRecoveryUseCase)

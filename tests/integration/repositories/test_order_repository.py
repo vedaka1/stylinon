@@ -194,6 +194,7 @@ class TestOrderRepository:
                 order_id=order.id,
                 product_id=product.id,
                 quantity=1,
+                price=product.retail_price,
             )
             await product_repository.create(product)
             await order_repository.create(order)

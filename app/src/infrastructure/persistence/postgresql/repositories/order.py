@@ -167,6 +167,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
             order_id=order_item.order_id,
             product_id=order_item.product_id,
             quantity=order_item.quantity,
+            price=order_item.price.value,
         )
 
         await self.session.execute(query)
@@ -180,6 +181,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
                     "order_id": order_item.order_id,
                     "product_id": order_item.product_id,
                     "quantity": order_item.quantity,
+                    "price": order_item.price.value,
                 }
                 for order_item in order_items
             ],

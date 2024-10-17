@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import Product
+from src.domain.products.value_objects import ProductPrice
 
 
 # fmt: off
@@ -64,6 +65,7 @@ class OrderItem:
     order_id: UUID
     product_id: UUID
     quantity: int
+    price: ProductPrice
 
     product: Product | None
 
@@ -72,7 +74,7 @@ class OrderItem:
         order_id: UUID,
         product_id: UUID,
         quantity: int,
-        product: Product | None = None,
+        price: ProductPrice,
     ) -> "OrderItem":
         if quantity <= 0:
             raise OrderItemIncorrectQuantityException
@@ -80,5 +82,6 @@ class OrderItem:
             order_id=order_id,
             product_id=product_id,
             quantity=quantity,
-            product=product,
+            price=price,
+            product=None,
         )

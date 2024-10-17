@@ -17,7 +17,7 @@ from src.application.auth.exceptions import (
     WrongTokenTypeException,
 )
 from src.application.auth.usecases import (
-    LoginUseCase,
+    LoginWithJWTUseCase,
     LogoutUseCase,
     PasswordRecoveryUseCase,
     RefreshTokenUseCase,
@@ -65,7 +65,7 @@ async def register(
     },
 )
 async def login(
-    login_interactor: FromDishka[LoginUseCase],
+    login_interactor: FromDishka[LoginWithJWTUseCase],
     request: Request,
     response: Response,
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],

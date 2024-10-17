@@ -55,6 +55,7 @@ class TestOrderItemRepository:
                 order_id=order.id,
                 product_id=product.id,
                 quantity=1,
+                price=product.retail_price,
             )
             await product_repository.create(product)
             await order_repository.create(order)
@@ -103,6 +104,7 @@ class TestOrderItemRepository:
                     order_id=order.id,
                     product_id=products[i].id,
                     quantity=1,
+                    price=products[i].retail_price,
                 )
                 for i in range(2)
             ]
@@ -154,6 +156,7 @@ class TestOrderItemRepository:
                 order_id=order.id,
                 product_id=product.id,
                 quantity=1,
+                price=product.retail_price,
             )
             await product_repository.create(product)
             await order_repository.create(order)

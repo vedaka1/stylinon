@@ -5,6 +5,7 @@ from uuid import UUID
 from sqlalchemy import TIMESTAMP, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
+from src.domain.products.value_objects import ProductPrice
 from src.infrastructure.persistence.postgresql.models.base import Base
 from src.infrastructure.persistence.postgresql.models.product import map_to_product
 
@@ -78,6 +79,7 @@ class OrderItemModel(Base):
         nullable=False,
     )
     quantity: Mapped[int] = mapped_column(nullable=False)
+    price: Mapped[int] = mapped_column(nullable=False)
 
     order: Mapped["OrderModel"] = relationship(
         back_populates="order_items",
@@ -100,6 +102,7 @@ def map_to_order_item(
         order_id=entity.order_id,
         product_id=entity.product_id,
         quantity=entity.quantity,
+        price=ProductPrice(entity.price),
         product=None,
     )
 

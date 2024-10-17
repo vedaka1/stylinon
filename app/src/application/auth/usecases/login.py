@@ -17,7 +17,7 @@ logger = logging.getLogger()
 
 
 @dataclass
-class LoginUseCase:
+class LoginWithJWTUseCase:
 
     user_repository: UserRepositoryInterface
     password_hasher: PasswordHasherInterface

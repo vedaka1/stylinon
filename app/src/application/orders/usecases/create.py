@@ -92,8 +92,9 @@ class CreateOrderUseCase:
                 order_id=order.id,
                 product_id=item.id,
                 quantity=item.quantity,
+                price=ProductPrice(product_in_payment.amount),
             )
-            for item in command.items
+            for item, product_in_payment in zip(command.items, products_in_payment)
         ]
 
         await self.order_repository.create(order=order)
