@@ -16,7 +16,6 @@ from src.infrastructure.persistence.postgresql.models.order import (
     map_to_order,
     map_to_order_item,
 )
-from src.infrastructure.persistence.postgresql.models.product import ProductVariantModel
 
 
 class SqlalchemyOrderRepository(OrderRepositoryInterface):
@@ -81,11 +80,9 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
             query = query.where(OrderModel.operation_id == value)
         if with_relations:
             query = query.options(
-                selectinload(OrderModel.order_items)
-                .joinedload(
+                selectinload(OrderModel.order_items).joinedload(
                     OrderItemModel.order_product,
-                )
-                .joinedload(ProductVariantModel.parent_product),
+                ),
             )
 
         cursor = await self.session.execute(query)
@@ -119,11 +116,9 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         query = (
             select(OrderModel)
             .options(
-                selectinload(OrderModel.order_items)
-                .joinedload(
+                selectinload(OrderModel.order_items).joinedload(
                     OrderItemModel.order_product,
-                )
-                .joinedload(ProductVariantModel.parent_product),
+                ),
             )
             .where(OrderModel.customer_email == customer_email)
         )
@@ -141,11 +136,9 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
         status: OrderStatus | None = None,
     ) -> list[Order]:
         query = select(OrderModel).options(
-            joinedload(OrderModel.order_items)
-            .joinedload(
+            joinedload(OrderModel.order_items).joinedload(
                 OrderItemModel.order_product,
-            )
-            .joinedload(ProductVariantModel.parent_product),
+            ),
         )
 
         if date_from:
@@ -171,7 +164,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
     async def create(self, order_item: OrderItem) -> None:
         query = insert(OrderItemModel).values(
             order_id=order_item.order_id,
-            product_variant_id=order_item.product_variant_id,
+            product_id=order_item.product_id,
             quantity=order_item.quantity,
         )
 
@@ -184,7 +177,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
             [
                 {
                     "order_id": order_item.order_id,
-                    "product_variant_id": order_item.product_variant_id,
+                    "product_id": order_item.product_id,
                     "quantity": order_item.quantity,
                 }
                 for order_item in order_items
@@ -198,7 +191,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
     async def delete(self, order_id: UUID, product_id: UUID) -> None:
         query = delete(OrderItemModel).where(
             (OrderItemModel.order_id == order_id)
-            & (OrderItemModel.product_variant_id == product_id),
+            & (OrderItemModel.product_id == product_id),
         )
 
         await self.session.execute(query)
@@ -210,10 +203,10 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
             update(OrderItemModel)
             .where(
                 (OrderItemModel.order_id == order_item.order_id)
-                & (OrderItemModel.product_variant_id == order_item.product_variant_id),
+                & (OrderItemModel.product_id == order_item.product_id),
             )
             .values(
-                product_variant_id=order_item.product_variant_id,
+                product_id=order_item.product_id,
                 quantity=order_item.quantity,
             )
         )
@@ -226,11 +219,7 @@ class SqlalchemyOrderItemRepository(OrderItemRepositoryInterface):
         query = (
             select(OrderItemModel)
             .where(OrderItemModel.order_id == order_id)
-            .options(
-                selectinload(OrderItemModel.order_product).joinedload(
-                    ProductVariantModel.parent_product,
-                ),
-            )
+            .options(selectinload(OrderItemModel.order_product))
         )
 
         cursor = await self.session.execute(query)

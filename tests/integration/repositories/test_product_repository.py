@@ -5,14 +5,13 @@ from src.domain.products.entities import (
     Category,
     Product,
     ProductStatus,
-    ProductVariant,
     UnitsOfMesaurement,
 )
 from src.domain.products.repository import (
     CategoryRepositoryInterface,
     ProductRepositoryInterface,
-    ProductVariantRepositoryInterface,
 )
+from src.domain.products.value_objects import ProductPrice
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
 
@@ -25,6 +24,12 @@ class TestProduct:
             description="test_description",
             category="test_category",
             units_of_measurement=UnitsOfMesaurement.PIECE,
+            sku="test_sku",
+            bag_weight=10,
+            pallet_weight=100,
+            bags_per_pallet=10,
+            retail_price=ProductPrice(100),
+            status=ProductStatus.INSTOCK,
         )
 
     @staticmethod
@@ -98,32 +103,13 @@ class TestProductRepository:
 
             category_repository = await di_container.get(CategoryRepositoryInterface)
             product_repository = await di_container.get(ProductRepositoryInterface)
-            product_variant_repository = await di_container.get(
-                ProductVariantRepositoryInterface,
-            )
 
             category = Category.create(name="test_category")
             product = TestProduct.create_product()
-            product_variant = ProductVariant.create(
-                product_id=product.id,
-                name=f"test_product_variant_1",
-                sku=f"test_sku_1",
-                bag_weight=10,
-                pallet_weight=100,
-                bags_per_pallet=10,
-                retail_price=100,
-                wholesale_delivery_price=100,
-                d2_delivery_price=100,
-                d2_self_pickup_price=100,
-                d1_delivery_price=100,
-                d1_self_pickup_price=100,
-                status=ProductStatus.INSTOCK,
-            )
 
             # Create product
             await category_repository.create(category)
             await product_repository.create(product=product)
-            await product_variant_repository.create(product_variant)
 
             # Check products
             products = await product_repository.get_many()
@@ -141,31 +127,13 @@ class TestProductRepository:
 
             product_repository = await di_container.get(ProductRepositoryInterface)
             category_repository = await di_container.get(CategoryRepositoryInterface)
-            product_variant_repository = await di_container.get(
-                ProductVariantRepositoryInterface,
-            )
+
             # Create product
             product = TestProduct.create_product()
             category = Category.create(name="test_category")
-            product_variant = ProductVariant.create(
-                product_id=product.id,
-                name=f"test_product_variant_1",
-                sku=f"test_sku_1",
-                bag_weight=10,
-                pallet_weight=100,
-                bags_per_pallet=10,
-                retail_price=100,
-                wholesale_delivery_price=100,
-                d2_delivery_price=100,
-                d2_self_pickup_price=100,
-                d1_delivery_price=100,
-                d1_self_pickup_price=100,
-                status=ProductStatus.INSTOCK,
-            )
 
             await category_repository.create(category)
             await product_repository.create(product)
-            await product_variant_repository.create(product_variant)
 
             count = await product_repository.count()
 

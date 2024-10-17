@@ -48,6 +48,7 @@ async def get_many_orders(
     command: GetManyOrdersCommand = Depends(),
 ) -> APIResponse[OrderOut]:
     response = await get_orders_list_interactor.execute(command=command)
+
     return APIResponse(data=response)
 
 
@@ -64,6 +65,7 @@ async def create_order(
     command: CreateOrderCommand,
 ) -> APIResponse[CreateOrderOut]:
     response = await create_orders_interactor.execute(command=command)
+
     return APIResponse(data=response)
 
 
@@ -89,6 +91,7 @@ async def get_order(
     get_order_interactor: FromDishka[GetOrderUseCase],
 ) -> APIResponse[OrderOut]:
     response = await get_order_interactor.execute(order_id=order_id)
+
     return APIResponse(data=response)
 
 

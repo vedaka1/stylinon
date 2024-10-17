@@ -4,7 +4,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
-from src.domain.products.entities import ProductVariant
+from src.domain.products.entities import Product
 
 
 # fmt: off
@@ -62,23 +62,23 @@ class Order:
 @dataclass
 class OrderItem:
     order_id: UUID
-    product_variant_id: UUID
+    product_id: UUID
     quantity: int
 
-    product: ProductVariant | None
+    product: Product | None
 
     @staticmethod
     def create(
         order_id: UUID,
-        product_variant_id: UUID,
+        product_id: UUID,
         quantity: int,
-        product: ProductVariant | None = None,
+        product: Product | None = None,
     ) -> "OrderItem":
         if quantity <= 0:
             raise OrderItemIncorrectQuantityException
         return OrderItem(
             order_id=order_id,
-            product_variant_id=product_variant_id,
+            product_id=product_id,
             quantity=quantity,
             product=product,
         )

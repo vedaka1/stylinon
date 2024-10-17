@@ -32,7 +32,6 @@ class OrderItemAdmin(ModelView, model=OrderItemModel):
         "order_id": "ID заказа",
         "order.id": "ID заказа",
         "product": "Товар",
-        "product_variant_id": "ID товара",
         "product.id": "ID товара",
         "order_product.parent_product.name": "Наименование товара",
         "order_product.name": "Вариант товара",

@@ -48,8 +48,8 @@ class OrderAdmin(ModelView, model=OrderModel):
     }
     form_ajax_refs = {
         "order_items": {
-            "fields": ("product_variant_id",),
-            "order_by": "product_variant_id",
+            "fields": ("product_id",),
+            "order_by": "product_id",
         },
     }
     # column_details_exclude_list = ["order_item"]

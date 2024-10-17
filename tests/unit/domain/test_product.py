@@ -4,59 +4,49 @@ import pytest
 from src.application.orders.dto import ProductInOrder
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
-from src.domain.products.entities import (
-    ProductStatus,
-    ProductVariant,
-    UnitsOfMesaurement,
-)
+from src.domain.products.entities import Product, ProductStatus, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductIncorrectPriceException
+from src.domain.products.value_objects import ProductPrice
 
 
 def test_success_create_product() -> None:
-    product_variant = ProductVariant.create(
-        product_id=uuid4(),
+    product = Product.create(
+        category="test_category",
+        description="test_description",
         name="test_product_variant",
         sku="test_sku",
         bag_weight=10,
         pallet_weight=100,
         bags_per_pallet=10,
-        retail_price=100,
-        wholesale_delivery_price=100,
-        d2_delivery_price=100,
-        d2_self_pickup_price=100,
-        d1_delivery_price=100,
-        d1_self_pickup_price=100,
+        retail_price=ProductPrice(100),
         status=ProductStatus.INSTOCK,
     )
-    assert product_variant.name == "test_product_variant"
-    assert product_variant.sku == "test_sku"
-    assert product_variant.bag_weight == 10
-    assert product_variant.pallet_weight == 100
-    assert product_variant.bags_per_pallet == 10
-    assert product_variant.retail_price.value == 100
-    assert product_variant.wholesale_delivery_price.value == 100
-    assert product_variant.d2_delivery_price.value == 100
-    assert product_variant.d2_self_pickup_price.value == 100
-    assert product_variant.d1_delivery_price.value == 100
-    assert product_variant.d1_self_pickup_price.value == 100
-    assert product_variant.status == ProductStatus.INSTOCK
+
+    assert product.name == "test_product_variant"
+    assert product.sku == "test_sku"
+    assert product.bag_weight == 10
+    assert product.pallet_weight == 100
+    assert product.bags_per_pallet == 10
+    assert product.retail_price.value == 100
+    assert product.wholesale_delivery_price == None
+    assert product.d2_delivery_price == None
+    assert product.d2_self_pickup_price == None
+    assert product.d1_delivery_price == None
+    assert product.d1_self_pickup_price == None
+    assert product.status == ProductStatus.INSTOCK
 
 
 def test_fail_create_product_variant_with_incorrect_price() -> None:
     with pytest.raises(ProductIncorrectPriceException):
-        ProductVariant.create(
-            product_id=uuid4(),
+        Product.create(
+            category="test_category",
+            description="test_description",
             name="test_product_variant",
             sku="test_sku",
             bag_weight=10,
             pallet_weight=100,
             bags_per_pallet=10,
-            retail_price=0,
-            wholesale_delivery_price=100,
-            d2_delivery_price=100,
-            d2_self_pickup_price=100,
-            d1_delivery_price=100,
-            d1_self_pickup_price=100,
+            retail_price=ProductPrice(0),
             status=ProductStatus.INSTOCK,
         )
 

@@ -6,14 +6,10 @@ from sqlalchemy import TIMESTAMP, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.infrastructure.persistence.postgresql.models.base import Base
-from src.infrastructure.persistence.postgresql.models.product import (
-    map_to_product_variant,
-)
+from src.infrastructure.persistence.postgresql.models.product import map_to_product
 
 if TYPE_CHECKING:
-    from src.infrastructure.persistence.postgresql.models.product import (
-        ProductVariantModel,
-    )
+    from src.infrastructure.persistence.postgresql.models.product import ProductModel
 
 
 class OrderModel(Base):
@@ -76,8 +72,8 @@ class OrderItemModel(Base):
         primary_key=True,
         nullable=False,
     )
-    product_variant_id: Mapped[UUID] = mapped_column(
-        ForeignKey("product_variants.id", ondelete="CASCADE"),
+    product_id: Mapped[UUID] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE"),
         primary_key=True,
         nullable=False,
     )
@@ -87,12 +83,10 @@ class OrderItemModel(Base):
         back_populates="order_items",
     )
 
-    order_product: Mapped["ProductVariantModel"] = relationship(
-        back_populates="order_item",
-    )
+    order_product: Mapped["ProductModel"] = relationship()
 
     def __str__(self) -> str:
-        return f"Order ID: {self.order_id}\nProduct ID: {self.product_variant_id}\nQuantity: {self.quantity}\n"
+        return f"Order ID: {self.order_id}\nProduct ID: {self.product_id}\nQuantity: {self.quantity}\n"
 
     def __repr__(self) -> str:
         return f"OrderItemModel: {self.__dict__})"
@@ -100,17 +94,16 @@ class OrderItemModel(Base):
 
 def map_to_order_item(
     entity: OrderItemModel,
-    with_relations: bool = False,
+    with_relations: bool = True,
 ) -> OrderItem:
     order_item = OrderItem(
         order_id=entity.order_id,
-        product_variant_id=entity.product_variant_id,
+        product_id=entity.product_id,
         quantity=entity.quantity,
-        product=map_to_product_variant(entity.order_product),
+        product=None,
     )
+
     if with_relations:
-        order_item.product = map_to_product_variant(
-            entity.order_product,
-            with_relations=with_relations,
-        )
+        order_item.product = map_to_product(entity.order_product)
+
     return order_item

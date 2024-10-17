@@ -2,7 +2,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from uuid import UUID
 
+from src.application.common.utils import convert_price
 from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
+from src.domain.products.value_objects import ProductPrice
 
 
 class VatType(Enum):
@@ -27,43 +29,62 @@ class PaymentObject(Enum):
 
 
 @dataclass
-class ProductWithoutVariantsOut:
-    id: UUID
-    name: str
-    category: str
-    description: str
-    units_of_measurement: UnitsOfMesaurement
-
-
-@dataclass
-class ProductVariantOut:
-    id: UUID
-    name: str
-    sku: str
-    bag_weight: float
-    pallet_weight: float
-    bags_per_pallet: float
-    retail_price: float
-    wholesale_delivery_price: float
-    d2_delivery_price: float
-    d2_self_pickup_price: float
-    d1_delivery_price: float
-    d1_self_pickup_price: float
-    image: str | None
-    status: ProductStatus
-
-    parent_product: "ProductWithoutVariantsOut | None" = None
-
-
-@dataclass
 class ProductOut:
     id: UUID
     name: str
     category: str
     description: str
+    sku: str
+    bag_weight: float
+    pallet_weight: float
+    bags_per_pallet: float
+    retail_price: float
+    wholesale_delivery_price: float | None
+    d2_delivery_price: float | None
+    d2_self_pickup_price: float | None
+    d1_delivery_price: float | None
+    d1_self_pickup_price: float | None
     units_of_measurement: UnitsOfMesaurement
+    image: str | None
+    status: ProductStatus
 
-    variants: list[ProductVariantOut]
+    def __init__(
+        self,
+        id: UUID,
+        name: str,
+        category: str,
+        description: str,
+        units_of_measurement: UnitsOfMesaurement,
+        sku: str,
+        bag_weight: float,
+        pallet_weight: float,
+        bags_per_pallet: float,
+        retail_price: ProductPrice,
+        wholesale_delivery_price: ProductPrice | None,
+        d2_delivery_price: ProductPrice | None,
+        d2_self_pickup_price: ProductPrice | None,
+        d1_delivery_price: ProductPrice | None,
+        d1_self_pickup_price: ProductPrice | None,
+        status: ProductStatus,
+        image: str | None = None,
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.category = category
+        self.description = description
+        self.sku = sku
+        self.bag_weight = bag_weight
+        self.pallet_weight = pallet_weight
+        self.bags_per_pallet = bags_per_pallet
+        self.retail_price = retail_price.in_rubles()
+        self.wholesale_delivery_price = convert_price(wholesale_delivery_price)
+        self.d2_delivery_price = convert_price(d2_delivery_price)
+        self.d2_self_pickup_price = convert_price(d2_self_pickup_price)
+        self.d1_delivery_price = convert_price(d1_delivery_price)
+        self.d1_self_pickup_price = convert_price(d1_self_pickup_price)
+        self.image = image
+        self.units_of_measurement = units_of_measurement
+        self.status = status
 
 
 @dataclass

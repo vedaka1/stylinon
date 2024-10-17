@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from uuid import UUID
 
+from src.application.common.utils import convert_price
 from src.domain.orders.entities import OrderStatus
 from src.domain.orders.exceptions import OrderItemIncorrectQuantityException
 from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
@@ -73,11 +74,11 @@ class OrderItemOut:
     pallet_weight: float
     bags_per_pallet: float
     retail_price: float
-    wholesale_delivery_price: float
-    d2_delivery_price: float
-    d2_self_pickup_price: float
-    d1_delivery_price: float
-    d1_self_pickup_price: float
+    wholesale_delivery_price: float | None
+    d2_delivery_price: float | None
+    d2_self_pickup_price: float | None
+    d1_delivery_price: float | None
+    d1_self_pickup_price: float | None
     status: ProductStatus
     image: str | None = None
 
@@ -95,11 +96,11 @@ class OrderItemOut:
         pallet_weight: float,
         bags_per_pallet: float,
         retail_price: ProductPrice,
-        wholesale_delivery_price: ProductPrice,
-        d2_delivery_price: ProductPrice,
-        d2_self_pickup_price: ProductPrice,
-        d1_delivery_price: ProductPrice,
-        d1_self_pickup_price: ProductPrice,
+        wholesale_delivery_price: ProductPrice | None,
+        d2_delivery_price: ProductPrice | None,
+        d2_self_pickup_price: ProductPrice | None,
+        d1_delivery_price: ProductPrice | None,
+        d1_self_pickup_price: ProductPrice | None,
         status: ProductStatus,
         image: str | None = None,
     ) -> None:
@@ -116,11 +117,11 @@ class OrderItemOut:
         self.bags_per_pallet = bags_per_pallet
         self.image = image
         self.retail_price = retail_price.in_rubles()
-        self.wholesale_delivery_price = wholesale_delivery_price.in_rubles()
-        self.d2_delivery_price = d2_delivery_price.in_rubles()
-        self.d2_self_pickup_price = d2_self_pickup_price.in_rubles()
-        self.d1_delivery_price = d1_delivery_price.in_rubles()
-        self.d1_self_pickup_price = d1_self_pickup_price.in_rubles()
+        self.wholesale_delivery_price = convert_price(wholesale_delivery_price)
+        self.d2_delivery_price = convert_price(d2_delivery_price)
+        self.d2_self_pickup_price = convert_price(d2_self_pickup_price)
+        self.d1_delivery_price = convert_price(d1_delivery_price)
+        self.d1_self_pickup_price = convert_price(d1_self_pickup_price)
         self.status = status
         self.image = image
 

@@ -28,7 +28,6 @@ class ProductAdmin(ModelView, model=ProductModel):
         ProductModel.category,
         ProductModel.description,
         ProductModel.units_of_measurement,
-        ProductModel.variants,
     ]
 
     column_labels = {

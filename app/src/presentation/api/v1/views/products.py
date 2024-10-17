@@ -6,7 +6,6 @@ from src.application.common.pagination import ListPaginatedResponse, PaginationQ
 from src.application.common.response import APIResponse
 from src.application.products.commands import (
     CreateProductCommand,
-    CreateProductVariantCommand,
     GetManyProductsCommand,
     UpdateProductCommand,
 )
@@ -83,7 +82,6 @@ async def create_product(
     category: str = Form(...),
     description: str = Form(...),
     units_of_measurement: UnitsOfMesaurement = Form(...),
-    variant_name: str = Form(...),
     sku: str = Form(...),
     retail_price: int = Form(...),
     wholesale_delivery_price: int = Form(...),
@@ -123,25 +121,19 @@ async def create_product(
         name=name,
         category=category,
         description=description,
+        sku=sku,
+        bag_weight=bag_weight,
+        pallet_weight=pallet_weight,
+        bags_per_pallet=bags_per_pallet,
+        retail_price=retail_price,
+        wholesale_delivery_price=wholesale_delivery_price,
+        d2_delivery_price=d2_delivery_price,
+        d2_self_pickup_price=d2_self_pickup_price,
+        d1_delivery_price=d1_delivery_price,
+        d1_self_pickup_price=d1_self_pickup_price,
         units_of_measurement=units_of_measurement,
-        photo_url=image_url,
-        variants=[
-            CreateProductVariantCommand(
-                name=variant_name,
-                sku=sku,
-                bag_weight=bag_weight,
-                pallet_weight=pallet_weight,
-                bags_per_pallet=bags_per_pallet,
-                image=image_url,
-                retail_price=retail_price,
-                wholesale_delivery_price=wholesale_delivery_price,
-                d2_delivery_price=d2_delivery_price,
-                d2_self_pickup_price=d2_self_pickup_price,
-                d1_delivery_price=d1_delivery_price,
-                d1_self_pickup_price=d1_self_pickup_price,
-                status=status,
-            ),
-        ],
+        image=image_url,
+        status=status,
     )
 
     await create_product_interactor.execute(command=command)

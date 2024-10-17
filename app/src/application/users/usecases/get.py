@@ -96,9 +96,9 @@ class GetUserOrdersUseCase:
                     OrderItemOut(
                         product_id=order_item.product.id,
                         name=order_item.product.name,
-                        category=order_item.product.parent_product.category,
-                        description=order_item.product.parent_product.description,
-                        units_of_measurement=order_item.product.parent_product.units_of_measurement,
+                        category=order_item.product.category,
+                        description=order_item.product.description,
+                        units_of_measurement=order_item.product.units_of_measurement,
                         quantity=order_item.quantity,
                         product_name=order_item.product.name,
                         sku=order_item.product.sku,
@@ -115,7 +115,7 @@ class GetUserOrdersUseCase:
                         image=order_item.product.image,
                     )
                     for order_item in order.items
-                    if order_item.product and order_item.product.parent_product
+                    if order_item.product
                 ],
             )
             for order in orders

@@ -14,14 +14,13 @@ from src.domain.products.entities import (
     Category,
     Product,
     ProductStatus,
-    ProductVariant,
     UnitsOfMesaurement,
 )
 from src.domain.products.repository import (
     CategoryRepositoryInterface,
     ProductRepositoryInterface,
-    ProductVariantRepositoryInterface,
 )
+from src.domain.products.value_objects import ProductPrice
 from src.infrastructure.persistence.postgresql.models.order import (
     OrderModel,
     map_to_order,
@@ -168,9 +167,6 @@ class TestOrderRepository:
             category_repository = await di_container.get(CategoryRepositoryInterface)
             category = Category.create(name="test_category")
             await category_repository.create(category)
-            product_variant_repository = await di_container.get(
-                ProductVariantRepositoryInterface,
-            )
             order_item_repository = await di_container.get(OrderItemRepositoryInterface)
 
             product = Product.create(
@@ -178,22 +174,14 @@ class TestOrderRepository:
                 description="test_description",
                 category="test_category",
                 units_of_measurement=UnitsOfMesaurement.PIECE,
-            )
-            product_variant = ProductVariant.create(
-                product_id=product.id,
-                name="test_product_variant",
                 sku="test_sku",
                 bag_weight=10,
                 pallet_weight=100,
                 bags_per_pallet=10,
-                retail_price=100,
-                wholesale_delivery_price=100,
-                d2_delivery_price=100,
-                d2_self_pickup_price=100,
-                d1_delivery_price=100,
-                d1_self_pickup_price=100,
+                retail_price=ProductPrice(100),
                 status=ProductStatus.INSTOCK,
             )
+
             order = Order.create(
                 customer_email="test@test.com",
                 operation_id=uuid4(),
@@ -201,13 +189,13 @@ class TestOrderRepository:
                 total_price=1234,
                 is_self_pickup=False,
             )
+
             order_item = OrderItem.create(
                 order_id=order.id,
-                product_variant_id=product_variant.id,
+                product_id=product.id,
                 quantity=1,
             )
             await product_repository.create(product)
-            await product_variant_repository.create(product_variant)
             await order_repository.create(order)
             await order_item_repository.create(order_item)
             # Check it and get it
@@ -219,12 +207,8 @@ class TestOrderRepository:
             assert len(order_data.items) == 1
             order_item = order_data.items[0]
             assert order_item.product
-            assert order_item.product.parent_product
-            assert order_item.product.name == product_variant.name
-            assert order_item.product.parent_product.description == product.description
-            assert order_item.product.parent_product.category == product.category
-            assert (
-                order_item.product.retail_price.value
-                == product_variant.retail_price.value
-            )
+            assert order_item.product.name == product.name
+            assert order_item.product.description == product.description
+            assert order_item.product.category == product.category
+            assert order_item.product.retail_price.value == product.retail_price.value
             assert order_item.quantity == 1

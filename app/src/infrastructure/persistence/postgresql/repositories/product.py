@@ -2,13 +2,11 @@ from uuid import UUID
 
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
 from src.application.products.filters import ProductFilters
 from src.domain.products.entities import Product
 from src.domain.products.repository import ProductRepositoryInterface
 from src.infrastructure.persistence.postgresql.models.product import (
     ProductModel,
-    ProductVariantModel,
     map_to_product,
 )
 
@@ -25,7 +23,34 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             name=product.name,
             category=product.category,
             description=product.description,
+            sku=product.sku,
+            bag_weight=product.bag_weight,
+            pallet_weight=product.pallet_weight,
+            bags_per_pallet=product.bags_per_pallet,
+            retail_price=product.retail_price.value,
+            wholesale_delivery_price=(
+                product.wholesale_delivery_price.value
+                if product.wholesale_delivery_price
+                else None
+            ),
+            d2_delivery_price=(
+                product.d2_delivery_price.value if product.d2_delivery_price else None
+            ),
+            d2_self_pickup_price=(
+                product.d2_self_pickup_price.value
+                if product.d2_self_pickup_price
+                else None
+            ),
+            d1_delivery_price=(
+                product.d1_delivery_price.value if product.d1_delivery_price else None
+            ),
+            d1_self_pickup_price=(
+                product.d1_self_pickup_price.value
+                if product.d1_self_pickup_price
+                else None
+            ),
             units_of_measurement=product.units_of_measurement,
+            image=product.image,
             status=product.status,
         )
 
@@ -41,7 +66,38 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 name=product.name,
                 category=product.category,
                 description=product.description,
+                sku=product.sku,
+                bag_weight=product.bag_weight,
+                pallet_weight=product.pallet_weight,
+                bags_per_pallet=product.bags_per_pallet,
+                retail_price=product.retail_price.value,
+                wholesale_delivery_price=(
+                    product.wholesale_delivery_price.value
+                    if product.wholesale_delivery_price
+                    else None
+                ),
+                d2_delivery_price=(
+                    product.d2_delivery_price.value
+                    if product.d2_delivery_price
+                    else None
+                ),
+                d2_self_pickup_price=(
+                    product.d2_self_pickup_price.value
+                    if product.d2_self_pickup_price
+                    else None
+                ),
+                d1_delivery_price=(
+                    product.d1_delivery_price.value
+                    if product.d1_delivery_price
+                    else None
+                ),
+                d1_self_pickup_price=(
+                    product.d1_self_pickup_price.value
+                    if product.d1_self_pickup_price
+                    else None
+                ),
                 units_of_measurement=product.units_of_measurement,
+                image=product.image,
                 status=product.status,
             )
         )
@@ -58,29 +114,21 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         return None
 
     async def get_by_id(self, product_id: UUID) -> Product | None:
-        query = (
-            select(ProductModel)
-            .where(ProductModel.id == product_id)
-            .options(joinedload(ProductModel.variants))
-        )
+        query = select(ProductModel).where(ProductModel.id == product_id)
 
         cursor = await self.session.execute(query)
 
-        entity = cursor.unique().scalar_one_or_none()
+        entity = cursor.scalar_one_or_none()
 
-        return map_to_product(entity, with_relations=True) if entity else None
+        return map_to_product(entity) if entity else None
 
     async def get_many(
         self,
         filters: ProductFilters | None = None,
-        with_relations: bool = False,
         offset: int = 0,
         limit: int = 100,
     ) -> list[Product]:
-        query = select(ProductModel).join(ProductVariantModel)
-
-        if with_relations:
-            query = query.options(selectinload(ProductModel.variants))
+        query = select(ProductModel)
 
         if filters:
             if filters.name:
@@ -95,11 +143,11 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 )
             if filters.price_from:
                 query = query.where(
-                    ProductVariantModel.retail_price >= filters.price_from,
+                    ProductModel.retail_price >= filters.price_from,
                 )
             if filters.price_to:
                 query = query.where(
-                    ProductVariantModel.retail_price <= filters.price_to,
+                    ProductModel.retail_price <= filters.price_to,
                 )
             if filters.units_of_measurement:
                 query = query.where(
@@ -112,15 +160,13 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
 
         entities = cursor.scalars().all()
 
-        return [
-            map_to_product(entity, with_relations=with_relations) for entity in entities
-        ]
+        return [map_to_product(entity) for entity in entities]
 
     async def count(
         self,
         filters: ProductFilters | None = None,
     ) -> int:
-        query = select(func.count()).select_from(ProductModel).join(ProductVariantModel)
+        query = select(func.count()).select_from(ProductModel)
 
         if filters:
             if filters.name:
@@ -135,11 +181,11 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 )
             if filters.price_from:
                 query = query.where(
-                    ProductVariantModel.retail_price >= filters.price_from,
+                    ProductModel.retail_price >= filters.price_from,
                 )
             if filters.price_to:
                 query = query.where(
-                    ProductVariantModel.retail_price <= filters.price_to,
+                    ProductModel.retail_price <= filters.price_to,
                 )
             if filters.units_of_measurement:
                 query = query.where(

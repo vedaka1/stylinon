@@ -35,9 +35,9 @@ class GetManyOrdersUseCase:
                     OrderItemOut(
                         product_id=order_item.product.id,
                         name=order_item.product.name,
-                        category=order_item.product.parent_product.category,
-                        description=order_item.product.parent_product.description,
-                        units_of_measurement=order_item.product.parent_product.units_of_measurement,
+                        category=order_item.product.category,
+                        description=order_item.product.description,
+                        units_of_measurement=order_item.product.units_of_measurement,
                         quantity=order_item.quantity,
                         product_name=order_item.product.name,
                         sku=order_item.product.sku,
@@ -54,7 +54,7 @@ class GetManyOrdersUseCase:
                         image=order_item.product.image,
                     )
                     for order_item in order.items
-                    if order_item.product and order_item.product.parent_product
+                    if order_item.product
                 ],
             )
             for order in orders
@@ -86,11 +86,11 @@ class GetOrderUseCase:
             items=[
                 OrderItemOut(
                     product_id=order_item.product.id,
-                    name=order_item.product.name,
-                    category=order_item.product.parent_product.category,
-                    description=order_item.product.parent_product.description,
-                    units_of_measurement=order_item.product.parent_product.units_of_measurement,
                     quantity=order_item.quantity,
+                    name=order_item.product.name,
+                    category=order_item.product.category,
+                    description=order_item.product.description,
+                    units_of_measurement=order_item.product.units_of_measurement,
                     product_name=order_item.product.name,
                     sku=order_item.product.sku,
                     bag_weight=order_item.product.bag_weight,
@@ -106,6 +106,6 @@ class GetOrderUseCase:
                     image=order_item.product.image,
                 )
                 for order_item in order.items
-                if order_item.product and order_item.product.parent_product
+                if order_item.product
             ],
         )
