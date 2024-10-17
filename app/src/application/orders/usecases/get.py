@@ -71,7 +71,7 @@ class GetOrderUseCase:
 
         if not order:
             raise OrderNotFoundException
-        print(order)
+
         return OrderOut(
             id=order.id,
             customer_email=order.customer_email,

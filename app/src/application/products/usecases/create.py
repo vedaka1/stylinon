@@ -24,7 +24,7 @@ class CreateProductUseCase:
 
         product = Product.create(
             name=command.name,
-            category=command.category,
+            category=command.category.lower(),
             description=command.description,
             units_of_measurement=command.units_of_measurement,
             sku=command.sku,
@@ -54,7 +54,7 @@ class CreateCategoryUseCase:
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateCategoryCommand) -> None:
-        category = Category.create(name=command.name)
+        category = Category.create(name=command.name.lower())
 
         await self.category_repository.create(category=category)
 

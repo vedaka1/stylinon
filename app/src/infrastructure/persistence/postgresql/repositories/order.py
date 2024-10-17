@@ -121,6 +121,7 @@ class SqlalchemyOrderRepository(OrderRepositoryInterface):
                 ),
             )
             .where(OrderModel.customer_email == customer_email)
+            .order_by(OrderModel.created_at.desc())
         )
 
         cursor = await self.session.execute(query)

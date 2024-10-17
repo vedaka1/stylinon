@@ -35,9 +35,9 @@ class ProductOut:
     category: str
     description: str
     sku: str
-    bag_weight: float
-    pallet_weight: float
-    bags_per_pallet: float
+    bag_weight: int
+    pallet_weight: int
+    bags_per_pallet: int
     retail_price: float
     wholesale_delivery_price: float | None
     d2_delivery_price: float | None
@@ -56,9 +56,9 @@ class ProductOut:
         description: str,
         units_of_measurement: UnitsOfMesaurement,
         sku: str,
-        bag_weight: float,
-        pallet_weight: float,
-        bags_per_pallet: float,
+        bag_weight: int,
+        pallet_weight: int,
+        bags_per_pallet: int,
         retail_price: ProductPrice,
         wholesale_delivery_price: ProductPrice | None,
         d2_delivery_price: ProductPrice | None,
