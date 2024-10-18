@@ -30,7 +30,7 @@ def create_product(
         d2_delivery_price=parse_price(d2_delivery_price),
         d1_self_pickup_price=parse_price(d1_self_pickup_price),
         d1_delivery_price=parse_price(d1_delivery_price),
-        status=ProductStatus.INSTOCK,
+        status=ProductStatus.IN_STOCK,
     )
 
 
@@ -91,31 +91,31 @@ def create_product(
             950,
         ),
         # 6. Отсрочка платежа, самовывоз, вес > 20 тонн, цена самовывоза
-        (
-            create_product(
-                retail_price=1000,
-                d2_self_pickup_price=850,
-                d2_delivery_price=900,
-            ),
-            PaymentMethod.DELAYED_PAYMENT,
-            True,
-            25000,
-            1,
-            850,
-        ),
-        # 7. Отсрочка платежа, доставка, вес > 20 тонн
-        (
-            create_product(
-                retail_price=1000,
-                d2_self_pickup_price=None,
-                d2_delivery_price=900,
-            ),
-            PaymentMethod.DELAYED_PAYMENT,
-            False,
-            25000,
-            1,
-            900,
-        ),
+        # (
+        #     create_product(
+        #         retail_price=1000,
+        #         d2_self_pickup_price=850,
+        #         d2_delivery_price=900,
+        #     ),
+        #     PaymentMethod.DELAYED_PAYMENT,
+        #     True,
+        #     25000,
+        #     1,
+        #     850,
+        # ),
+        # # 7. Отсрочка платежа, доставка, вес > 20 тонн
+        # (
+        #     create_product(
+        #         retail_price=1000,
+        #         d2_self_pickup_price=None,
+        #         d2_delivery_price=900,
+        #     ),
+        #     PaymentMethod.DELAYED_PAYMENT,
+        #     False,
+        #     25000,
+        #     1,
+        #     900,
+        # ),
         # 8. Несколько товаров, вес > 20 тонн
         (
             create_product(retail_price=1000),

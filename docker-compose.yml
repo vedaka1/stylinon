@@ -3,11 +3,14 @@ version: '3.8'
 services:
 
   app:
+    &app
     container_name: app
     hostname: app
     depends_on:
       postgres:
         condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -23,6 +26,19 @@ services:
       - ./images:/app/images
       - ./app/main.py:/app/main.py
     command: sh -c "alembic upgrade head && uvicorn --factory main:create_app --host 0.0.0.0 --port 8000 --reload --forwarded-allow-ips='*' --proxy-headers"
+
+  migrations:
+    <<: *app
+    ports: []
+    networks:
+      - internal
+    container_name: migrations
+    hostname: migrations
+    command: sh- c "alembic upgrade head"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 
   nginx:
     container_name: nginx

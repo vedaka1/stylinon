@@ -42,7 +42,7 @@ class TestOrderItemRepository:
                 pallet_weight=100,
                 bags_per_pallet=10,
                 retail_price=ProductPrice(100),
-                status=ProductStatus.INSTOCK,
+                status=ProductStatus.IN_STOCK,
             )
             order = Order.create(
                 customer_email="test@test.com",
@@ -86,7 +86,7 @@ class TestOrderItemRepository:
                     pallet_weight=100,
                     bags_per_pallet=10,
                     retail_price=ProductPrice(100),
-                    status=ProductStatus.INSTOCK,
+                    status=ProductStatus.IN_STOCK,
                 )
                 for i in range(2)
             ]
@@ -141,7 +141,7 @@ class TestOrderItemRepository:
                 pallet_weight=100,
                 bags_per_pallet=10,
                 retail_price=ProductPrice(100),
-                status=ProductStatus.INSTOCK,
+                status=ProductStatus.IN_STOCK,
             )
 
             order = Order.create(

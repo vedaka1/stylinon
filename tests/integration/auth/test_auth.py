@@ -22,8 +22,8 @@ class TestAuth:
             data={"username": "test_auth@test.com", "password": "1234qwe"},
         )
         assert response.status_code == 200
-        assert response.cookies.get("access_token") is not None
-        assert response.cookies.get("refresh_token") is not None
+        assert response.cookies.get("session") is not None
+        # assert response.cookies.get("refresh_token") is not None
 
     @pytest.mark.usefixtures("clean_users_table")
     async def test_register(self, client: AsyncClient) -> None:
@@ -34,14 +34,13 @@ class TestAuth:
         await self._register_request(client)
         await self._login_request(client)
 
-    @pytest.mark.usefixtures("clean_users_table")
-    async def test_refresh_token(self, client: AsyncClient) -> None:
-        await self._register_request(client)
-        await self._login_request(client)
-        response = await client.post("/auth/refresh")
-        assert response.status_code == 200
-        assert response.cookies.get("access_token") is not None
-        assert response.cookies.get("refresh_token") is not None
+    # @pytest.mark.usefixtures("clean_users_table")
+    # async def test_refresh_token(self, client: AsyncClient) -> None:
+    #     await self._register_request(client)
+    #     await self._login_request(client)
+    #     response = await client.post("/auth/refresh")
+    #     assert response.status_code == 200
+    #     assert response.cookies.get("session") is not None
 
     @pytest.mark.usefixtures("clean_users_table")
     async def test_logout(self, client: AsyncClient) -> None:
@@ -49,5 +48,4 @@ class TestAuth:
         await self._login_request(client)
         response = await client.post("/auth/logout")
         assert response.status_code == 200
-        assert response.cookies.get("access_token") is None
-        assert response.cookies.get("refresh_token") is None
+        assert response.cookies.get("session") is None

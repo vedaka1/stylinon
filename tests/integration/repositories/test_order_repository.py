@@ -179,7 +179,7 @@ class TestOrderRepository:
                 pallet_weight=100,
                 bags_per_pallet=10,
                 retail_price=ProductPrice(100),
-                status=ProductStatus.INSTOCK,
+                status=ProductStatus.IN_STOCK,
             )
 
             order = Order.create(
