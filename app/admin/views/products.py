@@ -81,19 +81,3 @@ class ProductAdmin(ModelView, model=ProductModel):
     ) -> None:
         if is_created:
             data["id"] = uuid4()
-            data["retail_price"] = int(ProductPrice(data["retail_price"]).value * 100)
-            data["wholesale_delivery_price"] = int(
-                ProductPrice(data["wholesale_delivery_price"]).value * 100,
-            )
-            data["d1_delivery_price"] = int(
-                ProductPrice(data["d1_delivery_price"]).value * 100,
-            )
-            data["d1_self_pickup_price"] = int(
-                ProductPrice(data["d1_self_pickup_price"]).value * 100,
-            )
-            data["d2_delivery_price"] = int(
-                ProductPrice(data["d2_delivery_price"]).value * 100,
-            )
-            data["d2_self_pickup_price"] = int(
-                ProductPrice(data["retaid2_self_pickup_pricel_price"]).value * 100,
-            )

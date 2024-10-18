@@ -8,7 +8,7 @@ from fastapi.openapi.models import OAuthFlowPassword
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
 from fastapi.security import OAuth2, SecurityScopes
 from fastapi.security.utils import get_authorization_scheme_param
-from src.application.auth.dto import UserTokenData
+from src.application.auth.dto import UserData
 from src.application.auth.exceptions import (
     NotAuthorizedException,
     NotEnoughPermissionsException,
@@ -20,7 +20,7 @@ from src.infrastructure.di.container import get_container
 
 logger = logging.getLogger()
 
-AUTH_COOKIE = "session"
+AUTH_COOKIE = "session_id"
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -104,7 +104,7 @@ async def get_current_user_data(
         Depends(oauth2_scheme),
     ],
     container: AsyncContainer = Depends(get_container),
-) -> UserTokenData:
+) -> UserData:
     if not authorization:
         raise NotAuthorizedException
 
@@ -125,7 +125,7 @@ async def get_current_user_data(
 async def get_current_user_from_websocket(
     websocket: WebSocket,
     container: AsyncContainer,
-) -> UserTokenData:
+) -> UserData:
     authorization: str | None = websocket.cookies.get(AUTH_COOKIE)
     if not authorization:
         raise NotAuthorizedException

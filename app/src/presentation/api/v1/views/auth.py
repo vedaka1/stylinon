@@ -122,7 +122,7 @@ async def login(
     user, session = await login_interactor.execute(command=command)
 
     response.set_cookie(
-        "session",
+        "session_id",
         value=str(session.id),
         max_age=int((session.expires_in - datetime.now()).total_seconds()),
         httponly=True,
@@ -207,7 +207,7 @@ async def logout(
 
     await logout_interactor.execute(command=command)
 
-    response.delete_cookie("session")
+    response.delete_cookie("session_id")
 
     return APIResponse()
 
@@ -222,6 +222,7 @@ async def password_recovery(
     password_recovery_interactor: FromDishka[PasswordRecoveryUseCase],
 ) -> APIResponse[None]:
     await password_recovery_interactor.execute(email=email)
+
     return APIResponse()
 
 
@@ -236,6 +237,9 @@ async def reset_password(
     reset_password_interactor: FromDishka[ResetPasswordUseCase],
 ) -> APIResponse[None]:
     await reset_password_interactor.execute(command=command)
-    response.delete_cookie("access_token")
-    response.delete_cookie("refresh_token")
+
+    response.delete_cookie("session_id")
+
+    response.delete_cookie("session")
+
     return APIResponse()

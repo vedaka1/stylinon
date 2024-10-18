@@ -5,7 +5,7 @@ from uuid import UUID
 from dishka import AsyncContainer
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Security, WebSocket, WebSocketDisconnect
-from src.application.auth.dto import UserTokenData
+from src.application.auth.dto import UserData
 from src.application.auth.exceptions import (
     NotAuthorizedException,
     TokenExpiredException,
@@ -56,12 +56,13 @@ def get_chats_list_command(
 async def create_chat(
     command: CreateChatCommand,
     create_chat_interactor: FromDishka[CreateChatUseCase],
-    user_data: Annotated[UserTokenData, Depends(get_current_user_data)],
+    user_data: Annotated[UserData, Depends(get_current_user_data)],
 ) -> APIResponse[None]:
     await create_chat_interactor.execute(
         command=command,
         user_id=user_data.user_id,
     )
+
     return APIResponse()
 
 
@@ -83,16 +84,17 @@ async def get_chats_list(
     get_chats_interactor: FromDishka[GetChatsListUseCase],
 ) -> APIResponse[ListPaginatedResponse[ChatOut]]:
     response = await get_chats_interactor.execute(command=command)
+
     return APIResponse(data=response)
 
 
-@router.get("/{chat_id}")
+@router.get("/{chat_id}", dependencies=[Depends(get_current_user_data)])
 async def get_chat(
     chat_id: UUID,
     get_chat_interactor: FromDishka[GetChatUseCase],
-    user_data: Annotated[UserTokenData, Depends(get_current_user_data)],
 ) -> APIResponse[ChatOut]:
     response = await get_chat_interactor.execute(chat_id=chat_id)
+
     return APIResponse(data=response)
 
 
@@ -101,7 +103,7 @@ async def create_message(
     command: CreateMessageCommand,
     chat_id: UUID,
     create_message_interactor: FromDishka[CreateMessageUseCase],
-    user_data: Annotated[UserTokenData, Depends(get_current_user_data)],
+    user_data: Annotated[UserData, Depends(get_current_user_data)],
 ) -> APIResponse[None]:
     await create_message_interactor.execute(
         command=command,
@@ -121,15 +123,21 @@ async def websocket_endpoint(
     container: Annotated[AsyncContainer, Depends(get_container)],
 ) -> None:
     websocket_manager = await container.get(WebsocketManagerInterface)
+
     await websocket_manager.accept_connection(websocket=websocket, key=chat_id)
 
     try:
+
         await get_current_user_from_websocket(websocket=websocket, container=container)
+
         while True:
             await websocket.receive_text()
+
     except (NotAuthorizedException, TokenExpiredException) as exc:
         await websocket.send_json(data={"message": exc.message})
+
         await websocket_manager.remove_connection(websocket=websocket, key=chat_id)
+
         await websocket.close()
 
     except WebSocketDisconnect:
