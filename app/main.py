@@ -33,7 +33,14 @@ def create_app() -> FastAPI:
     api_v1.include_router(api_router_v1)
     api_v1.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost", "https://localhost", "*"],
+        allow_origins=[
+            "http://localhost",
+            "https://localhost",
+            "http://vedaka.ru",
+            "http://www.vedaka.ru",
+            "https://vedaka.ru",
+            "https://www.vedaka.ru",
+        ],
         allow_credentials=True,
         allow_methods=["GET", "POST", "HEAD", "OPTIONS", "PUT", "PATCH"],
         allow_headers=[
