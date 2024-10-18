@@ -65,24 +65,26 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
         with_relations: bool = False,
     ) -> Chat | None:
         if with_relations:
-            query_with_join = (
-                select(ChatModel, MessageModel)
-                .join(ChatModel, ChatModel.id == MessageModel.chat_id)
-                .where(ChatModel.id == value)
-                .limit(10)
+            chat_query = select(ChatModel).where(ChatModel.id == value)
+            messages_query = (
+                select(MessageModel).where(MessageModel.chat_id == value).limit(10)
             )
 
-            cursor = await self.session.execute(query_with_join)
+            chat_cursor = await self.session.execute(chat_query)
 
-            entities = cursor.all()
+            chat_entitiy = chat_cursor.scalar_one_or_none()
 
-            if not entities or not entities[0]:
+            if not chat_entitiy:
                 return None
 
-            chat = entities[0][0]
-            messages = [row[1] for row in entities]
+            messages_cursor = await self.session.execute(messages_query)
 
-            return map_to_chat_with_messages(entity=chat, messages=messages)
+            messages = messages_cursor.scalars().all()
+
+            return map_to_chat_with_messages(
+                entity=chat_entitiy,
+                messages=messages,  # type: ignore
+            )
 
         else:
             query = select(ChatModel).where(ChatModel.id == value)

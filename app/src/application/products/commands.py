@@ -1,28 +1,28 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from pydantic import BaseModel
 from src.application.common.pagination import PaginationQuery
 from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
 
 
-class CreateProductCommand(BaseModel):
+@dataclass
+class CreateProductCommand:
     name: str
     category: str
-    description: str = "Описания нет"
     sku: str
     bag_weight: int
     pallet_weight: int
     bags_per_pallet: int
     retail_price: int
+    image: str | None
+    units_of_measurement: UnitsOfMesaurement
+    status: ProductStatus
+    description: str = "Описания нет"
     wholesale_delivery_price: int | None = None
     d2_delivery_price: int | None = None
     d2_self_pickup_price: int | None = None
     d1_delivery_price: int | None = None
     d1_self_pickup_price: int | None = None
-    image: str | None
-    units_of_measurement: UnitsOfMesaurement
-    status: ProductStatus
 
 
 @dataclass

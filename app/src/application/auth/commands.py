@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from uuid import UUID
 
 from pydantic import EmailStr
 
@@ -20,8 +21,13 @@ class LoginCommand:
 
 
 @dataclass
-class LogoutCommand:
+class LogoutWithJWTCommand:
     refresh_token: str
+
+
+@dataclass
+class LogoutWithSessionCommand:
+    session_id: UUID
 
 
 @dataclass

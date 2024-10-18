@@ -24,6 +24,7 @@ class SqlalchemyUserSessionRepository(UserSessionRepositoryInterface):
             user_id=session.user_id,
             created_at=session.created_at,
             expires_in=session.expires_in,
+            user_agent=session.user_agent,
         )
 
         await self.session.execute(query)
@@ -74,3 +75,20 @@ class SqlalchemyUserSessionRepository(UserSessionRepositoryInterface):
         entities = cursor.scalars().all()
 
         return [map_to_user_session(entity) for entity in entities]
+
+    async def get_by_user_id_and_user_agent(
+        self,
+        user_id: UUID,
+        user_agent: str,
+    ) -> UserSession | None:
+        query = (
+            select(UserSessionModel)
+            .where(UserSessionModel.user_id == user_id)
+            .where(UserSessionModel.user_agent == user_agent)
+        )
+
+        cursor = await self.session.execute(query)
+
+        entity = cursor.scalar_one_or_none()
+
+        return map_to_user_session(entity) if entity else None

@@ -19,7 +19,7 @@ class VatType(Enum):
 class PaymentMethod(Enum):
     FULL_PAYMENT = "full_payment"
     FULL_PREPAYMENT = "full_prepayment"
-    DELAYED_PAYMENT = "delayed_payment"
+    # DELAYED_PAYMENT = "delayed_payment"
 
 
 class PaymentObject(Enum):
@@ -47,6 +47,7 @@ class ProductOut:
     units_of_measurement: UnitsOfMesaurement
     image: str | None
     status: ProductStatus
+    is_available: bool
 
     def __init__(
         self,
@@ -66,6 +67,7 @@ class ProductOut:
         d1_delivery_price: ProductPrice | None,
         d1_self_pickup_price: ProductPrice | None,
         status: ProductStatus,
+        is_available: bool,
         image: str | None = None,
     ) -> None:
         self.id = id
@@ -85,6 +87,7 @@ class ProductOut:
         self.image = image
         self.units_of_measurement = units_of_measurement
         self.status = status
+        self.is_available = is_available
 
 
 @dataclass

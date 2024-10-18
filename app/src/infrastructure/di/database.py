@@ -16,7 +16,10 @@ from src.domain.products.repository import (
     CategoryRepositoryInterface,
     ProductRepositoryInterface,
 )
-from src.domain.users.repository import UserRepositoryInterface
+from src.domain.users.repository import (
+    UserRepositoryInterface,
+    UserSessionRepositoryInterface,
+)
 from src.infrastructure.persistence.postgresql.repositories import (
     SqlalchemyChatRepository,
     SqlalchemyMessageRepository,
@@ -28,6 +31,9 @@ from src.infrastructure.persistence.postgresql.repositories import (
 )
 from src.infrastructure.persistence.postgresql.repositories.category import (
     SqlalchemyCategoryRepository,
+)
+from src.infrastructure.persistence.postgresql.repositories.user_session import (
+    SqlalchemyUserSessionRepository,
 )
 from src.infrastructure.persistence.postgresql.transaction import TransactionManager
 
@@ -53,6 +59,10 @@ class DatabaseAdaptersProvider(Provider):
     user_repository = provide(
         SqlalchemyUserRepository,
         provides=UserRepositoryInterface,
+    )
+    user_session_repository = provide(
+        SqlalchemyUserSessionRepository,
+        provides=UserSessionRepositoryInterface,
     )
     order_repositoty = provide(
         SqlalchemyOrderRepository,

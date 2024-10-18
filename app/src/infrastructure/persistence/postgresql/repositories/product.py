@@ -52,6 +52,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             units_of_measurement=product.units_of_measurement,
             image=product.image,
             status=product.status,
+            is_available=product.is_available,
         )
 
         await self.session.execute(query)
@@ -99,6 +100,7 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 units_of_measurement=product.units_of_measurement,
                 image=product.image,
                 status=product.status,
+                is_available=product.is_available,
             )
         )
 
@@ -153,6 +155,10 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
                 query = query.where(
                     ProductModel.units_of_measurement == filters.units_of_measurement,
                 )
+            if filters.is_available:
+                query = query.where(
+                    ProductModel.is_available == filters.is_available,
+                )
 
         query = query.limit(limit).offset(offset)
 
@@ -190,6 +196,10 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             if filters.units_of_measurement:
                 query = query.where(
                     ProductModel.units_of_measurement == filters.units_of_measurement,
+                )
+            if filters.is_available:
+                query = query.where(
+                    ProductModel.is_available == filters.is_available,
                 )
 
         cursor = await self.session.execute(query)

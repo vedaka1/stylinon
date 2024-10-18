@@ -65,6 +65,7 @@ async def get_current_user(
         Security(get_current_user_data, scopes=[]),
     ],
 ) -> APIResponse[UserOut]:
+    print(user_data)
     response = await get_user_interactor.execute(user_id=user_data.user_id)
     return APIResponse(data=response)
 

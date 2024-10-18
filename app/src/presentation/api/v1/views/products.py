@@ -95,7 +95,7 @@ async def create_product(
     bags_per_pallet: int = Form(...),
     image: UploadFile | None = None,
 ) -> APIResponse[None]:
-    image_url = "/images/no_image.png"
+    image_url = "./images/no_image.png"
 
     if image:
         try:

@@ -15,26 +15,24 @@ class OrderItemAdmin(ModelView, model=OrderItemModel):
     ]
     column_list = [
         OrderItemModel.order_id,
-        "order_product.parent_product.name",
         "order_product.name",
         OrderItemModel.quantity,
+        OrderItemModel.price,
     ]
     column_details_list = [
         # OrderItemModel.order_id,
         # OrderItemModel.product_id,
         "order",
-        "order_product.parent_product.name",
         "order_product.name",
         "quantity",
+        "price",
     ]
     column_labels = {
         "order": "Заказ",
-        "order_id": "ID заказа",
-        "order.id": "ID заказа",
         "product": "Товар",
         "product.id": "ID товара",
-        "order_product.parent_product.name": "Наименование товара",
-        "order_product.name": "Вариант товара",
+        "order_product.name": "Наименование товара",
         "quantity": "Количество",
+        "price": "Расчетная цена за товар (в копейках)",
     }
     # column_details_exclude_list = ["order_item"]
