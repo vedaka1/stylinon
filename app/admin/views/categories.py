@@ -15,11 +15,11 @@ class CategoryAdmin(ModelView, model=CategoryModel):
     name = "Категория"
     name_plural = "Категории"
 
-    # column_searchable_list = [
-    #     ProductModel.name,
-    #     ProductModel.category,
-    #     ProductModel.description,
-    # ]
+    column_searchable_list = [
+        CategoryModel.name,
+        #     ProductModel.category,
+        #     ProductModel.description,
+    ]
     column_list = [
         CategoryModel.name,
         CategoryModel.is_available,
@@ -29,14 +29,7 @@ class CategoryAdmin(ModelView, model=CategoryModel):
         CategoryModel.name,
         CategoryModel.is_available,
     ]
-    # column_labels = {
-    #     "name": "Наименование",
-    #     "category": "Категория",
-    #     "description": "Описание",
-    #     "price": "Цена",
-    #     "units_of_measurement": "Единицы измерения",
-    #     "photo_url": "Фото",
-    # }
-
-    # column_details_exclude_list = ["order_item"]
-    # form_excluded_columns = ["id", "order_item"]
+    column_labels = {
+        "name": "Название",
+        "is_available": "Доступна",
+    }

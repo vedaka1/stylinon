@@ -36,15 +36,14 @@ class SessionIdentityProvider(IdentityProviderInterface):
             raise NotAuthorizedException
 
         session = await self.session_repository.get_by_id(UUID(authorization))
-
         if not session or not session.user:
             raise NotAuthorizedException
 
         role_scopes = get_role_restrictions(role=session.user.role)
 
         return UserTokenData(
+            user_id=session.user.id,
             email=session.user.email,
-            user_id=session.id,
             scopes=role_scopes,
         )
 

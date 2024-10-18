@@ -42,13 +42,13 @@ def calculate_product_price(
             price = product.d1_delivery_price
 
     # отсрочка платежа и вес заказа больше 20 тонн
-    if payment_method == PaymentMethod.DELAYED_PAYMENT:
+    # if payment_method == PaymentMethod.DELAYED_PAYMENT:
 
-        if is_self_pickup and product.d2_self_pickup_price is not None:
-            price = product.d2_self_pickup_price
+    #     if is_self_pickup and product.d2_self_pickup_price is not None:
+    #         price = product.d2_self_pickup_price
 
-        elif product.d2_delivery_price is not None:
-            price = product.d2_delivery_price
+    #     elif product.d2_delivery_price is not None:
+    #         price = product.d2_delivery_price
 
     return price.value
 

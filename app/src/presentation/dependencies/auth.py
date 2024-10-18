@@ -1,5 +1,6 @@
 import logging
 from typing import Annotated, Dict, Optional
+from uuid import UUID
 
 from dishka import AsyncContainer
 from fastapi import Depends, Request, WebSocket
@@ -19,6 +20,8 @@ from src.infrastructure.di.container import get_container
 
 logger = logging.getLogger()
 
+AUTH_COOKIE = "session"
+
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
     def __init__(
@@ -36,15 +39,15 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
     async def __call__(self, request: Request) -> Optional[str]:
-        authorization: str | None = request.cookies.get("access_token")
+        authorization: str | None = request.cookies.get(AUTH_COOKIE)
 
-        scheme, param = get_authorization_scheme_param(authorization)
-        if not authorization or scheme.lower() != "bearer":
+        # scheme, param = get_authorization_scheme_param(authorization)
+        if not authorization:
             if self.auto_error:
                 raise NotAuthorizedException
             else:
                 return None
-        return param
+        return authorization
 
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(
@@ -56,10 +59,10 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(
 )
 
 
-def _get_token_data(value: str | None) -> str:
+def _get_authorization_data(value: str | None) -> str:
     scheme, param = get_authorization_scheme_param(value)
 
-    if not value or scheme.lower() != "bearer":
+    if not value:
         raise NotAuthorizedException
 
     return param
@@ -70,7 +73,15 @@ async def get_refresh_token(
 ) -> str:
     refresh_token: str | None = request.cookies.get("refresh_token")
 
-    return _get_token_data(value=refresh_token)
+    return _get_authorization_data(value=refresh_token)
+
+
+async def get_current_session(
+    request: Request,
+) -> UUID:
+    authorization: str | None = request.cookies.get(AUTH_COOKIE)
+
+    return UUID(authorization)
 
 
 async def auth_required(
@@ -97,27 +108,33 @@ async def get_current_user_data(
     if not authorization:
         raise NotAuthorizedException
 
-    identity_provider = await container.get(IdentityProviderInterface)
+    async with container() as container:
+        identity_provider = await container.get(IdentityProviderInterface)
 
-    user_data = await identity_provider.get_current_user(authorization=authorization)
+        user_data = await identity_provider.get_current_user(
+            authorization=authorization,
+        )
 
-    for scope in security_scopes.scopes:
-        if scope not in user_data.scopes:
-            raise NotEnoughPermissionsException
+        for scope in security_scopes.scopes:
+            if scope not in user_data.scopes:
+                raise NotEnoughPermissionsException
 
-    return user_data
+        return user_data
 
 
 async def get_current_user_from_websocket(
     websocket: WebSocket,
     container: AsyncContainer,
 ) -> UserTokenData:
-    access_token: str | None = websocket.cookies.get("access_token")
+    authorization: str | None = websocket.cookies.get(AUTH_COOKIE)
+    if not authorization:
+        raise NotAuthorizedException
+    # authorization = _get_authorization_data(value=session)
 
-    authorization = _get_token_data(value=access_token)
+    async with container() as container:
+        identity_provider = await container.get(IdentityProviderInterface)
 
-    identity_provider = await container.get(IdentityProviderInterface)
-
-    user_data = await identity_provider.get_current_user(authorization=authorization)
-
-    return user_data
+        user_data = await identity_provider.get_current_user(
+            authorization=authorization,
+        )
+        return user_data

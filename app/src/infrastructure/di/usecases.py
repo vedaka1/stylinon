@@ -1,11 +1,15 @@
 from dishka import Provider, Scope, provide
 from src.application.auth.usecases import (
     LoginWithJWTUseCase,
-    LogoutUseCase,
+    LogoutWithJWTUseCase,
     PasswordRecoveryUseCase,
     RefreshTokenUseCase,
     RegisterUseCase,
     ResetPasswordUseCase,
+)
+from src.application.auth.usecases.login import (
+    LoginWithSessionUseCase,
+    LogoutWithSessionUseCase,
 )
 from src.application.chats.usecases.create import (
     CreateChatUseCase,
@@ -43,8 +47,10 @@ class UseCasesProvider(Provider):
     scope = Scope.REQUEST
 
     register = provide(RegisterUseCase)
-    login = provide(LoginWithJWTUseCase)
-    logout = provide(LogoutUseCase)
+    login_with_jwt = provide(LoginWithJWTUseCase)
+    logout_with_jwt = provide(LogoutWithJWTUseCase)
+    login_with_session = provide(LoginWithSessionUseCase)
+    logout_with_session = provide(LogoutWithSessionUseCase)
     refresh_token = provide(RefreshTokenUseCase)
     send_recovery_email = provide(PasswordRecoveryUseCase)
     reset_password = provide(ResetPasswordUseCase)

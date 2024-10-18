@@ -6,7 +6,7 @@ from src.application.common.interfaces import (
 from src.application.common.interfaces.identity_provider import (
     IdentityProviderInterface,
 )
-from src.infrastructure.authentication.identity_provider import TokenIdentityProvider
+from src.infrastructure.authentication.identity_provider import SessionIdentityProvider
 from src.infrastructure.authentication.jwt_processor import JWTProcessor
 from src.infrastructure.authentication.password_hasher import PasswordHasher
 
@@ -22,8 +22,13 @@ class SecurityProvider(Provider):
         provides=JWTProcessorInterface,
         scope=Scope.APP,
     )
+    # identity_provider = provide(
+    #     TokenIdentityProvider,
+    #     provides=IdentityProviderInterface,
+    #     scope=Scope.APP,
+    # )
     identity_provider = provide(
-        TokenIdentityProvider,
+        SessionIdentityProvider,
         provides=IdentityProviderInterface,
-        scope=Scope.APP,
+        scope=Scope.REQUEST,
     )

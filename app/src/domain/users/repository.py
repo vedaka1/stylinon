@@ -58,3 +58,10 @@ class UserSessionRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_by_user_id(self, user_id: UUID) -> list[UserSession]: ...
+
+    @abstractmethod
+    async def get_by_user_id_and_user_agent(
+        self,
+        user_id: UUID,
+        user_agent: str,
+    ) -> UserSession | None: ...

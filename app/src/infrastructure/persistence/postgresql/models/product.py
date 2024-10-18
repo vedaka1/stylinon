@@ -56,8 +56,9 @@ class ProductModel(Base):
     d1_delivery_price: Mapped[int | None] = mapped_column(nullable=True)
     d1_self_pickup_price: Mapped[int | None] = mapped_column(nullable=True)
     units_of_measurement: Mapped[UnitsOfMesaurement] = mapped_column(nullable=False)
-    image: Mapped[str] = mapped_column(nullable=False)
+    image: Mapped[str] = mapped_column(nullable=False, default="./images/not_found.jpg")
     status: Mapped[ProductStatus] = mapped_column(nullable=False)
+    is_available: Mapped[bool] = mapped_column(nullable=False, default=True)
 
     def __repr__(self) -> str:
         return f"ProductModel({self.__dict__})"
@@ -82,6 +83,7 @@ def map_to_product(entity: ProductModel) -> Product:
         units_of_measurement=entity.units_of_measurement,
         image=entity.image,
         status=entity.status,
+        is_available=entity.is_available,
     )
 
     return product

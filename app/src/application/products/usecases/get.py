@@ -42,6 +42,7 @@ class GetProductUseCase:
             units_of_measurement=product.units_of_measurement,
             image=product.image,
             status=product.status,
+            is_available=product.is_available,
         )
 
 
@@ -91,6 +92,7 @@ class GetManyProductsUseCase:
                     units_of_measurement=product.units_of_measurement,
                     image=product.image,
                     status=product.status,
+                    is_available=product.is_available,
                 )
                 for product in products
             ],

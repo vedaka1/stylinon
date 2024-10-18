@@ -19,8 +19,8 @@ class UnitsOfMesaurement(str, Enum):
 
 
 class ProductStatus(str, Enum):
-    INSTOCK = "in_stock"
-    OUTOFSTOCK = "out_of_stock"
+    IN_STOCK = "in_stock"
+    OUT_OF_STOCK = "out_of_stock"
 
 
 @dataclass
@@ -55,6 +55,7 @@ class Product:
     units_of_measurement: UnitsOfMesaurement
     image: str | None
     status: ProductStatus
+    is_available: bool
 
     @staticmethod
     def create(
@@ -74,7 +75,8 @@ class Product:
         d1_self_pickup_price: ProductPrice | None = None,
         units_of_measurement: UnitsOfMesaurement = UnitsOfMesaurement.PIECE,
         image: str | None = "/images/no_image.png",
-        status: ProductStatus = ProductStatus.INSTOCK,
+        status: ProductStatus = ProductStatus.IN_STOCK,
+        is_available: bool = True,
     ) -> "Product":
         return Product(
             id=uuid4(),
@@ -94,6 +96,7 @@ class Product:
             d1_delivery_price=d1_delivery_price,
             d1_self_pickup_price=d1_self_pickup_price,
             status=status,
+            is_available=is_available,
         )
 
     def __hash__(self) -> int:

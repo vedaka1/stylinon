@@ -18,6 +18,7 @@ router = APIRouter(
 
 @router.post(
     "",
+    summary="Создает категорию",
     dependencies=[
         Security(
             get_current_user_data,
@@ -37,7 +38,10 @@ async def create_category(
     return APIResponse()
 
 
-@router.get("")
+@router.get(
+    "",
+    summary="Возвращает список категорий",
+)
 async def get_categories(
     get_categories_list_interactor: FromDishka[GetCategoriesListUseCase],
 ) -> APIResponse[list[Category]]:
@@ -46,7 +50,19 @@ async def get_categories(
     return APIResponse(data=response)
 
 
-@router.delete("/{category_name}")
+@router.delete(
+    "/{category_name}",
+    summary="Удаляет категорию по id",
+    dependencies=[
+        Security(
+            get_current_user_data,
+            scopes=[
+                UserRole.ADMIN.value,
+                UserRole.MANAGER.value,
+            ],
+        ),
+    ],
+)
 async def delete_category(
     category_name: str,
     delete_category_interactor: FromDishka[DeleteCategoryUseCase],

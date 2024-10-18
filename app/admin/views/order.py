@@ -25,6 +25,7 @@ class OrderAdmin(ModelView, model=OrderModel):
         OrderModel.status,
         OrderModel.created_at,
         OrderModel.updated_at,
+        OrderModel.total_price,
     ]
     column_details_list = [
         OrderModel.customer_email,
@@ -34,6 +35,7 @@ class OrderAdmin(ModelView, model=OrderModel):
         OrderModel.status,
         OrderModel.created_at,
         OrderModel.updated_at,
+        OrderModel.total_price,
         "order_items",
     ]
     column_labels = {
@@ -45,6 +47,7 @@ class OrderAdmin(ModelView, model=OrderModel):
         "created_at": "Дата создания",
         "updated_at": "Дата обновления",
         "order_items": "Список товаров",
+        "total_price": "Цена (в копейках)",
     }
     form_ajax_refs = {
         "order_items": {

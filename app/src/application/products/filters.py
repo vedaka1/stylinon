@@ -11,3 +11,4 @@ class ProductFilters:
     price_from: int | None = None
     price_to: int | None = None
     units_of_measurement: UnitsOfMesaurement | None = None
+    is_available: bool | None = None
