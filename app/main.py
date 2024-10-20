@@ -1,7 +1,6 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from admin.dependencies import init_admin
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +8,7 @@ from src.infrastructure.di.container import get_container, init_logger
 from src.infrastructure.persistence.postgresql.database import get_async_engine
 from src.presentation.api.v1.exc_handlers import init_exc_handlers
 from src.presentation.api.v1.router import api_router as api_router_v1
+from st_admin.main import init_admin
 
 
 def init_di(app: FastAPI) -> None:
@@ -40,6 +40,7 @@ def create_app() -> FastAPI:
             "http://www.vedaka.ru",
             "https://vedaka.ru",
             "https://www.vedaka.ru",
+            "https://merch.bank24.int",
         ],
         allow_credentials=True,
         allow_methods=["GET", "POST", "HEAD", "OPTIONS", "PUT", "PATCH"],

@@ -22,8 +22,8 @@ services:
       - 8000:8000
     volumes:
       - ./app/src:/app/src
-      - ./app/admin:/app/admin
-      - ./images:/app/images
+      - ./app/st_admin:/app/st_admin
+      - ./images:/images
       - ./app/main.py:/app/main.py
     command: sh -c "alembic upgrade head && uvicorn --factory main:create_app --host 0.0.0.0 --port 8000 --reload --forwarded-allow-ips='*' --proxy-headers"
 

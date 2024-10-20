@@ -20,6 +20,7 @@ from src.domain.common.exceptions.base import ApplicationException
 from src.domain.products.entities import ProductStatus, UnitsOfMesaurement
 from src.domain.products.exceptions import ProductNotFoundException
 from src.domain.users.entities import UserRole
+from src.infrastructure.utils.common import StorageBackend
 from src.presentation.dependencies.auth import get_current_user_data
 
 router = APIRouter(
@@ -36,6 +37,7 @@ def get_pagination(limit: int = 100, page: int = 0) -> PaginationQuery:
 def get_products_list_command(
     name: str | None = None,
     category: str | None = None,
+    collection: str | None = None,
     description: str | None = None,
     price_from: int | None = None,
     price_to: int | None = None,
@@ -44,6 +46,7 @@ def get_products_list_command(
 ) -> GetManyProductsCommand:
     return GetManyProductsCommand(
         name=name,
+        collection=collection,
         category=category,
         description=description,
         price_from=price_from,
@@ -78,24 +81,23 @@ async def get_many_products(
 )
 async def create_product(
     create_product_interactor: FromDishka[CreateProductUseCase],
+    storage_backend: FromDishka[StorageBackend],
     name: str = Form(...),
     category: str = Form(...),
     description: str = Form("Описания нет"),
     units_of_measurement: UnitsOfMesaurement = Form(...),
     sku: str = Form(...),
     retail_price: int = Form(...),
-    wholesale_delivery_price: int | None = Form(None),
-    d2_delivery_price: int | None = Form(None),
-    d2_self_pickup_price: int | None = Form(None),
+    collection: str | None = Form(None),
+    size: str | None = Form(None),
+    wholesale_price: int | None = Form(None),
     d1_delivery_price: int | None = Form(None),
     d1_self_pickup_price: int | None = Form(None),
     status: ProductStatus = Form(...),
-    bag_weight: int = Form(...),
-    pallet_weight: int = Form(...),
-    bags_per_pallet: int = Form(...),
+    weight: int | None = Form(None),
     image: UploadFile | None = None,
 ) -> APIResponse[None]:
-    image_url = "./images/no_image.png"
+    image_path = "/images/no_image.png"
 
     if image:
         try:
@@ -106,10 +108,9 @@ async def create_product(
 
             image_id = str(uuid4())
 
-            with open(f"./images/{image_id}.{content_type}", "wb+") as f:
-                f.write(image.file.read())
+            file_name = f"{image_id}.{content_type}"
 
-            image_url = f"/images/{image_id}.{content_type}"
+            image_path = storage_backend.write(file_name=file_name, file=image)
 
         except Exception:
             raise ApplicationException
@@ -121,18 +122,16 @@ async def create_product(
         name=name,
         category=category,
         description=description,
+        collection=collection,
+        size=size,
         sku=sku,
-        bag_weight=bag_weight,
-        pallet_weight=pallet_weight,
-        bags_per_pallet=bags_per_pallet,
+        weight=weight,
         retail_price=retail_price,
-        wholesale_delivery_price=wholesale_delivery_price,
-        d2_delivery_price=d2_delivery_price,
-        d2_self_pickup_price=d2_self_pickup_price,
+        wholesale_price=wholesale_price,
         d1_delivery_price=d1_delivery_price,
         d1_self_pickup_price=d1_self_pickup_price,
         units_of_measurement=units_of_measurement,
-        image=image_url,
+        image=image_path,
         status=status,
     )
 

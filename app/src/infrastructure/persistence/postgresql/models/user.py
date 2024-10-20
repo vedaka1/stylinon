@@ -1,6 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
+from fastapi import Request
 from sqlalchemy import TIMESTAMP, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.users.entities import User, UserRole, UserSession
@@ -20,6 +21,9 @@ class UserModel(Base):
     role: Mapped[UserRole] = mapped_column(nullable=False)
 
     sessions: Mapped[list["UserSessionModel"]] = relationship(back_populates="user")
+
+    def __admin_repr__(self, request: Request) -> str:
+        return f"{self.email}"
 
     def __repr__(self) -> str:
         return f"UserModel({self.__dict__})"

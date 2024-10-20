@@ -10,6 +10,7 @@ from src.infrastructure.persistence.postgresql.database import (
     get_async_sessionmaker,
 )
 from src.infrastructure.settings import settings
+from src.infrastructure.utils.common import StorageBackend
 from src.infrastructure.websockets.manager import WebsocketManager
 
 
@@ -41,3 +42,7 @@ class SettingsProvider(Provider):
     @provide(scope=Scope.APP)
     def sender_name(self) -> SenderName:
         return SenderName(settings.smtp.SENDER_NAME)
+
+    @provide(scope=Scope.APP)
+    def storage_backend(self) -> StorageBackend:
+        return StorageBackend(path="/images")

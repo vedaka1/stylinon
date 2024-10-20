@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 702c8cd4fe3f
+Revision ID: 31d707d63fdd
 Revises: 
-Create Date: 2024-10-18 19:23:51.586063
+Create Date: 2024-10-20 16:12:36.849134
 
 """
 from typing import Sequence, Union
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '702c8cd4fe3f'
+revision: str = '31d707d63fdd'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -65,19 +65,17 @@ def upgrade() -> None:
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('category', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
+    sa.Column('collection', sa.String(), nullable=True),
+    sa.Column('size', sa.String(), nullable=True),
     sa.Column('sku', sa.String(), nullable=False),
-    sa.Column('bag_weight', sa.Integer(), nullable=False),
-    sa.Column('pallet_weight', sa.Integer(), nullable=False),
-    sa.Column('bags_per_pallet', sa.Integer(), nullable=False),
+    sa.Column('weight', sa.Integer(), nullable=False),
     sa.Column('retail_price', sa.Integer(), nullable=False),
-    sa.Column('wholesale_delivery_price', sa.Integer(), nullable=True),
-    sa.Column('d2_delivery_price', sa.Integer(), nullable=True),
-    sa.Column('d2_self_pickup_price', sa.Integer(), nullable=True),
+    sa.Column('wholesale_price', sa.Integer(), nullable=True),
     sa.Column('d1_delivery_price', sa.Integer(), nullable=True),
     sa.Column('d1_self_pickup_price', sa.Integer(), nullable=True),
-    sa.Column('units_of_measurement', sa.Enum('PIECE', 'GRAM', 'KILOGRAM', 'TON', 'MILLILITER', 'LITER', 'MILLIMETER', 'CENTIMETER', 'DECIMETER', 'METER', name='unitsofmesaurement'), nullable=False),
+    sa.Column('units_of_measurement', sa.Enum('PIECE', 'GRAM', 'KILOGRAM', 'TON', 'MILLILITER', 'LITER', 'MILLIMETER', 'CENTIMETER', 'DECIMETER', 'METER', 'CUBIC_MILLIMETER', 'CUBIC_CENTIMETER', 'CUBIC_DECIMETER', 'CUBIC_METER', name='unitsofmesaurement'), nullable=False),
     sa.Column('image', sa.String(), nullable=False),
-    sa.Column('status', sa.Enum('IN_STOCK', 'OUT_OF_STOCK', name='productstatus'), nullable=False),
+    sa.Column('status', sa.Enum('AVAILABLE', 'UNAVAILABLE', 'ON_REQUEST', name='productstatus'), nullable=False),
     sa.Column('is_available', sa.Boolean(), nullable=False),
     sa.ForeignKeyConstraint(['category'], ['categories.name'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),

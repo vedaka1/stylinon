@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
+from fastapi import Request
 from sqlalchemy import TIMESTAMP, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
@@ -36,12 +37,6 @@ class OrderModel(Base):
     order_items: Mapped[list["OrderItemModel"]] = relationship(
         back_populates="order",
     )
-
-    def __str__(self) -> str:
-        return f"Почта клиента: {self.customer_email}\nСоздан: {self.created_at}\nОбновлен: {self.updated_at}\n"
-
-    def __repr__(self) -> str:
-        return f"OrderModel({self.__dict__})"
 
 
 def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
@@ -87,11 +82,8 @@ class OrderItemModel(Base):
 
     order_product: Mapped["ProductModel"] = relationship()
 
-    def __str__(self) -> str:
-        return f"Order ID: {self.order_id}\nProduct ID: {self.product_id}\nQuantity: {self.quantity}\n"
-
-    def __repr__(self) -> str:
-        return f"OrderItemModel: {self.__dict__})"
+    def __admin_repr__(self, request: Request) -> str:
+        return f"{self.product_id}"
 
 
 def map_to_order_item(

@@ -15,25 +15,19 @@ def test_success_create_product() -> None:
         description="test_description",
         name="test_product_variant",
         sku="test_sku",
-        bag_weight=10,
-        pallet_weight=100,
-        bags_per_pallet=10,
+        weight=10,
         retail_price=ProductPrice(100),
-        status=ProductStatus.IN_STOCK,
+        status=ProductStatus.AVAILABLE,
     )
 
     assert product.name == "test_product_variant"
     assert product.sku == "test_sku"
-    assert product.bag_weight == 10
-    assert product.pallet_weight == 100
-    assert product.bags_per_pallet == 10
+    assert product.weight == 10
     assert product.retail_price.value == 100
-    assert product.wholesale_delivery_price == None
-    assert product.d2_delivery_price == None
-    assert product.d2_self_pickup_price == None
+    assert product.wholesale_price == None
     assert product.d1_delivery_price == None
     assert product.d1_self_pickup_price == None
-    assert product.status == ProductStatus.IN_STOCK
+    assert product.status == ProductStatus.AVAILABLE
 
 
 def test_fail_create_product_variant_with_incorrect_price() -> None:
@@ -43,11 +37,9 @@ def test_fail_create_product_variant_with_incorrect_price() -> None:
             description="test_description",
             name="test_product_variant",
             sku="test_sku",
-            bag_weight=10,
-            pallet_weight=100,
-            bags_per_pallet=10,
+            weight=10,
             retail_price=ProductPrice(0),
-            status=ProductStatus.IN_STOCK,
+            status=ProductStatus.AVAILABLE,
         )
 
 

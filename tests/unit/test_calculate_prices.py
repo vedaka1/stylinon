@@ -10,9 +10,7 @@ test_params_1 = ()
 
 def create_product(
     retail_price: int,
-    wholesale_delivery_price: int | None = None,
-    d2_self_pickup_price: int | None = None,
-    d2_delivery_price: int | None = None,
+    wholesale_price: int | None = None,
     d1_self_pickup_price: int | None = None,
     d1_delivery_price: int | None = None,
 ) -> Product:
@@ -21,16 +19,12 @@ def create_product(
         description="test_description",
         name="test_product_variant",
         sku="test_sku",
-        bag_weight=10,
-        pallet_weight=100,
-        bags_per_pallet=10,
+        weight=10,
         retail_price=ProductPrice(retail_price),
-        wholesale_delivery_price=parse_price(wholesale_delivery_price),
-        d2_self_pickup_price=parse_price(d2_self_pickup_price),
-        d2_delivery_price=parse_price(d2_delivery_price),
+        wholesale_price=parse_price(wholesale_price),
         d1_self_pickup_price=parse_price(d1_self_pickup_price),
         d1_delivery_price=parse_price(d1_delivery_price),
-        status=ProductStatus.IN_STOCK,
+        status=ProductStatus.AVAILABLE,
     )
 
 
@@ -48,7 +42,7 @@ def create_product(
         ),
         # 2. Один товар, вес > 20 тонн, оптовая доставка
         (
-            create_product(retail_price=1000, wholesale_delivery_price=800),
+            create_product(retail_price=1000, wholesale_price=800),
             PaymentMethod.FULL_PREPAYMENT,
             False,
             21000,
@@ -57,7 +51,7 @@ def create_product(
         ),
         # 3. Один товар, вес > 20 тонн, без оптовой доставки
         (
-            create_product(retail_price=1000, wholesale_delivery_price=None),
+            create_product(retail_price=1000, wholesale_price=None),
             PaymentMethod.FULL_PREPAYMENT,
             False,
             21000,
@@ -90,33 +84,7 @@ def create_product(
             1,
             950,
         ),
-        # 6. Отсрочка платежа, самовывоз, вес > 20 тонн, цена самовывоза
-        # (
-        #     create_product(
-        #         retail_price=1000,
-        #         d2_self_pickup_price=850,
-        #         d2_delivery_price=900,
-        #     ),
-        #     PaymentMethod.DELAYED_PAYMENT,
-        #     True,
-        #     25000,
-        #     1,
-        #     850,
-        # ),
-        # # 7. Отсрочка платежа, доставка, вес > 20 тонн
-        # (
-        #     create_product(
-        #         retail_price=1000,
-        #         d2_self_pickup_price=None,
-        #         d2_delivery_price=900,
-        #     ),
-        #     PaymentMethod.DELAYED_PAYMENT,
-        #     False,
-        #     25000,
-        #     1,
-        #     900,
-        # ),
-        # 8. Несколько товаров, вес > 20 тонн
+        # 6. Несколько товаров, вес > 20 тонн
         (
             create_product(retail_price=1000),
             PaymentMethod.FULL_PREPAYMENT,
@@ -125,7 +93,7 @@ def create_product(
             5,
             1000,
         ),
-        # 9. Вес равен 20 тоннам, проверка обычной цены
+        # 7. Вес равен 20 тоннам, проверка обычной цены
         (
             create_product(retail_price=1000),
             PaymentMethod.FULL_PREPAYMENT,
@@ -143,7 +111,7 @@ def test_calculate_product_price(
     order_weight: int,
     products_count: int,
     expected: int,
-):
+) -> None:
     price = calculate_product_price(
         product=product,
         payment_method=payment_method,

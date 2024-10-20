@@ -22,7 +22,7 @@ class TestAuth:
             data={"username": "test_auth@test.com", "password": "1234qwe"},
         )
         assert response.status_code == 200
-        assert response.cookies.get("session") is not None
+        assert response.cookies.get("session_id") is not None
         # assert response.cookies.get("refresh_token") is not None
 
     @pytest.mark.usefixtures("clean_users_table")
@@ -48,4 +48,4 @@ class TestAuth:
         await self._login_request(client)
         response = await client.post("/auth/logout")
         assert response.status_code == 200
-        assert response.cookies.get("session") is None
+        assert response.cookies.get("session_id") is None

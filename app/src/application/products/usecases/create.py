@@ -21,22 +21,21 @@ class CreateProductUseCase:
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateProductCommand) -> None:
+        category_name = command.category.lower().replace(r"/", "-")
 
         product = Product.create(
-            name=command.name,
-            category=command.category.lower(),
+            name=command.name.replace("/", "-"),
+            category=category_name,
             description=command.description,
             units_of_measurement=command.units_of_measurement,
             sku=command.sku,
-            bag_weight=command.bag_weight,
-            pallet_weight=command.pallet_weight,
-            bags_per_pallet=command.bags_per_pallet,
+            weight=command.weight,
+            collection=command.collection,
+            size=command.size,
             retail_price=ProductPrice(command.retail_price),
-            wholesale_delivery_price=parse_price(command.wholesale_delivery_price),
+            wholesale_price=parse_price(command.wholesale_price),
             d1_delivery_price=parse_price(command.d1_delivery_price),
             d1_self_pickup_price=parse_price(command.d1_self_pickup_price),
-            d2_delivery_price=parse_price(command.d2_delivery_price),
-            d2_self_pickup_price=parse_price(command.d2_self_pickup_price),
             image=command.image,
         )
 
@@ -54,7 +53,8 @@ class CreateCategoryUseCase:
     transaction_manager: TransactionManagerInterface
 
     async def execute(self, command: CreateCategoryCommand) -> None:
-        category = Category.create(name=command.name.lower())
+        category_name = command.name.lower().replace(r"/", "-")
+        category = Category.create(name=category_name)
 
         await self.category_repository.create(category=category)
 

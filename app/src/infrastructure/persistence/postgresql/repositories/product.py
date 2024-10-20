@@ -21,25 +21,15 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
         query = insert(ProductModel).values(
             id=product.id,
             name=product.name,
+            sku=product.sku,
             category=product.category,
             description=product.description,
-            sku=product.sku,
-            bag_weight=product.bag_weight,
-            pallet_weight=product.pallet_weight,
-            bags_per_pallet=product.bags_per_pallet,
+            collection=product.collection,
+            weight=product.weight,
+            size=product.size,
             retail_price=product.retail_price.value,
-            wholesale_delivery_price=(
-                product.wholesale_delivery_price.value
-                if product.wholesale_delivery_price
-                else None
-            ),
-            d2_delivery_price=(
-                product.d2_delivery_price.value if product.d2_delivery_price else None
-            ),
-            d2_self_pickup_price=(
-                product.d2_self_pickup_price.value
-                if product.d2_self_pickup_price
-                else None
+            wholesale_price=(
+                product.wholesale_price.value if product.wholesale_price else None
             ),
             d1_delivery_price=(
                 product.d1_delivery_price.value if product.d1_delivery_price else None
@@ -65,27 +55,15 @@ class SqlalchemyProductRepository(ProductRepositoryInterface):
             .where(ProductModel.id == product.id)
             .values(
                 name=product.name,
+                sku=product.sku,
                 category=product.category,
                 description=product.description,
-                sku=product.sku,
-                bag_weight=product.bag_weight,
-                pallet_weight=product.pallet_weight,
-                bags_per_pallet=product.bags_per_pallet,
+                collection=product.collection,
+                weight=product.weight,
+                size=product.size,
                 retail_price=product.retail_price.value,
-                wholesale_delivery_price=(
-                    product.wholesale_delivery_price.value
-                    if product.wholesale_delivery_price
-                    else None
-                ),
-                d2_delivery_price=(
-                    product.d2_delivery_price.value
-                    if product.d2_delivery_price
-                    else None
-                ),
-                d2_self_pickup_price=(
-                    product.d2_self_pickup_price.value
-                    if product.d2_self_pickup_price
-                    else None
+                wholesale_price=(
+                    product.wholesale_price.value if product.wholesale_price else None
                 ),
                 d1_delivery_price=(
                     product.d1_delivery_price.value

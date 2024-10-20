@@ -260,6 +260,20 @@ tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4
 tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
+name = "babel"
+version = "2.16.0"
+description = "Internationalization utilities"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "babel-2.16.0-py3-none-any.whl", hash = "sha256:368b5b98b37c06b7daf6696391c3240c938b37767d4584413e8438c5c435fa8b"},
+    {file = "babel-2.16.0.tar.gz", hash = "sha256:d1f3554ca26605fe173f3de0c65f750f5a42f924499bf134de6423582298e316"},
+]
+
+[package.extras]
+dev = ["freezegun (>=1.0,<2.0)", "pytest (>=6.0)", "pytest-cov"]
+
+[[package]]
 name = "bcrypt"
 version = "4.2.0"
 description = "Modern password hashing for your software and your servers"
@@ -2658,6 +2672,7 @@ files = [
 ]
 
 [package.dependencies]
+babel = {version = ">=2.13.0", optional = true, markers = "extra == \"i18n\""}
 jinja2 = ">=3,<4"
 python-multipart = "*"
 starlette = "*"
@@ -3170,4 +3185,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "372389e724facd6d424551f97f8d3e7afd6494759108e2153a4c2e4e649ebca7"
+content-hash = "0b4105a3144bb0943fa0b5d57dc39a814bf0321873d21eaf7fd77c1724bc9f14"

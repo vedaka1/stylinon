@@ -66,17 +66,15 @@ class OrderItemOut:
     name: str
     category: str
     description: str
+    collection: str | None
+    size: str | None
     units_of_measurement: UnitsOfMesaurement
     quantity: int
     product_name: str
     sku: str
-    bag_weight: float
-    pallet_weight: float
-    bags_per_pallet: float
+    weight: float | None
     retail_price: float
-    wholesale_delivery_price: float | None
-    d2_delivery_price: float | None
-    d2_self_pickup_price: float | None
+    wholesale_price: float | None
     d1_delivery_price: float | None
     d1_self_pickup_price: float | None
     status: ProductStatus
@@ -92,16 +90,14 @@ class OrderItemOut:
         quantity: int,
         product_name: str,
         sku: str,
-        bag_weight: float,
-        pallet_weight: float,
-        bags_per_pallet: float,
         retail_price: ProductPrice,
-        wholesale_delivery_price: ProductPrice | None,
-        d2_delivery_price: ProductPrice | None,
-        d2_self_pickup_price: ProductPrice | None,
-        d1_delivery_price: ProductPrice | None,
-        d1_self_pickup_price: ProductPrice | None,
         status: ProductStatus,
+        collection: str | None = None,
+        size: str | None = None,
+        wholesale_price: ProductPrice | None = None,
+        d1_delivery_price: ProductPrice | None = None,
+        d1_self_pickup_price: ProductPrice | None = None,
+        bag_weight: float | None = None,
         image: str | None = None,
     ) -> None:
         self.product_id = product_id
@@ -112,14 +108,12 @@ class OrderItemOut:
         self.quantity = quantity
         self.product_name = product_name
         self.sku = sku
-        self.bag_weight = bag_weight
-        self.pallet_weight = pallet_weight
-        self.bags_per_pallet = bags_per_pallet
+        self.weight = bag_weight
+        self.collection = collection
+        self.size = size
         self.image = image
         self.retail_price = retail_price.in_rubles()
-        self.wholesale_delivery_price = convert_price(wholesale_delivery_price)
-        self.d2_delivery_price = convert_price(d2_delivery_price)
-        self.d2_self_pickup_price = convert_price(d2_self_pickup_price)
+        self.wholesale_price = convert_price(wholesale_price)
         self.d1_delivery_price = convert_price(d1_delivery_price)
         self.d1_self_pickup_price = convert_price(d1_self_pickup_price)
         self.status = status

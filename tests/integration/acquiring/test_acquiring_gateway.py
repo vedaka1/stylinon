@@ -1,7 +1,7 @@
 import pytest
 from dishka import AsyncContainer
 from src.application.acquiring.interface import AcquiringGatewayInterface
-from src.application.orders.usecases.create import calculate_total_price
+from src.application.orders.utils import calculate_total_price
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.products.entities import UnitsOfMesaurement
 

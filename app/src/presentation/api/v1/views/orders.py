@@ -2,14 +2,13 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, Request, Security
-from fastapi.responses import RedirectResponse
 from src.application.common.response import APIResponse
 from src.application.orders.commands import (
     CreateOrderCommand,
     GetManyOrdersCommand,
     UpdateOrderCommand,
 )
-from src.application.orders.dto import OrderOut
+from src.application.orders.dto import CreateOrderOut, OrderOut
 from src.application.orders.usecases import (
     CreateOrderUseCase,
     GetManyOrdersUseCase,
@@ -17,7 +16,10 @@ from src.application.orders.usecases import (
     UpdateOrderByWebhookUseCase,
     UpdateOrderUseCase,
 )
-from src.domain.orders.exceptions import OrderNotFoundException
+from src.domain.orders.exceptions import (
+    OrderItemIncorrectQuantityException,
+    OrderNotFoundException,
+)
 from src.domain.users.entities import UserRole
 from src.presentation.dependencies.auth import get_current_user_data
 
@@ -53,18 +55,18 @@ async def get_many_orders(
 @router.post(
     "",
     summary="Создает новый заказ",
-    # responses={
-    #     200: {"model": RedirectResponse},
-    #     400: {"model": OrderItemIncorrectQuantityException},
-    # },
+    responses={
+        200: {"model": APIResponse[CreateOrderOut]},
+        400: {"model": OrderItemIncorrectQuantityException},
+    },
 )
 async def create_order(
     create_orders_interactor: FromDishka[CreateOrderUseCase],
     command: CreateOrderCommand,
-) -> RedirectResponse:
+) -> APIResponse[CreateOrderOut]:
     response = await create_orders_interactor.execute(command=command)
 
-    return RedirectResponse(response.payment_link)
+    return APIResponse(data=response)
 
 
 @router.get(

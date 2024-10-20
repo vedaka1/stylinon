@@ -51,5 +51,6 @@ repos:
         pass_filenames: false
         types: [python]
         args:
-          - ./app
-          # - ./tests
+          - ./app/src
+          - ./app/main.py
+          - ./tests

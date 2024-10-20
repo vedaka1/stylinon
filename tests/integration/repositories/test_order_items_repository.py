@@ -38,11 +38,9 @@ class TestOrderItemRepository:
                 category="test_category",
                 units_of_measurement=UnitsOfMesaurement.PIECE,
                 sku="test_sku",
-                bag_weight=10,
-                pallet_weight=100,
-                bags_per_pallet=10,
+                weight=10,
                 retail_price=ProductPrice(100),
-                status=ProductStatus.IN_STOCK,
+                status=ProductStatus.AVAILABLE,
             )
             order = Order.create(
                 customer_email="test@test.com",
@@ -82,11 +80,9 @@ class TestOrderItemRepository:
                     category=f"test_category",
                     units_of_measurement=UnitsOfMesaurement.PIECE,
                     sku=f"test_sku{i}",
-                    bag_weight=10,
-                    pallet_weight=100,
-                    bags_per_pallet=10,
+                    weight=10,
                     retail_price=ProductPrice(100),
-                    status=ProductStatus.IN_STOCK,
+                    status=ProductStatus.AVAILABLE,
                 )
                 for i in range(2)
             ]
@@ -137,11 +133,9 @@ class TestOrderItemRepository:
                 category="test_category",
                 units_of_measurement=UnitsOfMesaurement.PIECE,
                 sku="test_sku",
-                bag_weight=10,
-                pallet_weight=100,
-                bags_per_pallet=10,
+                weight=10,
                 retail_price=ProductPrice(100),
-                status=ProductStatus.IN_STOCK,
+                status=ProductStatus.AVAILABLE,
             )
 
             order = Order.create(

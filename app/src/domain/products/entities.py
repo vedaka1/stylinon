@@ -16,11 +16,16 @@ class UnitsOfMesaurement(str, Enum):
     CENTIMETER = "см."
     DECIMETER = "дм."
     METER = "м."
+    CUBIC_MILLIMETER = "мм2."
+    CUBIC_CENTIMETER = "см2."
+    CUBIC_DECIMETER = "дм2."
+    CUBIC_METER = "м2."
 
 
 class ProductStatus(str, Enum):
-    IN_STOCK = "in_stock"
-    OUT_OF_STOCK = "out_of_stock"
+    AVAILABLE = "available"
+    UNAVAILABLE = "unavailable"
+    ON_REQUEST = "on_request"
 
 
 @dataclass
@@ -40,16 +45,14 @@ class Category:
 class Product:
     id: UUID
     name: str
-    category: str
-    description: str
     sku: str
-    bag_weight: int
-    pallet_weight: int
-    bags_per_pallet: int
+    description: str
+    category: str
+    collection: str | None
+    weight: int | None
+    size: str | None
     retail_price: ProductPrice
-    wholesale_delivery_price: ProductPrice | None
-    d2_delivery_price: ProductPrice | None
-    d2_self_pickup_price: ProductPrice | None
+    wholesale_price: ProductPrice | None
     d1_delivery_price: ProductPrice | None
     d1_self_pickup_price: ProductPrice | None
     units_of_measurement: UnitsOfMesaurement
@@ -60,22 +63,20 @@ class Product:
     @staticmethod
     def create(
         name: str,
+        sku: str,
         category: str,
         description: str,
-        sku: str,
-        bag_weight: int,
-        pallet_weight: int,
-        bags_per_pallet: int,
         retail_price: ProductPrice,
         *,
-        wholesale_delivery_price: ProductPrice | None = None,
-        d2_delivery_price: ProductPrice | None = None,
-        d2_self_pickup_price: ProductPrice | None = None,
+        weight: int | None = None,
+        collection: str | None = None,
+        size: str | None = None,
+        wholesale_price: ProductPrice | None = None,
         d1_delivery_price: ProductPrice | None = None,
         d1_self_pickup_price: ProductPrice | None = None,
         units_of_measurement: UnitsOfMesaurement = UnitsOfMesaurement.PIECE,
         image: str | None = "/images/no_image.png",
-        status: ProductStatus = ProductStatus.IN_STOCK,
+        status: ProductStatus = ProductStatus.AVAILABLE,
         is_available: bool = True,
     ) -> "Product":
         return Product(
@@ -85,14 +86,12 @@ class Product:
             description=description,
             units_of_measurement=units_of_measurement,
             sku=sku,
-            bag_weight=bag_weight,
-            pallet_weight=pallet_weight,
-            bags_per_pallet=bags_per_pallet,
+            weight=weight,
+            collection=collection,
+            size=size,
             image=image,
             retail_price=retail_price,
-            wholesale_delivery_price=wholesale_delivery_price,
-            d2_delivery_price=d2_delivery_price,
-            d2_self_pickup_price=d2_self_pickup_price,
+            wholesale_price=wholesale_price,
             d1_delivery_price=d1_delivery_price,
             d1_self_pickup_price=d1_self_pickup_price,
             status=status,

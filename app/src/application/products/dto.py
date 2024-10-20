@@ -33,15 +33,13 @@ class ProductOut:
     id: UUID
     name: str
     category: str
+    collection: str | None
+    size: str | None
     description: str
     sku: str
-    bag_weight: int
-    pallet_weight: int
-    bags_per_pallet: int
+    weight: int | None
     retail_price: float
-    wholesale_delivery_price: float | None
-    d2_delivery_price: float | None
-    d2_self_pickup_price: float | None
+    wholesale_price: float | None
     d1_delivery_price: float | None
     d1_self_pickup_price: float | None
     units_of_measurement: UnitsOfMesaurement
@@ -53,21 +51,19 @@ class ProductOut:
         self,
         id: UUID,
         name: str,
+        sku: str,
         category: str,
         description: str,
         units_of_measurement: UnitsOfMesaurement,
-        sku: str,
-        bag_weight: int,
-        pallet_weight: int,
-        bags_per_pallet: int,
         retail_price: ProductPrice,
-        wholesale_delivery_price: ProductPrice | None,
-        d2_delivery_price: ProductPrice | None,
-        d2_self_pickup_price: ProductPrice | None,
-        d1_delivery_price: ProductPrice | None,
-        d1_self_pickup_price: ProductPrice | None,
         status: ProductStatus,
         is_available: bool,
+        weight: int | None = None,
+        wholesale_price: ProductPrice | None = None,
+        d1_delivery_price: ProductPrice | None = None,
+        d1_self_pickup_price: ProductPrice | None = None,
+        collection: str | None = None,
+        size: str | None = None,
         image: str | None = None,
     ) -> None:
         self.id = id
@@ -75,19 +71,17 @@ class ProductOut:
         self.category = category
         self.description = description
         self.sku = sku
-        self.bag_weight = bag_weight
-        self.pallet_weight = pallet_weight
-        self.bags_per_pallet = bags_per_pallet
+        self.weight = weight
         self.retail_price = retail_price.in_rubles()
-        self.wholesale_delivery_price = convert_price(wholesale_delivery_price)
-        self.d2_delivery_price = convert_price(d2_delivery_price)
-        self.d2_self_pickup_price = convert_price(d2_self_pickup_price)
+        self.wholesale_price = convert_price(wholesale_price)
         self.d1_delivery_price = convert_price(d1_delivery_price)
         self.d1_self_pickup_price = convert_price(d1_self_pickup_price)
         self.image = image
         self.units_of_measurement = units_of_measurement
         self.status = status
         self.is_available = is_available
+        self.collection = collection
+        self.size = size
 
 
 @dataclass

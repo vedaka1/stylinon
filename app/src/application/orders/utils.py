@@ -1,3 +1,4 @@
+from src.application.orders.dto import ProductInOrder
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.products.entities import Product
 from src.domain.products.value_objects import ProductPrice
@@ -7,7 +8,7 @@ def calculate_product_price(
     product: Product,
     payment_method: PaymentMethod,
     is_self_pickup: bool,
-    order_weight: int,
+    order_weight: int | None,
     products_count: int,
 ) -> int:
     """
@@ -25,12 +26,12 @@ def calculate_product_price(
     price = product.retail_price
 
     # вес заказа меньше 20 тонн
-    if order_weight <= 20000:
+    if order_weight and order_weight <= 20000:
         return price.value
 
     # в заказе один товар и вес заказа больше 20 тонн
-    if products_count == 1 and product.wholesale_delivery_price:
-        return product.wholesale_delivery_price.value
+    if products_count == 1 and product.wholesale_price:
+        return product.wholesale_price.value
 
     # предоплата и вес заказа больше 20 тонн
     if payment_method == PaymentMethod.FULL_PREPAYMENT:
@@ -40,15 +41,6 @@ def calculate_product_price(
 
         elif product.d1_delivery_price is not None:
             price = product.d1_delivery_price
-
-    # отсрочка платежа и вес заказа больше 20 тонн
-    # if payment_method == PaymentMethod.DELAYED_PAYMENT:
-
-    #     if is_self_pickup and product.d2_self_pickup_price is not None:
-    #         price = product.d2_self_pickup_price
-
-    #     elif product.d2_delivery_price is not None:
-    #         price = product.d2_delivery_price
 
     return price.value
 
@@ -65,3 +57,16 @@ def calculate_total_price(
     """
     total_price = sum([product.amount * product.quantity for product in products])
     return ProductPrice(total_price)
+
+
+def calculate_total_weight(
+    products: list[Product],
+    command_items: list[ProductInOrder],
+) -> int:
+    order_weight = 0
+
+    for index, product in enumerate(products):
+        if product.weight:
+            order_weight += product.weight * command_items[index].quantity
+
+    return order_weight

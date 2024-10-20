@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
+from fastapi import Request
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.application.common.utils import parse_price
 from src.domain.products.entities import (
     Category,
@@ -45,20 +46,23 @@ class ProductModel(Base):
         nullable=False,
     )
     description: Mapped[str] = mapped_column(nullable=False)
+    collection: Mapped[str | None] = mapped_column(nullable=True)
+    size: Mapped[str | None] = mapped_column(nullable=True)
     sku: Mapped[str] = mapped_column(nullable=False, unique=True)
-    bag_weight: Mapped[int] = mapped_column(nullable=False)
-    pallet_weight: Mapped[int] = mapped_column(nullable=False)
-    bags_per_pallet: Mapped[int] = mapped_column(nullable=False)
+    weight: Mapped[int] = mapped_column(nullable=False)
     retail_price: Mapped[int] = mapped_column(nullable=False)
-    wholesale_delivery_price: Mapped[int | None] = mapped_column(nullable=True)
-    d2_delivery_price: Mapped[int | None] = mapped_column(nullable=True)
-    d2_self_pickup_price: Mapped[int | None] = mapped_column(nullable=True)
+    wholesale_price: Mapped[int | None] = mapped_column(nullable=True)
     d1_delivery_price: Mapped[int | None] = mapped_column(nullable=True)
     d1_self_pickup_price: Mapped[int | None] = mapped_column(nullable=True)
     units_of_measurement: Mapped[UnitsOfMesaurement] = mapped_column(nullable=False)
-    image: Mapped[str] = mapped_column(nullable=False, default="./images/not_found.jpg")
+    image: Mapped[str] = mapped_column(nullable=False, default="/images/not_found.jpg")
     status: Mapped[ProductStatus] = mapped_column(nullable=False)
     is_available: Mapped[bool] = mapped_column(nullable=False, default=True)
+
+    product_category: Mapped["CategoryModel"] = relationship()
+
+    def __admin_repr__(self, request: Request) -> str:
+        return f"{self.name}"
 
     def __repr__(self) -> str:
         return f"ProductModel({self.__dict__})"
@@ -70,14 +74,12 @@ def map_to_product(entity: ProductModel) -> Product:
         name=entity.name,
         category=entity.category,
         description=entity.description,
+        collection=entity.collection,
+        size=entity.size,
         sku=entity.sku,
-        bag_weight=entity.bag_weight,
-        pallet_weight=entity.pallet_weight,
-        bags_per_pallet=entity.bags_per_pallet,
+        weight=entity.weight,
         retail_price=ProductPrice(entity.retail_price),
-        wholesale_delivery_price=parse_price(entity.wholesale_delivery_price),
-        d2_delivery_price=parse_price(entity.d2_delivery_price),
-        d2_self_pickup_price=parse_price(entity.d2_self_pickup_price),
+        wholesale_price=parse_price(entity.wholesale_price),
         d1_delivery_price=parse_price(entity.d1_delivery_price),
         d1_self_pickup_price=parse_price(entity.d1_self_pickup_price),
         units_of_measurement=entity.units_of_measurement,

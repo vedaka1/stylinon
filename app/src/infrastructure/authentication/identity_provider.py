@@ -35,8 +35,9 @@ class SessionIdentityProvider(IdentityProviderInterface):
     ) -> UserData:
         if not authorization:
             raise NotAuthorizedException
-        print(authorization)
+
         session = await self.session_repository.get_by_id(UUID(authorization))
+
         if not session or not session.user:
             raise NotAuthorizedException
 

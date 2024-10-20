@@ -5,7 +5,11 @@ from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.interfaces.transaction import TransactionManagerInterface
 from src.application.orders.commands import CreateOrderCommand
 from src.application.orders.dto import CreateOrderOut
-from src.application.orders.utils import calculate_product_price, calculate_total_price
+from src.application.orders.utils import (
+    calculate_product_price,
+    calculate_total_price,
+    calculate_total_weight,
+)
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.exceptions import DuplicateOrderPositionsException
@@ -47,9 +51,9 @@ class CreateOrderUseCase:
 
         products_count = len(products)
 
-        order_weight = sum(
-            product.bag_weight * item.quantity
-            for product, item in zip(products, command.items)
+        order_weight = calculate_total_weight(
+            products=products,
+            command_items=command.items,
         )
 
         products_in_payment = [
