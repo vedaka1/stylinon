@@ -49,7 +49,7 @@ class ProductModel(Base):
     collection: Mapped[str | None] = mapped_column(nullable=True)
     size: Mapped[str | None] = mapped_column(nullable=True)
     sku: Mapped[str] = mapped_column(nullable=False, unique=True)
-    weight: Mapped[int] = mapped_column(nullable=False)
+    weight: Mapped[int] = mapped_column(nullable=True)
     retail_price: Mapped[int] = mapped_column(nullable=False)
     wholesale_price: Mapped[int | None] = mapped_column(nullable=True)
     d1_delivery_price: Mapped[int | None] = mapped_column(nullable=True)
