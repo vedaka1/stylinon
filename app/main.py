@@ -1,10 +1,11 @@
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.infrastructure.di.container import get_container, init_logger
+from src.infrastructure.di.container import get_container, init_logger, init_loki_logger
 from src.infrastructure.persistence.postgresql.database import get_async_engine
 from src.presentation.api.v1.exc_handlers import init_exc_handlers
 from src.presentation.api.v1.router import api_router as api_router_v1
@@ -12,6 +13,7 @@ from st_admin.main import init_admin
 
 
 def init_di(app: FastAPI) -> None:
+    app = FastAPI()
     container = get_container()
     setup_dishka(container, app)
 
@@ -30,6 +32,8 @@ def create_app() -> FastAPI:
     init_di(api_v1)
     init_exc_handlers(api_v1)
     init_logger()
+    handler = init_loki_logger(app_name="app")
+    logging.getLogger().addHandler(handler)
     api_v1.include_router(api_router_v1)
     api_v1.add_middleware(
         CORSMiddleware,
