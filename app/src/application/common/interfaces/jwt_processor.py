@@ -8,20 +8,14 @@ from src.domain.users.entities import UserRole
 
 
 class TokenType(Enum):
-    ACCESS = "access_token"
-    REFRESH = "refresh_token"
-    RESET = "reset_token"
+    ACCESS = 'access_token'
+    REFRESH = 'refresh_token'
+    RESET = 'reset_token'
 
 
 class JWTProcessorInterface(ABC):
-
     @abstractmethod
-    def create_access_token(
-        self,
-        user_id: UUID,
-        user_role: UserRole,
-        email: str,
-    ) -> str: ...
+    def create_access_token(self, user_id: UUID, user_role: UserRole, email: str) -> str: ...
 
     @abstractmethod
     def create_refresh_token(self, user_id: UUID) -> str: ...
@@ -30,11 +24,7 @@ class JWTProcessorInterface(ABC):
     def create_reset_password_token(self, email: str) -> str: ...
 
     @abstractmethod
-    def _generate_token(
-        self,
-        token_type: TokenType,
-        payload: dict[str, Any],
-    ) -> str: ...
+    def _generate_token(self, token_type: TokenType, payload: dict[str, Any]) -> str: ...
 
     @abstractmethod
     def validate_access_token(self, token: str) -> UserTokenData: ...

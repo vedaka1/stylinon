@@ -11,13 +11,10 @@ class Chat:
     created_at: datetime
     updated_at: datetime
 
-    messages: list["Message"] = field(default_factory=list)
+    messages: list['Message'] = field(default_factory=list)
 
     @staticmethod
-    def create(
-        owner_id: UUID,
-        title: str,
-    ) -> "Chat":
+    def create(owner_id: UUID, title: str) -> 'Chat':
         current_date = datetime.now()
         return Chat(
             id=uuid4(),
@@ -38,11 +35,7 @@ class Message:
     updated_at: datetime
 
     @staticmethod
-    def create(
-        user_id: UUID,
-        chat_id: UUID,
-        content: str,
-    ) -> "Message":
+    def create(user_id: UUID, chat_id: UUID, content: str) -> 'Message':
         current_date = datetime.now()
         return Message(
             id=uuid4(),

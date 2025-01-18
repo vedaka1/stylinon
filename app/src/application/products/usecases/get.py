@@ -15,12 +15,10 @@ from src.domain.products.repository import (
 
 @dataclass
 class GetProductUseCase:
-
     product_repository: ProductRepositoryInterface
 
     async def execute(self, product_id: UUID) -> ProductOut:
         product = await self.product_repository.get_by_id(product_id=product_id)
-
         if not product:
             raise ProductNotFoundException
 
@@ -46,7 +44,6 @@ class GetProductUseCase:
 
 @dataclass
 class GetManyProductsUseCase:
-
     product_repository: ProductRepositoryInterface
 
     async def execute(
@@ -102,7 +99,6 @@ class GetManyProductsUseCase:
 
 @dataclass
 class GetCategoriesListUseCase:
-
     category_repository: CategoryRepositoryInterface
 
     async def execute(self) -> list[Category]:

@@ -6,11 +6,11 @@ from .refresh import SqlalchemyRefreshTokenRepository
 from .user import SqlalchemyUserRepository
 
 __all__ = [
-    "SqlalchemyOrderRepository",
-    "SqlalchemyOrderItemRepository",
-    "SqlalchemyProductRepository",
-    "SqlalchemyUserRepository",
-    "SqlalchemyRefreshTokenRepository",
-    "SqlalchemyChatRepository",
-    "SqlalchemyMessageRepository",
+    'SqlalchemyOrderRepository',
+    'SqlalchemyOrderItemRepository',
+    'SqlalchemyProductRepository',
+    'SqlalchemyUserRepository',
+    'SqlalchemyRefreshTokenRepository',
+    'SqlalchemyChatRepository',
+    'SqlalchemyMessageRepository',
 ]

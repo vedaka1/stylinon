@@ -5,9 +5,9 @@ from uuid import UUID, uuid4
 
 
 class UserRole(Enum):
-    USER = "user"
-    MANAGER = "manager"
-    ADMIN = "admin"
+    USER = 'user'
+    MANAGER = 'manager'
+    ADMIN = 'admin'
 
 
 @dataclass
@@ -29,7 +29,7 @@ class User:
         first_name: str | None = None,
         last_name: str | None = None,
         is_verified: bool = False,
-    ) -> "User":
+    ) -> 'User':
         return User(
             id=uuid4(),
             email=email,
@@ -57,7 +57,7 @@ class UserSession:
         user_id: UUID,
         user_agent: str,
         expires_in: datetime = datetime.now() + timedelta(days=30),
-    ) -> "UserSession":
+    ) -> 'UserSession':
         return UserSession(
             id=uuid4(),
             user_id=user_id,

@@ -11,7 +11,7 @@ class ChatOut:
     created_at: datetime
     updated_at: datetime
 
-    messages: list["MessageOut"] = field(default_factory=list)
+    messages: list['MessageOut'] = field(default_factory=list)
 
 
 @dataclass

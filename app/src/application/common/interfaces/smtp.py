@@ -6,7 +6,6 @@ logger = logging.getLogger()
 
 
 class SMTPServerInterface(ABC):
-
     @abstractmethod
     async def start(self) -> None: ...
 
@@ -24,15 +23,8 @@ class SMTPServerInterface(ABC):
 
 
 class SyncSMTPServerInterface(ABC):
-
     @abstractmethod
-    def create_message(
-        self,
-        content: str,
-        sender_name: str,
-        to_address: str,
-        subject: str,
-    ) -> MIMEMultipart: ...
+    def create_message(self, content: str, sender_name: str, to_address: str, subject: str) -> MIMEMultipart: ...
 
     @abstractmethod
     def _send(self, message: MIMEMultipart) -> None: ...

@@ -9,7 +9,7 @@ from src.infrastructure.persistence.postgresql.models.base import Base
 
 
 class UserModel(Base):
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(nullable=False)
@@ -20,13 +20,13 @@ class UserModel(Base):
     is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
     role: Mapped[UserRole] = mapped_column(nullable=False)
 
-    sessions: Mapped[list["UserSessionModel"]] = relationship(back_populates="user")
+    sessions: Mapped[list['UserSessionModel']] = relationship(back_populates='user')
 
     def __admin_repr__(self, request: Request) -> str:
-        return f"{self.email}"
+        return f'{self.email}'
 
     def __repr__(self) -> str:
-        return f"UserModel({self.__dict__})"
+        return f'UserModel({self.__dict__})'
 
 
 def map_to_user(entity: UserModel) -> User:
@@ -43,23 +43,14 @@ def map_to_user(entity: UserModel) -> User:
 
 
 class UserSessionModel(Base):
-    __tablename__ = "user_sessions"
+    __tablename__ = 'user_sessions'
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=False),
-        nullable=False,
-    )
-    expires_in: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=False),
-        nullable=False,
-    )
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False)
+    expires_in: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False)
     user_agent: Mapped[str] = mapped_column(nullable=False)
 
-    user: Mapped["UserModel"] = relationship(back_populates="sessions")
+    user: Mapped['UserModel'] = relationship(back_populates='sessions')
 
 
 def map_to_user_session(

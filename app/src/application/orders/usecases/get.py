@@ -9,14 +9,11 @@ from src.domain.orders.repository import OrderRepositoryInterface
 
 @dataclass
 class GetManyOrdersUseCase:
-
     order_repository: OrderRepositoryInterface
 
     async def execute(self, command: GetManyOrdersCommand) -> list[OrderOut]:
         orders = await self.order_repository.get_many(
-            date_from=command.date_from,
-            date_to=command.date_to,
-            status=command.status,
+            date_from=command.date_from, date_to=command.date_to, status=command.status,
         )
 
         return [
@@ -61,12 +58,10 @@ class GetManyOrdersUseCase:
 
 @dataclass
 class GetOrderUseCase:
-
     order_repository: OrderRepositoryInterface
 
     async def execute(self, order_id: UUID) -> OrderOut:
         order = await self.order_repository.get_by_id_with_products(order_id)
-
         if not order:
             raise OrderNotFoundException
 

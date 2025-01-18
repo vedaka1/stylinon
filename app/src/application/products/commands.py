@@ -20,7 +20,7 @@ class CreateProductCommand:
     wholesale_price: int | None = None
     d1_delivery_price: int | None = None
     d1_self_pickup_price: int | None = None
-    description: str = "Описания нет"
+    description: str = 'Описания нет'
 
 
 @dataclass

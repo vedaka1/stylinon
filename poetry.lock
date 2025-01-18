@@ -835,13 +835,13 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "dishka"
-version = "1.2.0"
-description = "Minimal DI framework"
+version = "1.4.2"
+description = "Cute DI framework with scopes and agreeable API"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "dishka-1.2.0-py3-none-any.whl", hash = "sha256:d543497b611a448d14a4a138976435937b3b58e5657549f73e7df8c3fc04ccad"},
-    {file = "dishka-1.2.0.tar.gz", hash = "sha256:aae988a49f9f5e591cb103c45287a709378b2f3924a95192fceede168f8605dd"},
+    {file = "dishka-1.4.2-py3-none-any.whl", hash = "sha256:5a59c6bf5ac9f34b3e698093207ddb871c13a0721eeb3948eb29011aee61f69c"},
+    {file = "dishka-1.4.2.tar.gz", hash = "sha256:fe1e7b2d0df4306b39650cf4c05485aa79ce1fc31507d1f73300dec3c64b2397"},
 ]
 
 [[package]]

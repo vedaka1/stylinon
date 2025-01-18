@@ -35,7 +35,6 @@ def calculate_product_price(
 
     # предоплата и вес заказа больше 20 тонн
     if payment_method == PaymentMethod.FULL_PREPAYMENT:
-
         if is_self_pickup and product.d1_self_pickup_price is not None:
             price = product.d1_self_pickup_price
 
@@ -45,9 +44,7 @@ def calculate_product_price(
     return price.value
 
 
-def calculate_total_price(
-    products: list[ProductInPaymentDTO],
-) -> ProductPrice:
+def calculate_total_price(products: list[ProductInPaymentDTO]) -> ProductPrice:
     """
     Принимает список товаров в заказе и возвращает итоговую цену заказа в копейках
     ### Args:
@@ -59,10 +56,7 @@ def calculate_total_price(
     return ProductPrice(total_price)
 
 
-def calculate_total_weight(
-    products: list[Product],
-    command_items: list[ProductInOrder],
-) -> int:
+def calculate_total_weight(products: list[Product], command_items: list[ProductInOrder]) -> int:
     order_weight = 0
 
     for index, product in enumerate(products):

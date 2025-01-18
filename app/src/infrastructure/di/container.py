@@ -21,9 +21,9 @@ def init_logger() -> None:
 
 
 @lru_cache(1)
-def init_loki_logger(app_name: str = 'app') -> None:
+def init_loki_logger(app_name: str = 'app') -> logging_loki.LokiQueueHandler:
     return logging_loki.LokiQueueHandler(
-        Queue(-1),  # type: ignore
+        Queue(-1),
         url='http://loki:3100/loki/api/v1/push',
         tags={'application': app_name},
         version='1',

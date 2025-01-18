@@ -15,11 +15,7 @@ from src.domain.users.repository import (
 
 
 class SessionIdentityProvider(IdentityProviderInterface):
-
-    __slots__ = (
-        "user_repository",
-        "session_repository",
-    )
+    __slots__ = ('user_repository', 'session_repository')
 
     def __init__(
         self,
@@ -29,15 +25,11 @@ class SessionIdentityProvider(IdentityProviderInterface):
         self.user_repository = user_repository
         self.session_repository = session_repository
 
-    async def get_current_user(
-        self,
-        authorization: str | None,
-    ) -> UserData:
+    async def get_current_user(self, authorization: str | None) -> UserData:
         if not authorization:
             raise NotAuthorizedException
 
         session = await self.session_repository.get_by_id(UUID(authorization))
-
         if not session or not session.user:
             raise NotAuthorizedException
 

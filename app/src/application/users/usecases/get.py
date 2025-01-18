@@ -12,13 +12,10 @@ from src.domain.users.repository import UserRepositoryInterface
 
 @dataclass
 class GetUserUseCase:
-
     user_repository: UserRepositoryInterface
 
     async def execute(self, user_id: UUID) -> UserOut:
-
         user = await self.user_repository.get_by_id(user_id=user_id)
-
         if not user:
             raise UserNotFoundException
 
@@ -35,14 +32,9 @@ class GetUserUseCase:
 
 @dataclass
 class GetUsersListUseCase:
-
     user_repository: UserRepositoryInterface
 
-    async def execute(
-        self,
-        command: GetUsersListCommand,
-    ) -> ListPaginatedResponse[UserOut]:
-
+    async def execute(self, command: GetUsersListCommand) -> ListPaginatedResponse[UserOut]:
         users = await self.user_repository.get_many(
             offset=command.pagiantion.offset,
             limit=command.pagiantion.limit,
@@ -63,21 +55,15 @@ class GetUsersListUseCase:
                 )
                 for user in users
             ],
-            pagination=PaginationOutSchema(
-                limit=command.pagiantion.limit,
-                page=command.pagiantion.page,
-                total=total,
-            ),
+            pagination=PaginationOutSchema(limit=command.pagiantion.limit, page=command.pagiantion.page, total=total),
         )
 
 
 @dataclass
 class GetUserOrdersUseCase:
-
     order_repository: OrderRepositoryInterface
 
     async def execute(self, email: str) -> list[OrderOut]:
-
         orders = await self.order_repository.get_by_user_email(customer_email=email)
 
         return [

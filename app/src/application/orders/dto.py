@@ -31,7 +31,7 @@ class OrderOut:
     total_price: float
     is_self_pickup: bool
     status: OrderStatus
-    items: list["OrderItemOut"] = field(default_factory=list)
+    items: list['OrderItemOut'] = field(default_factory=list)
 
     def __init__(
         self,
@@ -45,7 +45,7 @@ class OrderOut:
         total_price: int,
         is_self_pickup: bool,
         status: OrderStatus,
-        items: list["OrderItemOut"] = field(default_factory=list),
+        items: list['OrderItemOut'] = field(default_factory=list),
     ) -> None:
         self.id = id
         self.customer_email = customer_email

@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
-TListItem = TypeVar("TListItem")
+TListItem = TypeVar('TListItem')
 
 
 class PaginationOutSchema(BaseModel):

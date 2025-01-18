@@ -9,7 +9,7 @@ class ProductPrice:
 
     def __post_init__(self) -> None:
         if not isinstance(self.value, int):
-            raise ValueError("Value must be a integer")
+            raise ValueError('Value must be a integer')
         if self.value <= 0:
             raise ProductIncorrectPriceException
 
@@ -17,6 +17,6 @@ class ProductPrice:
         return self.value / 100
 
     @staticmethod
-    def from_rubles(value: int) -> "ProductPrice":
+    def from_rubles(value: int) -> 'ProductPrice':
         value *= 100
         return ProductPrice(value)

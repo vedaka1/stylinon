@@ -5,7 +5,6 @@ from src.application.auth.dto import RefreshSession
 
 
 class RefreshTokenRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, refresh_session: RefreshSession) -> None: ...
 
@@ -19,8 +18,4 @@ class RefreshTokenRepositoryInterface(ABC):
     async def get(self, refresh_token: str) -> RefreshSession | None: ...
 
     @abstractmethod
-    async def get_by_user_id_and_user_agent(
-        self,
-        user_id: UUID,
-        user_agent: str,
-    ) -> RefreshSession | None: ...
+    async def get_by_user_id_and_user_agent(self, user_id: UUID, user_agent: str) -> RefreshSession | None: ...

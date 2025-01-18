@@ -23,11 +23,7 @@ from src.domain.users.entities import UserRole
 from src.infrastructure.utils.common import StorageBackend
 from src.presentation.dependencies.auth import get_current_user_data
 
-router = APIRouter(
-    tags=["Products"],
-    prefix="/products",
-    route_class=DishkaRoute,
-)
+router = APIRouter(tags=['Products'], prefix='/products', route_class=DishkaRoute)
 
 
 def get_pagination(limit: int = 100, page: int = 0) -> PaginationQuery:
@@ -56,35 +52,26 @@ def get_products_list_command(
     )
 
 
-@router.get("", summary="Возвращает список товаров")
+@router.get('', summary='Возвращает список товаров')
 async def get_many_products(
     get_products_list_interactor: FromDishka[GetManyProductsUseCase],
     command: GetManyProductsCommand = Depends(get_products_list_command),
 ) -> APIResponse[ListPaginatedResponse[ProductOut]]:
     response = await get_products_list_interactor.execute(command=command)
-
     return APIResponse(data=response)
 
 
 @router.post(
-    "",
-    summary="Создает новый товар",
-    dependencies=[
-        Security(
-            get_current_user_data,
-            scopes=[
-                UserRole.ADMIN.value,
-                UserRole.MANAGER.value,
-            ],
-        ),
-    ],
+    '',
+    summary='Создает новый товар',
+    dependencies=[Security(get_current_user_data, scopes=[UserRole.ADMIN.value, UserRole.MANAGER.value])],
 )
 async def create_product(
     create_product_interactor: FromDishka[CreateProductUseCase],
     storage_backend: FromDishka[StorageBackend],
     name: str = Form(...),
     category: str = Form(...),
-    description: str = Form("Описания нет"),
+    description: str = Form('Описания нет'),
     units_of_measurement: UnitsOfMesaurement = Form(...),
     sku: str = Form(...),
     retail_price: int = Form(...),
@@ -97,24 +84,19 @@ async def create_product(
     weight: int | None = Form(None),
     image: UploadFile | None = None,
 ) -> APIResponse[None]:
-    image_path = "/images/no_image.png"
+    image_path = '/images/no_image.png'
 
     if image:
         try:
-            content_type = "jpg"
-
+            content_type = 'jpg'
             if image.filename:
-                content_type = image.filename.split(".")[1]
+                content_type = image.filename.split('.')[1]
 
             image_id = str(uuid4())
-
-            file_name = f"{image_id}.{content_type}"
-
+            file_name = f'{image_id}.{content_type}'
             image_path = storage_backend.write(file_name=file_name, file=image)
-
         except Exception:
             raise ApplicationException
-
         finally:
             await image.close()
 
@@ -134,46 +116,31 @@ async def create_product(
         image=image_path,
         status=status,
     )
-
     await create_product_interactor.execute(command=command)
-
     return APIResponse()
 
 
 @router.get(
-    "/{product_id}",
-    summary="Возвращает данные о товаре",
-    responses={
-        200: {"model": APIResponse[ProductOut]},
-        404: {"model": ProductNotFoundException},
-    },
+    '/{product_id}',
+    summary='Возвращает данные о товаре',
+    responses={200: {'model': APIResponse[ProductOut]}, 404: {'model': ProductNotFoundException}},
 )
 async def get_product(
     product_id: UUID,
     get_product_interactor: FromDishka[GetProductUseCase],
 ) -> APIResponse[ProductOut]:
     response = await get_product_interactor.execute(product_id=product_id)
-
     return APIResponse(data=response)
 
 
 @router.patch(
-    "/{product_id}",
-    summary="Обновляет данные о товаре",
-    dependencies=[
-        Security(
-            get_current_user_data,
-            scopes=[
-                UserRole.ADMIN.value,
-                UserRole.MANAGER.value,
-            ],
-        ),
-    ],
+    '/{product_id}',
+    summary='Обновляет данные о товаре',
+    dependencies=[Security(get_current_user_data, scopes=[UserRole.ADMIN.value, UserRole.MANAGER.value])],
 )
 async def update_product(
     update_product_interactor: FromDishka[UpdateProductUseCase],
     command: UpdateProductCommand = Depends(),
 ) -> APIResponse[None]:
     await update_product_interactor.execute(command=command)
-
     return APIResponse()

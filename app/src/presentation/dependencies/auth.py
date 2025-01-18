@@ -1,5 +1,5 @@
 import logging
-from typing import Annotated, Dict, Optional
+from typing import Annotated, Dict, Optional, cast
 from uuid import UUID
 
 from dishka import AsyncContainer
@@ -20,7 +20,7 @@ from src.infrastructure.di.container import get_container
 
 logger = logging.getLogger()
 
-AUTH_COOKIE = "session_id"
+AUTH_COOKIE = 'session_id'
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2):
@@ -51,58 +51,42 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
 
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(
-    tokenUrl="/api/v1/auth/login",
+    tokenUrl='/api/v1/auth/login',
     scopes={
-        "user": "Basic rights",
-        "admin": "Admin rights",
+        'user': 'Basic rights',
+        'admin': 'Admin rights',
     },
 )
 
 
 def _get_authorization_data(value: str | None) -> str:
     scheme, param = get_authorization_scheme_param(value)
-
     if not value:
         raise NotAuthorizedException
 
     return param
 
 
-async def get_refresh_token(
-    request: Request,
-) -> str:
-    refresh_token: str | None = request.cookies.get("refresh_token")
-
+async def get_refresh_token(request: Request) -> str:
+    refresh_token: str | None = request.cookies.get('refresh_token')
     return _get_authorization_data(value=refresh_token)
 
 
-async def get_current_session(
-    request: Request,
-) -> UUID:
+async def get_current_session(request: Request) -> UUID:
     authorization: str | None = request.cookies.get(AUTH_COOKIE)
-
     return UUID(authorization)
 
 
-async def auth_required(
-    request: Request,
-    authorization: Annotated[
-        str,
-        Depends(oauth2_scheme),
-    ],
-) -> None:
+async def auth_required(request: Request, authorization: Annotated[str, Depends(oauth2_scheme)]) -> None:
     if not authorization:
         raise NotAuthorizedException
 
-    request.scope["auth"] = authorization
+    request.scope['auth'] = authorization
 
 
 async def get_current_user_data(
     security_scopes: SecurityScopes,
-    authorization: Annotated[
-        str,
-        Depends(oauth2_scheme),
-    ],
+    authorization: Annotated[str, Depends(oauth2_scheme)],
     container: AsyncContainer = Depends(get_container),
 ) -> UserData:
     if not authorization:
@@ -111,21 +95,15 @@ async def get_current_user_data(
     async with container() as container:
         identity_provider = await container.get(IdentityProviderInterface)
 
-        user_data = await identity_provider.get_current_user(
-            authorization=authorization,
-        )
-
+        user_data = await identity_provider.get_current_user(authorization=authorization)
         for scope in security_scopes.scopes:
             if scope not in user_data.scopes:
                 raise NotEnoughPermissionsException
 
-        return user_data
+        return cast(UserData, user_data)
 
 
-async def get_current_user_from_websocket(
-    websocket: WebSocket,
-    container: AsyncContainer,
-) -> UserData:
+async def get_current_user_from_websocket(websocket: WebSocket, container: AsyncContainer) -> UserData:
     authorization: str | None = websocket.cookies.get(AUTH_COOKIE)
     if not authorization:
         raise NotAuthorizedException
@@ -133,8 +111,5 @@ async def get_current_user_from_websocket(
 
     async with container() as container:
         identity_provider = await container.get(IdentityProviderInterface)
-
-        user_data = await identity_provider.get_current_user(
-            authorization=authorization,
-        )
-        return user_data
+        user_data = await identity_provider.get_current_user(authorization=authorization)
+        return cast(UserData, user_data)

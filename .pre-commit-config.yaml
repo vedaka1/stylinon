@@ -28,22 +28,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: black
-        name: Format with Black
-        entry: poetry run black
-        language: system
-        types: [python]
-
-      - id: isort
-        name: Run isort
-        entry: poetry run isort
-        language: system
-        pass_filenames: false
-        types: [python]
-        args:
-          - "app"
-          - "tests"
-
       - id: mypy
         name: Validate types with MyPy
         entry: poetry run mypy

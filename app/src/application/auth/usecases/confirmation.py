@@ -19,7 +19,7 @@
 # class UserConfirmationUseCase:
 #     user_repository: BaseUserRepository
 #     user_confirmation_repository: BaseUserConfirmationRepository
-#     transaction_manager: BaseTransactionManager
+#     commiter: BaseTransactionManager
 
 #     async def execute(self, command: UserConfirmationCommand) -> None:
 #         confirmation = await self.user_confirmation_repository.get_by_id(command.id)
@@ -35,5 +35,5 @@
 #         user.is_verified = True
 #         await self.user_repository.update(confirmation.user_id, user)
 #         await self.user_confirmation_repository.delete(confirmation.id)
-#         await self.transaction_manager.commit()
+#         await self.commiter.commit()
 #         return None

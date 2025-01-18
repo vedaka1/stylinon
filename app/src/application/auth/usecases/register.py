@@ -5,7 +5,7 @@ from src.application.auth.commands import RegisterCommand
 from src.application.common.interfaces.jwt_processor import JWTProcessorInterface
 from src.application.common.interfaces.password_hasher import PasswordHasherInterface
 from src.application.common.interfaces.refresh import RefreshTokenRepositoryInterface
-from src.application.common.interfaces.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import ICommiter
 from src.domain.users.entities import User
 from src.domain.users.exceptions import UserAlreadyExistsException
 from src.domain.users.repository import UserRepositoryInterface
@@ -15,21 +15,18 @@ logger = logging.getLogger()
 
 @dataclass
 class RegisterUseCase:
-
     jwt_processor: JWTProcessorInterface
     user_repository: UserRepositoryInterface
     password_hasher: PasswordHasherInterface
     refresh_token_repository: RefreshTokenRepositoryInterface
-    transaction_manager: TransactionManagerInterface
+    commiter: ICommiter
 
     async def execute(self, command: RegisterCommand) -> None:
         user_exist = await self.user_repository.get_by_email(email=command.email)
-
         if user_exist:
             raise UserAlreadyExistsException
 
         hashed_password = self.password_hasher.hash(command.password)
-
         user = User.create(
             email=command.email,
             hashed_password=hashed_password,
@@ -39,8 +36,7 @@ class RegisterUseCase:
         )
 
         await self.user_repository.create(user=user)
-
-        await self.transaction_manager.commit()
+        await self.commiter.commit()
 
         return None
         # user_confirmation = UserConfirmation.create(user_id=user.id)

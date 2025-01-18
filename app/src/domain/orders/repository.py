@@ -7,12 +7,11 @@ from src.domain.orders.entities import Order, OrderItem, OrderStatus
 
 
 class OrderPrimaryKey(Enum):
-    ID = "id"
-    OPERATION_ID = "operation_id"
+    ID = 'id'
+    OPERATION_ID = 'operation_id'
 
 
 class OrderRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, order: Order) -> None: ...
 
@@ -23,12 +22,7 @@ class OrderRepositoryInterface(ABC):
     async def update(self, order: Order) -> None: ...
 
     @abstractmethod
-    async def _get_by(
-        self,
-        key: OrderPrimaryKey,
-        value: UUID | str,
-        with_relations: bool = False,
-    ) -> Order | None: ...
+    async def _get_by(self, key: OrderPrimaryKey, value: UUID | str, with_relations: bool = False) -> Order | None: ...
 
     @abstractmethod
     async def get_by_id(self, order_id: UUID) -> Order | None: ...
@@ -60,7 +54,6 @@ class OrderRepositoryInterface(ABC):
 
 
 class OrderItemRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, order_item: OrderItem) -> None: ...
 

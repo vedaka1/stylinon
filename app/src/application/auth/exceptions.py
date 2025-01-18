@@ -8,7 +8,7 @@ class AuthException(ApplicationException):
     def __init__(
         self,
         status_code: int = 500,
-        message: str = "Unknown auth error occured",
+        message: str = 'Unknown auth error occured',
         *args: object,
     ) -> None:
         self.status_code = status_code
@@ -19,28 +19,28 @@ class AuthException(ApplicationException):
 @dataclass
 class NotAuthorizedException(AuthException):
     status_code: int = 401
-    message: str = "Not authorized"
+    message: str = 'Not authorized'
 
 
 @dataclass
 class RefreshTokenNotFoundException(AuthException):
     status_code: int = 404
-    message: str = "Refresh token not found"
+    message: str = 'Refresh token not found'
 
 
 @dataclass
 class TokenExpiredException(AuthException):
     status_code: int = 401
-    message: str = "Your access token has expired"
+    message: str = 'Your access token has expired'
 
 
 @dataclass
 class WrongTokenTypeException(AuthException):
     status_code: int = 400
-    message: str = "Wrong token type"
+    message: str = 'Wrong token type'
 
 
 @dataclass
 class NotEnoughPermissionsException(AuthException):
     status_code: int = 403
-    message: str = "Not enough permissions"
+    message: str = 'Not enough permissions'

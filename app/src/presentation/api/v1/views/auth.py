@@ -30,21 +30,14 @@ from src.domain.users.exceptions import (
 )
 from src.presentation.dependencies.auth import get_current_session
 
-router = APIRouter(
-    tags=["Auth"],
-    prefix="/auth",
-    route_class=DishkaRoute,
-)
+router = APIRouter(tags=['Auth'], prefix='/auth', route_class=DishkaRoute)
 
 
 @router.post(
-    "/register",
+    '/register',
     status_code=201,
-    summary="Создает нового пользователя",
-    responses={
-        201: {"model": APIResponse[None]},
-        409: {"model": UserAlreadyExistsException},
-    },
+    summary='Создает нового пользователя',
+    responses={201: {'model': APIResponse[None]}, 409: {'model': UserAlreadyExistsException}},
 )
 async def register(
     command: RegisterCommand,
@@ -95,12 +88,9 @@ async def register(
 
 
 @router.post(
-    "/login",
-    summary="Аутентифицирует пользователя с помощью сессии",
-    responses={
-        200: {"model": APIResponse[UserOut]},
-        400: {"model": UserInvalidCredentialsException},
-    },
+    '/login',
+    summary='Аутентифицирует пользователя с помощью сессии',
+    responses={200: {'model': APIResponse[UserOut]}, 400: {'model': UserInvalidCredentialsException}},
 )
 async def login(
     login_interactor: FromDishka[LoginWithSessionUseCase],
@@ -108,10 +98,9 @@ async def login(
     response: Response,
     credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> APIResponse[UserOut]:
-    user_agent = request.headers.get("user-agent")
-
+    user_agent = request.headers.get('user-agent')
     if not user_agent:
-        user_agent = "none"
+        user_agent = 'none'
 
     command = LoginCommand(
         password=credentials.password,
@@ -122,7 +111,7 @@ async def login(
     user, session = await login_interactor.execute(command=command)
 
     response.set_cookie(
-        "session_id",
+        'session_id',
         value=str(session.id),
         max_age=int((session.expires_in - datetime.now()).total_seconds()),
         httponly=True,
@@ -191,11 +180,11 @@ async def login(
 
 
 @router.post(
-    "/logout",
-    summary="Logout",
+    '/logout',
+    summary='Logout',
     responses={
-        200: {"model": APIResponse[None]},
-        401: {"model": NotAuthorizedException},
+        200: {'model': APIResponse[None]},
+        401: {'model': NotAuthorizedException},
     },
 )
 async def logout(
@@ -207,15 +196,15 @@ async def logout(
 
     await logout_interactor.execute(command=command)
 
-    response.delete_cookie("session_id")
+    response.delete_cookie('session_id')
 
     return APIResponse()
 
 
 @router.post(
-    "/password-recovery/{email}",
-    summary="Отправка письма для восстановления пароля через email",
-    responses={200: {"model": APIResponse[None]}},
+    '/password-recovery/{email}',
+    summary='Отправка письма для восстановления пароля через email',
+    responses={200: {'model': APIResponse[None]}},
 )
 async def password_recovery(
     email: EmailStr,
@@ -227,9 +216,9 @@ async def password_recovery(
 
 
 @router.post(
-    "/reset-password",
-    summary="Сброс пароля",
-    responses={200: {"model": APIResponse[None]}},
+    '/reset-password',
+    summary='Сброс пароля',
+    responses={200: {'model': APIResponse[None]}},
 )
 async def reset_password(
     command: ResetPasswordCommand,
@@ -238,8 +227,8 @@ async def reset_password(
 ) -> APIResponse[None]:
     await reset_password_interactor.execute(command=command)
 
-    response.delete_cookie("session_id")
+    response.delete_cookie('session_id')
 
-    response.delete_cookie("session")
+    response.delete_cookie('session')
 
     return APIResponse()

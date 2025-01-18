@@ -6,26 +6,26 @@ from src.domain.products.value_objects import ProductPrice
 
 
 class UnitsOfMesaurement(str, Enum):
-    PIECE = "шт."
-    GRAM = "г."
-    KILOGRAM = "кг."
-    TON = "т."
-    MILLILITER = "мл."
-    LITER = "л."
-    MILLIMETER = "мм."
-    CENTIMETER = "см."
-    DECIMETER = "дм."
-    METER = "м."
-    CUBIC_MILLIMETER = "мм2."
-    CUBIC_CENTIMETER = "см2."
-    CUBIC_DECIMETER = "дм2."
-    CUBIC_METER = "м2."
+    PIECE = 'шт.'
+    GRAM = 'г.'
+    KILOGRAM = 'кг.'
+    TON = 'т.'
+    MILLILITER = 'мл.'
+    LITER = 'л.'
+    MILLIMETER = 'мм.'
+    CENTIMETER = 'см.'
+    DECIMETER = 'дм.'
+    METER = 'м.'
+    CUBIC_MILLIMETER = 'мм2.'
+    CUBIC_CENTIMETER = 'см2.'
+    CUBIC_DECIMETER = 'дм2.'
+    CUBIC_METER = 'м2.'
 
 
 class ProductStatus(str, Enum):
-    AVAILABLE = "available"
-    UNAVAILABLE = "unavailable"
-    ON_REQUEST = "on_request"
+    AVAILABLE = 'available'
+    UNAVAILABLE = 'unavailable'
+    ON_REQUEST = 'on_request'
 
 
 @dataclass
@@ -34,11 +34,8 @@ class Category:
     is_available: bool
 
     @staticmethod
-    def create(name: str, is_available: bool = True) -> "Category":
-        return Category(
-            name=name,
-            is_available=is_available,
-        )
+    def create(name: str, is_available: bool = True) -> 'Category':
+        return Category(name=name, is_available=is_available)
 
 
 @dataclass
@@ -75,10 +72,10 @@ class Product:
         d1_delivery_price: ProductPrice | None = None,
         d1_self_pickup_price: ProductPrice | None = None,
         units_of_measurement: UnitsOfMesaurement = UnitsOfMesaurement.PIECE,
-        image: str | None = "/images/no_image.png",
+        image: str | None = '/images/no_image.png',
         status: ProductStatus = ProductStatus.AVAILABLE,
         is_available: bool = True,
-    ) -> "Product":
+    ) -> 'Product':
         return Product(
             id=uuid4(),
             name=name,

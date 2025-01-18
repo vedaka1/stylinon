@@ -12,7 +12,7 @@ class Token:
     refresh_token: str
     access_max_age: int
     refresh_max_age: int
-    type: str = "Bearer "
+    type: str = 'Bearer '
 
 
 @dataclass
@@ -23,7 +23,7 @@ class RefreshSession:
     user_agent: str
 
     def __post_init__(self) -> None:
-        token = self.refresh_token.removeprefix("Bearer ")
+        token = self.refresh_token.removeprefix('Bearer ')
         self.refresh_token = token
 
     @staticmethod
@@ -31,12 +31,11 @@ class RefreshSession:
         user_id: UUID,
         refresh_token: str,
         user_agent: str,
-    ) -> "RefreshSession":
+    ) -> 'RefreshSession':
         return RefreshSession(
             user_id=user_id,
             refresh_token=refresh_token,
-            expires_at=datetime.now()
-            + timedelta(days=settings.jwt.REFRESH_TOKEN_EXPIRE_DAYS),
+            expires_at=datetime.now() + timedelta(days=settings.jwt.REFRESH_TOKEN_EXPIRE_DAYS),
             user_agent=user_agent,
         )
 

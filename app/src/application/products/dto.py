@@ -8,24 +8,24 @@ from src.domain.products.value_objects import ProductPrice
 
 
 class VatType(Enum):
-    NONE = "none"
-    VAT0 = "vat0"
-    VAT10 = "vat10"
-    VAT20 = "vat20"
-    VAT110 = "vat110"
-    VAT120 = "vat120"
+    NONE = 'none'
+    VAT0 = 'vat0'
+    VAT10 = 'vat10'
+    VAT20 = 'vat20'
+    VAT110 = 'vat110'
+    VAT120 = 'vat120'
 
 
 class PaymentMethod(Enum):
-    FULL_PAYMENT = "full_payment"
-    FULL_PREPAYMENT = "full_prepayment"
+    FULL_PAYMENT = 'full_payment'
+    FULL_PREPAYMENT = 'full_prepayment'
     # DELAYED_PAYMENT = "delayed_payment"
 
 
 class PaymentObject(Enum):
-    GOODS = "goods"
-    SERVICE = "service"
-    WORK = "work"
+    GOODS = 'goods'
+    SERVICE = 'service'
+    WORK = 'work'
 
 
 @dataclass

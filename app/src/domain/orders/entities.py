@@ -33,7 +33,7 @@ class Order:
     is_self_pickup: bool
     status: OrderStatus
 
-    items: list["OrderItem"] = field(default_factory=list)
+    items: list['OrderItem'] = field(default_factory=list)
 
     @staticmethod
     def create(
@@ -44,7 +44,7 @@ class Order:
         is_self_pickup: bool,
         *,
         status: OrderStatus = OrderStatus.CREATED,
-    ) -> "Order":
+    ) -> 'Order':
         current_date = datetime.now()
         return Order(
             id=uuid4(),
@@ -70,12 +70,7 @@ class OrderItem:
     product: Product | None
 
     @staticmethod
-    def create(
-        order_id: UUID,
-        product_id: UUID,
-        quantity: int,
-        price: ProductPrice,
-    ) -> "OrderItem":
+    def create(order_id: UUID, product_id: UUID, quantity: int, price: ProductPrice) -> 'OrderItem':
         if quantity <= 0:
             raise OrderItemIncorrectQuantityException
         return OrderItem(

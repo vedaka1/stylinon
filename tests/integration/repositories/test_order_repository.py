@@ -4,7 +4,7 @@ import pytest
 from dishka import AsyncContainer
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from src.application.common.interfaces.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import ICommiter
 from src.domain.orders.entities import Order, OrderItem, OrderStatus
 from src.domain.orders.repository import (
     OrderItemRepositoryInterface,
@@ -26,7 +26,7 @@ from src.infrastructure.persistence.postgresql.models.order import (
     map_to_order,
 )
 
-pytestmark = pytest.mark.asyncio(loop_scope="session")
+pytestmark = pytest.mark.asyncio(loop_scope='session')
 
 
 class TestOrderRepository:
@@ -34,17 +34,17 @@ class TestOrderRepository:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             sessionmaker = await di_container.get(async_sessionmaker[AsyncSession])
-            transaction_manager = await di_container.get(TransactionManagerInterface)
+            commiter = await di_container.get(ICommiter)
             # Create order
             order = Order.create(
-                customer_email="test@test.com",
+                customer_email='test@test.com',
                 operation_id=uuid4(),
-                shipping_address="test_address",
+                shipping_address='test_address',
                 total_price=1234,
                 is_self_pickup=False,
             )
             await order_repository.create(order)
-            await transaction_manager.commit()
+            await commiter.commit()
             # Check it
             async with sessionmaker() as session:
                 query = select(OrderModel).where(OrderModel.id == order.id)
@@ -65,9 +65,9 @@ class TestOrderRepository:
         async with container() as di_container:
             order_repository = await di_container.get(OrderRepositoryInterface)
             order = Order.create(
-                customer_email="test@test.com",
+                customer_email='test@test.com',
                 operation_id=uuid4(),
-                shipping_address="test_address",
+                shipping_address='test_address',
                 total_price=1234,
                 is_self_pickup=False,
             )
@@ -83,9 +83,9 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
             order = Order.create(
-                customer_email="test@test.com",
+                customer_email='test@test.com',
                 operation_id=uuid4(),
-                shipping_address="test_address",
+                shipping_address='test_address',
                 total_price=1234,
                 is_self_pickup=False,
             )
@@ -103,9 +103,9 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
             order = Order.create(
-                customer_email="test@test.com",
+                customer_email='test@test.com',
                 operation_id=uuid4(),
-                shipping_address="test_address",
+                shipping_address='test_address',
                 total_price=1234,
                 is_self_pickup=False,
             )
@@ -121,9 +121,9 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             # Create order
             order = Order.create(
-                customer_email="test@test.com",
+                customer_email='test@test.com',
                 operation_id=uuid4(),
-                shipping_address="test_address",
+                shipping_address='test_address',
                 total_price=1234,
                 is_self_pickup=False,
             )
@@ -138,9 +138,9 @@ class TestOrderRepository:
             # Create orders
             orders: list[Order] = [
                 Order.create(
-                    customer_email=f"test{i}@test.com",
+                    customer_email=f'test{i}@test.com',
                     operation_id=uuid4(),
-                    shipping_address=f"test{i}_address",
+                    shipping_address=f'test{i}_address',
                     total_price=1234,
                     is_self_pickup=False,
                 )
@@ -165,25 +165,25 @@ class TestOrderRepository:
             order_repository = await di_container.get(OrderRepositoryInterface)
             product_repository = await di_container.get(ProductRepositoryInterface)
             category_repository = await di_container.get(CategoryRepositoryInterface)
-            category = Category.create(name="test_category")
+            category = Category.create(name='test_category')
             await category_repository.create(category)
             order_item_repository = await di_container.get(OrderItemRepositoryInterface)
 
             product = Product.create(
-                name="test_product",
-                description="test_description",
-                category="test_category",
+                name='test_product',
+                description='test_description',
+                category='test_category',
                 units_of_measurement=UnitsOfMesaurement.PIECE,
-                sku="test_sku",
+                sku='test_sku',
                 weight=10,
                 retail_price=ProductPrice(100),
                 status=ProductStatus.AVAILABLE,
             )
 
             order = Order.create(
-                customer_email="test@test.com",
+                customer_email='test@test.com',
                 operation_id=uuid4(),
-                shipping_address="test_address",
+                shipping_address='test_address',
                 total_price=1234,
                 is_self_pickup=False,
             )

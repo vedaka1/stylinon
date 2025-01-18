@@ -25,15 +25,12 @@ class SettingsProvider(Provider):
 
     @provide(scope=Scope.APP)
     def acquiring_session(self) -> aiohttp.ClientSession:
-        headers = {"Authorization": f"Bearer {settings.tochka.TOKEN}"}
+        headers = {'Authorization': f'Bearer {settings.tochka.TOKEN}'}
         return aiohttp.ClientSession(headers=headers)
 
     @provide(scope=Scope.APP)
     def smtp_server(self) -> SyncSMTPServerInterface:
-        return SyncSMTPServer(
-            from_address=settings.smtp.FROM_EMAIL,
-            password=settings.smtp.PASSWORD,
-        )
+        return SyncSMTPServer(from_address=settings.smtp.FROM_EMAIL, password=settings.smtp.PASSWORD)
 
     @provide(scope=Scope.APP)
     def websocker_manager(self) -> WebsocketManagerInterface:
@@ -45,4 +42,4 @@ class SettingsProvider(Provider):
 
     @provide(scope=Scope.APP)
     def storage_backend(self) -> StorageBackend:
-        return StorageBackend(path="/images")
+        return StorageBackend(path='/images')

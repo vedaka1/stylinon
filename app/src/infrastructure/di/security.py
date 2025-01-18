@@ -12,23 +12,11 @@ from src.infrastructure.authentication.password_hasher import PasswordHasher
 
 
 class SecurityProvider(Provider):
-    password_hasher = provide(
-        PasswordHasher,
-        provides=PasswordHasherInterface,
-        scope=Scope.APP,
-    )
-    jwt_processor = provide(
-        JWTProcessor,
-        provides=JWTProcessorInterface,
-        scope=Scope.APP,
-    )
+    password_hasher = provide(PasswordHasher, provides=PasswordHasherInterface, scope=Scope.APP)
+    jwt_processor = provide(JWTProcessor, provides=JWTProcessorInterface, scope=Scope.APP)
     # identity_provider = provide(
     #     TokenIdentityProvider,
     #     provides=IdentityProviderInterface,
     #     scope=Scope.APP,
     # )
-    identity_provider = provide(
-        SessionIdentityProvider,
-        provides=IdentityProviderInterface,
-        scope=Scope.REQUEST,
-    )
+    identity_provider = provide(SessionIdentityProvider, provides=IdentityProviderInterface, scope=Scope.REQUEST)

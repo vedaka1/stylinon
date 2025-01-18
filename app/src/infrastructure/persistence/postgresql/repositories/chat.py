@@ -15,8 +15,7 @@ from src.infrastructure.persistence.postgresql.repositories.mappers import (
 
 
 class SqlalchemyChatRepository(ChatRepositoryInterface):
-
-    __slots__ = "session"
+    __slots__ = 'session'
 
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -40,9 +39,9 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
             .where(ChatModel.id == chat.id)
             .values(
                 {
-                    "owner_id": chat.owner_id,
-                    "title": chat.title,
-                    "updated_at": chat.updated_at,
+                    'owner_id': chat.owner_id,
+                    'title': chat.title,
+                    'updated_at': chat.updated_at,
                 },
             )
         )
@@ -66,9 +65,7 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
     ) -> Chat | None:
         if with_relations:
             chat_query = select(ChatModel).where(ChatModel.id == value)
-            messages_query = (
-                select(MessageModel).where(MessageModel.chat_id == value).limit(10)
-            )
+            messages_query = select(MessageModel).where(MessageModel.chat_id == value).limit(10)
 
             chat_cursor = await self.session.execute(chat_query)
 
@@ -112,7 +109,7 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
         query = select(ChatModel)
 
         if search:
-            query = query.where(ChatModel.title.ilike(f"%{search}%"))
+            query = query.where(ChatModel.title.ilike(f'%{search}%'))
         if owner_id:
             query = query.where(ChatModel.owner_id == owner_id)
 
@@ -132,7 +129,7 @@ class SqlalchemyChatRepository(ChatRepositoryInterface):
         query = select(func.count()).select_from(ChatModel)
 
         if search:
-            query = query.where(ChatModel.title.ilike(f"%{search}%"))
+            query = query.where(ChatModel.title.ilike(f'%{search}%'))
         if owner_id:
             query = query.where(ChatModel.owner_id == owner_id)
 

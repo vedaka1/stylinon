@@ -15,18 +15,12 @@ if TYPE_CHECKING:
 
 
 class OrderModel(Base):
-    __tablename__ = "orders"
+    __tablename__ = 'orders'
 
     id: Mapped[UUID] = mapped_column(primary_key=True, index=True)
     customer_email: Mapped[str] = mapped_column(nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=False),
-        nullable=False,
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=False),
-        nullable=False,
-    )
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False)
     shipping_address: Mapped[str] = mapped_column(nullable=False)
     operation_id: Mapped[UUID] = mapped_column(nullable=False)
     tracking_number: Mapped[str] = mapped_column(nullable=True)
@@ -34,9 +28,7 @@ class OrderModel(Base):
     is_self_pickup: Mapped[bool] = mapped_column(nullable=False)
     status: Mapped[OrderStatus] = mapped_column(nullable=False)
 
-    order_items: Mapped[list["OrderItemModel"]] = relationship(
-        back_populates="order",
-    )
+    order_items: Mapped[list['OrderItemModel']] = relationship(back_populates='order')
 
 
 def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
@@ -54,36 +46,28 @@ def map_to_order(entity: OrderModel, with_relations: bool = False) -> Order:
     )
     if with_relations:
         order.items = [
-            map_to_order_item(order_item, with_relations=with_relations)
-            for order_item in entity.order_items
+            map_to_order_item(order_item, with_relations=with_relations) for order_item in entity.order_items
         ]
     return order
 
 
 class OrderItemModel(Base):
-    __tablename__ = "order_items"
+    __tablename__ = 'order_items'
 
     order_id: Mapped[UUID] = mapped_column(
-        ForeignKey("orders.id", ondelete="CASCADE"),
-        primary_key=True,
-        nullable=False,
+        ForeignKey('orders.id', ondelete='CASCADE'), primary_key=True, nullable=False,
     )
     product_id: Mapped[UUID] = mapped_column(
-        ForeignKey("products.id", ondelete="CASCADE"),
-        primary_key=True,
-        nullable=False,
+        ForeignKey('products.id', ondelete='CASCADE'), primary_key=True, nullable=False,
     )
     quantity: Mapped[int] = mapped_column(nullable=False)
     price: Mapped[int] = mapped_column(nullable=False)
 
-    order: Mapped["OrderModel"] = relationship(
-        back_populates="order_items",
-    )
-
-    order_product: Mapped["ProductModel"] = relationship()
+    order: Mapped['OrderModel'] = relationship(back_populates='order_items')
+    order_product: Mapped['ProductModel'] = relationship()
 
     def __admin_repr__(self, request: Request) -> str:
-        return f"{self.product_id}"
+        return f'{self.product_id}'
 
 
 def map_to_order_item(

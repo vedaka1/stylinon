@@ -6,7 +6,6 @@ from fastapi import WebSocket
 
 
 class WebsocketManagerInterface(ABC):
-
     connections_map: dict[UUID, set[WebSocket]] = {}
 
     @abstractmethod

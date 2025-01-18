@@ -6,12 +6,11 @@ from src.domain.users.entities import User, UserSession
 
 
 class UserPrimaryKey(Enum):
-    ID = "id"
-    EMAIL = "email"
+    ID = 'id'
+    EMAIL = 'email'
 
 
 class UserRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, user: User) -> None: ...
 
@@ -43,7 +42,6 @@ class UserRepositoryInterface(ABC):
 
 
 class UserSessionRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, session: UserSession) -> None: ...
 
@@ -60,8 +58,4 @@ class UserSessionRepositoryInterface(ABC):
     async def get_by_user_id(self, user_id: UUID) -> list[UserSession]: ...
 
     @abstractmethod
-    async def get_by_user_id_and_user_agent(
-        self,
-        user_id: UUID,
-        user_agent: str,
-    ) -> UserSession | None: ...
+    async def get_by_user_id_and_user_agent(self, user_id: UUID, user_agent: str) -> UserSession | None: ...

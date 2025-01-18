@@ -10,7 +10,6 @@ from src.domain.chats.repository import ChatRepositoryInterface
 
 @dataclass
 class GetUserChatsUseCase:
-
     chat_repository: ChatRepositoryInterface
 
     async def execute(self, user_id: UUID) -> list[ChatOut]:
@@ -40,12 +39,10 @@ class GetUserChatsUseCase:
 
 @dataclass
 class GetChatUseCase:
-
     chat_repository: ChatRepositoryInterface
 
     async def execute(self, chat_id: UUID) -> ChatOut:
         chat = await self.chat_repository.get_by_id(chat_id=chat_id)
-
         if not chat:
             raise ChatNotFoundException
 
@@ -70,7 +67,6 @@ class GetChatUseCase:
 
 @dataclass
 class GetChatsListUseCase:
-
     chat_repository: ChatRepositoryInterface
 
     async def execute(
@@ -82,7 +78,6 @@ class GetChatsListUseCase:
             limit=command.pagination.limit,
             offset=command.pagination.offset,
         )
-
         count = await self.chat_repository.count(search=command.search)
 
         return ListPaginatedResponse(
@@ -106,9 +101,5 @@ class GetChatsListUseCase:
                 )
                 for chat in chats
             ],
-            pagination=PaginationOutSchema(
-                limit=command.pagination.limit,
-                page=command.pagination.page,
-                total=count,
-            ),
+            pagination=PaginationOutSchema(limit=command.pagination.limit, page=command.pagination.page, total=count),
         )

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class TransactionManagerInterface(ABC):
+class ICommiter(ABC):
     @abstractmethod
     async def commit(self) -> None: ...
 

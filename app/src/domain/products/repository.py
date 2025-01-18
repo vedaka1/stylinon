@@ -6,7 +6,6 @@ from src.domain.products.entities import Category, Product
 
 
 class ProductRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, product: Product) -> None: ...
 
@@ -31,16 +30,10 @@ class ProductRepositoryInterface(ABC):
     ) -> list[Product]: ...
 
     @abstractmethod
-    async def count(
-        self,
-        filters: ProductFilters | None = None,
-    ) -> int: ...
+    async def count(self, filters: ProductFilters | None = None) -> int: ...
 
     @abstractmethod
-    async def get_many_by_ids(
-        self,
-        product_ids: set[UUID],
-    ) -> tuple[list[Product], set[UUID]]:
+    async def get_many_by_ids(self, product_ids: set[UUID]) -> tuple[list[Product], set[UUID]]:
         """
         ### Args:
         `product_ids` - set of product ids
@@ -52,7 +45,6 @@ class ProductRepositoryInterface(ABC):
 
 
 class CategoryRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, category: Category) -> None: ...
 

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.application.common.interfaces.transaction import TransactionManagerInterface
+from src.application.common.interfaces.transaction import ICommiter
 from src.application.common.utils import parse_price
 from src.application.products.commands import (
     CreateCategoryCommand,
@@ -16,15 +16,14 @@ from src.domain.products.value_objects import ProductPrice
 
 @dataclass
 class CreateProductUseCase:
-
     product_repository: ProductRepositoryInterface
-    transaction_manager: TransactionManagerInterface
+    commiter: ICommiter
 
     async def execute(self, command: CreateProductCommand) -> None:
-        category_name = command.category.lower().replace(r"/", "-")
+        category_name = command.category.lower().replace(r'/', '-')
 
         product = Product.create(
-            name=command.name.replace("/", "-"),
+            name=command.name.replace('/', '-'),
             category=category_name,
             description=command.description,
             units_of_measurement=command.units_of_measurement,
@@ -40,24 +39,21 @@ class CreateProductUseCase:
         )
 
         await self.product_repository.create(product=product)
-
-        await self.transaction_manager.commit()
+        await self.commiter.commit()
 
         return None
 
 
 @dataclass
 class CreateCategoryUseCase:
-
     category_repository: CategoryRepositoryInterface
-    transaction_manager: TransactionManagerInterface
+    commiter: ICommiter
 
     async def execute(self, command: CreateCategoryCommand) -> None:
-        category_name = command.name.lower().replace(r"/", "-")
+        category_name = command.name.lower().replace(r'/', '-')
         category = Category.create(name=category_name)
 
         await self.category_repository.create(category=category)
-
-        await self.transaction_manager.commit()
+        await self.commiter.commit()
 
         return None

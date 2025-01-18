@@ -6,7 +6,4 @@ from src.infrastructure.integrations.acquiring.gateway import TochkaAcquiringGat
 class GatewayProvider(Provider):
     scope = Scope.APP
 
-    acquiring_gateway = provide(
-        TochkaAcquiringGateway,
-        provides=AcquiringGatewayInterface,
-    )
+    acquiring_gateway = provide(TochkaAcquiringGateway, provides=AcquiringGatewayInterface)

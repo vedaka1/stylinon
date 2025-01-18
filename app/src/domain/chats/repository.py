@@ -6,18 +6,17 @@ from src.domain.chats.entities import Chat, Message
 
 
 class ChatPrimaryKey(Enum):
-    ID = "id"
+    ID = 'id'
     # OWNER_ID = "owner_id"
 
 
 class MessagePrimaryKey(Enum):
-    ID = "id"
-    USER_ID = "user_id"
-    CHAT_ID = "chat_id"
+    ID = 'id'
+    USER_ID = 'user_id'
+    CHAT_ID = 'chat_id'
 
 
 class ChatRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, chat: Chat) -> None: ...
 
@@ -28,12 +27,7 @@ class ChatRepositoryInterface(ABC):
     async def delete(self, chat_id: UUID) -> None: ...
 
     @abstractmethod
-    async def _get_by(
-        self,
-        key: ChatPrimaryKey,
-        value: UUID,
-        with_relations: bool = False,
-    ) -> Chat | None: ...
+    async def _get_by(self, key: ChatPrimaryKey, value: UUID, with_relations: bool = False) -> Chat | None: ...
 
     @abstractmethod
     async def get_by_id(self, chat_id: UUID) -> Chat | None: ...
@@ -48,15 +42,10 @@ class ChatRepositoryInterface(ABC):
     ) -> list[Chat]: ...
 
     @abstractmethod
-    async def count(
-        self,
-        search: str | None = None,
-        owner_id: UUID | None = None,
-    ) -> int: ...
+    async def count(self, search: str | None = None, owner_id: UUID | None = None) -> int: ...
 
 
 class MessageRepositoryInterface(ABC):
-
     @abstractmethod
     async def create(self, message: Message) -> None: ...
 
@@ -73,12 +62,7 @@ class MessageRepositoryInterface(ABC):
     async def get_by_id(self, message_id: UUID) -> Message | None: ...
 
     @abstractmethod
-    async def get_by_chat_id(
-        self,
-        chat_id: UUID,
-        offset: int = 0,
-        limit: int = 10,
-    ) -> list[Message]: ...
+    async def get_by_chat_id(self, chat_id: UUID, offset: int = 0, limit: int = 10) -> list[Message]: ...
 
     @abstractmethod
     async def get_many(
@@ -90,8 +74,4 @@ class MessageRepositoryInterface(ABC):
     ) -> list[Message]: ...
 
     @abstractmethod
-    async def count(
-        self,
-        chat_id: UUID | None = None,
-        user_id: UUID | None = None,
-    ) -> int: ...
+    async def count(self, chat_id: UUID | None = None, user_id: UUID | None = None) -> int: ...
