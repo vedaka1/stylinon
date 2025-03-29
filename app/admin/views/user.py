@@ -1,56 +1,49 @@
-from typing import Any
+from typing import Any, Dict
 from uuid import uuid4
 
-from sqladmin import ModelView
-from src.application.common.interfaces.password_hasher import PasswordHasherInterface
+from fastapi import Request, UploadFile
 from src.infrastructure.di.container import get_container
-from src.infrastructure.persistence.postgresql.models.user import UserModel
+from src.infrastructure.utils.common import StorageBackend
+from starlette_admin.contrib.sqla import ModelView
 
 
-class UserAdmin(ModelView, model=UserModel):
-    can_create = True
-    can_edit = True
-    can_delete = True
-    can_view_details = True
+class UserView(ModelView):
+    fields = [
+        "id",
+        "email",
+        "hashed_password",
+        "first_name",
+        "last_name",
+        "mobile_phone",
+        "is_verified",
+        "sessions",
+        "role",
+    ]
 
     name = "Пользователь"
-    name_plural = "Пользователи"
-    icon = "fa-solid fa-user"
+    label = "Пользователи"
+    exclude_fields_from_edit = ["id", "hashed_password", "sessions"]
+    exclude_fields_from_create = ["id", "sessions"]
 
-    column_searchable_list = [
-        UserModel.email,
-        UserModel.first_name,
-        UserModel.last_name,
-        UserModel.mobile_phone,
-    ]
-    column_list = [
-        UserModel.email,
-        UserModel.first_name,
-        UserModel.last_name,
-        UserModel.mobile_phone,
-        UserModel.role,
-    ]
-    column_labels = {
-        "email": "Почта",
-        "hashed_password": "Пароль",
-        "first_name": "Имя",
-        "last_name": "Фамилия",
-        "mobile_phone": "Телефон",
-        "role": "Роль",
-        "is_verified": "Подтвержденый",
-    }
-    column_details_exclude_list = ["sessions"]
-    form_excluded_columns = ["id", "sessions"]
-
-    async def on_model_change(
+    async def before_create(
         self,
-        data: dict[str, Any],
-        model: Any,
-        is_created: bool,
-        request: Any,
+        request: Request,
+        data: Dict[str, Any],
+        obj: Any,
     ) -> None:
-        if is_created:
-            container = get_container()
-            password_hasher = await container.get(PasswordHasherInterface)
-            data["id"] = uuid4()
-            data["hashed_password"] = password_hasher.hash(data["hashed_password"])
+        container = get_container()
+        storage_backend = await container.get(StorageBackend)
+        image: UploadFile | None = data["image"][0]
+        if image:
+            image_path = storage_backend.write(file=image)
+        else:
+            image_path = "/images/no_image.png"
+        data["image"] = image_path
+        obj.id = uuid4()
+        obj.image = image_path
+
+
+class UserSessionsView(ModelView):
+    label = "Сессии пользователей"
+
+    searchable_fields = ["user"]

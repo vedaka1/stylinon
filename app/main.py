@@ -8,7 +8,7 @@ from src.infrastructure.di.container import get_container, init_logger
 from src.infrastructure.persistence.postgresql.database import get_async_engine
 from src.presentation.api.v1.exc_handlers import init_exc_handlers
 from src.presentation.api.v1.router import api_router as api_router_v1
-from st_admin.main import init_admin
+from admin.main import init_admin
 
 
 def init_di(app: FastAPI) -> None:

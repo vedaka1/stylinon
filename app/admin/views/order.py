@@ -1,59 +1,11 @@
-from sqladmin import ModelView
-from src.infrastructure.persistence.postgresql.models.order import OrderModel
+from starlette_admin.contrib.sqla import ModelView
 
 
-class OrderAdmin(ModelView, model=OrderModel):
-    can_create = False
-    can_edit = True
-    can_delete = True
-    can_view_details = True
-
+class OrderView(ModelView):
     name = "Заказ"
-    name_plural = "Заказы"
+    label = "Заказы"
 
-    column_searchable_list = [
-        OrderModel.customer_email,
-        OrderModel.shipping_address,
-        OrderModel.tracking_number,
-        OrderModel.status,
-    ]
-    column_list = [
-        OrderModel.customer_email,
-        OrderModel.operation_id,
-        OrderModel.shipping_address,
-        OrderModel.tracking_number,
-        OrderModel.status,
-        OrderModel.created_at,
-        OrderModel.updated_at,
-        OrderModel.total_price,
-    ]
-    column_details_list = [
-        OrderModel.customer_email,
-        OrderModel.operation_id,
-        OrderModel.shipping_address,
-        OrderModel.tracking_number,
-        OrderModel.status,
-        OrderModel.created_at,
-        OrderModel.updated_at,
-        OrderModel.total_price,
-        "order_items",
-    ]
-    column_labels = {
-        "customer_email": "Email клиента",
-        "operation_id": "ID платежной операции",
-        "shipping_address": "Адрес доставки",
-        "tracking_number": "Номер отправления",
-        "status": "Статус заказа",
-        "created_at": "Дата создания",
-        "updated_at": "Дата обновления",
-        "order_items": "Список товаров",
-        "total_price": "Цена (в копейках)",
-    }
-    form_ajax_refs = {
-        "order_items": {
-            "fields": ("product_id",),
-            "order_by": "product_id",
-        },
-    }
-    # column_details_exclude_list = ["order_item"]
-    form_excluded_columns = ["id"]
+
+class OrderItemView(ModelView):
+    name = "Позиция заказа"
+    label = "Позиции заказа"

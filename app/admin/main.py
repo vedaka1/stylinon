@@ -1,19 +1,38 @@
-from admin.auth import AdminAuth
-from admin.views.categories import CategoryAdmin
-from admin.views.order import OrderAdmin
-from admin.views.order_item import OrderItemAdmin
-from admin.views.products import ProductAdmin
-from admin.views.user import UserAdmin
 from fastapi import FastAPI
-from sqladmin import Admin
 from sqlalchemy.ext.asyncio import AsyncEngine
+from src.infrastructure.persistence.postgresql.models.order import (
+    OrderItemModel,
+    OrderModel,
+)
+from src.infrastructure.persistence.postgresql.models.product import (
+    CategoryModel,
+    ProductModel,
+)
+from src.infrastructure.persistence.postgresql.models.user import (
+    UserModel,
+    UserSessionModel,
+)
+from starlette_admin import I18nConfig
+from starlette_admin.contrib.sqla import Admin
+
+from admin.auth import UsernameAndPasswordProvider
+from admin.views.category import CategoryView
+from admin.views.order import OrderItemView, OrderView
+from admin.views.product import ProductView
+from admin.views.user import UserSessionsView, UserView
 
 
 def init_admin(app: FastAPI, engine: AsyncEngine) -> None:
-    authentication_backend = AdminAuth(secret_key="test_secret")
-    admin = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
-    admin.add_view(UserAdmin)
-    admin.add_view(ProductAdmin)
-    admin.add_view(OrderAdmin)
-    admin.add_view(OrderItemAdmin)
-    admin.add_view(CategoryAdmin)
+    admin = Admin(
+        engine,
+        title='ТехСтрой-Сити',
+        auth_provider=UsernameAndPasswordProvider(),
+        i18n_config=I18nConfig(default_locale='ru'),
+    )
+    admin.add_view(OrderView(OrderModel))
+    admin.add_view(OrderItemView(OrderItemModel))
+    admin.add_view(UserView(UserModel))
+    admin.add_view(UserSessionsView(UserSessionModel))
+    admin.add_view(CategoryView(CategoryModel))
+    admin.add_view(ProductView(ProductModel))
+    admin.mount_to(app)
