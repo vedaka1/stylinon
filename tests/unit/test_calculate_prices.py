@@ -1,6 +1,6 @@
 import pytest
 from src.application.common.utils import parse_price
-from src.application.orders.utils import calculate_order_product_price
+from src.application.orders.calculation import calculate_order_product_price
 from src.application.products.dto import PaymentMethod
 from src.domain.products.entities import Product, ProductStatus
 from src.domain.products.value_objects import ProductPrice

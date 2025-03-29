@@ -1,5 +1,5 @@
 import pytest
-from src.application.orders.utils import calculate_order_total_price
+from src.application.orders.calculation import calculate_order_total_price
 from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.products.entities import UnitsOfMesaurement
 from src.infrastructure.integrations.acquiring.mappers import (

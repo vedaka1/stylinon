@@ -3,13 +3,10 @@ from dataclasses import dataclass
 
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.interfaces.transaction import ICommiter
+from src.application.orders.calculation import calculate_order_total_price, calculate_order_total_weight
 from src.application.orders.commands import CreateOrderCommand
 from src.application.orders.dto import CreateOrderOut
-from src.application.orders.utils import (
-    calculate_order_total_price,
-    calculate_order_total_weight,
-    create_product_in_payment_list,
-)
+from src.application.orders.utils import create_product_in_payment_list
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.exceptions import DuplicateOrderPositionsException
 from src.domain.orders.repository import (
