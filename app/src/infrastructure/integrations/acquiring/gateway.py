@@ -14,7 +14,7 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
     def __init__(self, session: aiohttp.ClientSession) -> None:
         self.session = session
         self.base_url = settings.acquiring.ACQUIRING_URL
-        self.api_version = 'v1.0'
+        self.api_version = settings.acquiring.ACQUIRING_API_VERSION
         self.redirect_url = settings.DOMAIN_URL
 
     async def create_payment_operation_with_receipt(

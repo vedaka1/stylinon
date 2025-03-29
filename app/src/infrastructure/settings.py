@@ -9,6 +9,7 @@ class TochkaBankSettings:
     PUBLIC_KEY: str
     ALGORITHM: str
     ACQUIRING_URL: str
+    ACQUIRING_API_VERSION: str
 
     @staticmethod
     def load_from_env() -> 'TochkaBankSettings':
@@ -17,6 +18,7 @@ class TochkaBankSettings:
             PUBLIC_KEY=get_env_var('ACQUIRING_PUBLIC_KEY', str),
             ALGORITHM=get_env_var('ACQUIRING_ALGORITHM', str, default='RS256'),
             ACQUIRING_URL=get_env_var('ACQUIRING_URL', str, default='https://enter.tochka.com/sandbox/v2'),
+            ACQUIRING_API_VERSION=get_env_var('ACQUIRING_API_VERSION', str, default='v1.0'),
         )
 
 
