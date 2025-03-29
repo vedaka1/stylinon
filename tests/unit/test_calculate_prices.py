@@ -1,6 +1,6 @@
 import pytest
 from src.application.common.utils import parse_price
-from src.application.orders.utils import calculate_product_price
+from src.application.orders.utils import calculate_order_product_price
 from src.application.products.dto import PaymentMethod
 from src.domain.products.entities import Product, ProductStatus
 from src.domain.products.value_objects import ProductPrice
@@ -15,10 +15,10 @@ def create_product(
     d1_delivery_price: int | None = None,
 ) -> Product:
     return Product.create(
-        category="test_category",
-        description="test_description",
-        name="test_product_variant",
-        sku="test_sku",
+        category='test_category',
+        description='test_description',
+        name='test_product_variant',
+        sku='test_sku',
         weight=10,
         retail_price=ProductPrice(retail_price),
         wholesale_price=parse_price(wholesale_price),
@@ -29,7 +29,7 @@ def create_product(
 
 
 @pytest.mark.parametrize(
-    "product, payment_method, is_self_pickup, order_weight, products_count, expected",
+    'product, payment_method, is_self_pickup, order_weight, products_count, expected',
     [
         # 1. Рынок: вес <= 20 тонн, ожидаемая цена по умолчанию
         (
@@ -112,7 +112,7 @@ def test_calculate_product_price(
     products_count: int,
     expected: int,
 ) -> None:
-    price = calculate_product_price(
+    price = calculate_order_product_price(
         product=product,
         payment_method=payment_method,
         is_self_pickup=is_self_pickup,

@@ -20,7 +20,7 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
     async def create_payment_operation_with_receipt(
         self,
         client_email: str,
-        items: list[ProductInPaymentDTO],
+        items: tuple[ProductInPaymentDTO, ...],
         total_price: float,
         purpose: str = 'Перевод за оказанные услуги',
         payment_mode: list[str] = ['sbp', 'card'],

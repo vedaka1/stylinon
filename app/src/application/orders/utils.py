@@ -4,7 +4,7 @@ from src.domain.products.entities import Product
 from src.domain.products.value_objects import ProductPrice
 
 
-def calculate_product_price(
+def calculate_order_product_price(
     product: Product,
     payment_method: PaymentMethod,
     is_self_pickup: bool,
@@ -44,23 +44,50 @@ def calculate_product_price(
     return price.value
 
 
-def calculate_total_price(products: list[ProductInPaymentDTO]) -> ProductPrice:
+def calculate_order_total_price(products: tuple[ProductInPaymentDTO, ...]) -> ProductPrice:
     """
-    Принимает список товаров в заказе и возвращает итоговую цену заказа в копейках
-    ### Args:
-        products: list[ProductInPaymentDTO] - список товаров в заказе
-    ### Returns:
-        ProductPrice - цена в копейках
+    Принимает кортеж товаров в заказе и возвращает итоговую цену заказа в копейках
+    Args:
+        products:  список товаров в заказе
+    Returns:
+        ValueObject - итоговая цена заказа в копейках
     """
     total_price = sum([product.amount * product.quantity for product in products])
     return ProductPrice(total_price)
 
 
-def calculate_total_weight(products: list[Product], command_items: list[ProductInOrder]) -> int:
+def calculate_order_total_weight(products: list[Product], order_products: list[ProductInOrder]) -> int:
     order_weight = 0
+    order_products_dict = {product.id: product for product in order_products}
 
-    for index, product in enumerate(products):
+    for product in products:
         if product.weight:
-            order_weight += product.weight * command_items[index].quantity
+            order_weight += product.weight * order_products_dict[product.id].quantity
 
     return order_weight
+
+
+def create_product_in_payment_list(
+    products: list[Product],
+    order_products: list[ProductInOrder],
+    products_count: int,
+    order_weight: int,
+    is_self_pickup: bool,
+    payment_method: PaymentMethod,
+) -> tuple[ProductInPaymentDTO, ...]:
+    return tuple(
+        ProductInPaymentDTO(
+            name=product.name,
+            amount=calculate_order_product_price(
+                product=product,
+                is_self_pickup=is_self_pickup,
+                payment_method=payment_method,
+                products_count=products_count,
+                order_weight=order_weight,
+            ),
+            quantity=item.quantity,
+            payment_method=PaymentMethod.FULL_PAYMENT,
+            measure=product.units_of_measurement,
+        )
+        for product, item in zip(products, order_products)
+    )

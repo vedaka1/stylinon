@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from src.application.acquiring.dto import AcquiringWebhookType
+from src.application.acquiring.enums import AcquiringWebhookType
 from src.application.acquiring.exceptions import IncorrectAcqioringWebhookTypeException
 from src.application.acquiring.interface import AcquiringGatewayInterface
 from src.application.common.email.types import SenderName

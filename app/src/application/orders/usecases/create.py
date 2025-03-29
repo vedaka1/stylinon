@@ -6,11 +6,10 @@ from src.application.common.interfaces.transaction import ICommiter
 from src.application.orders.commands import CreateOrderCommand
 from src.application.orders.dto import CreateOrderOut
 from src.application.orders.utils import (
-    calculate_product_price,
-    calculate_total_price,
-    calculate_total_weight,
+    calculate_order_total_price,
+    calculate_order_total_weight,
+    create_product_in_payment_list,
 )
-from src.application.products.dto import PaymentMethod, ProductInPaymentDTO
 from src.domain.orders.entities import Order, OrderItem
 from src.domain.orders.exceptions import DuplicateOrderPositionsException
 from src.domain.orders.repository import (
@@ -35,36 +34,26 @@ class CreateOrderUseCase:
     async def execute(self, command: CreateOrderCommand) -> CreateOrderOut:
         products_ids = set()
         for product_item in command.items:
-            if product_item.id not in products_ids:
-                products_ids.add(product_item.id)
-            else:
+            if product_item.id in products_ids:
                 raise DuplicateOrderPositionsException(product_item.id)
+            products_ids.add(product_item.id)
 
         products, missing_products = await self.product_repository.get_many_by_ids(product_ids=products_ids)
         if missing_products:
             raise ManyProductsNotFoundException(missing_products)
 
         products_count = len(products)
-        order_weight = calculate_total_weight(products=products, command_items=command.items)
+        order_weight = calculate_order_total_weight(products=products, order_products=command.items)
+        products_in_payment = create_product_in_payment_list(
+            products=products,
+            order_products=command.items,
+            products_count=products_count,
+            order_weight=order_weight,
+            is_self_pickup=command.is_self_pickup,
+            payment_method=command.payment_method,
+        )
+        total_price = calculate_order_total_price(products_in_payment)
 
-        products_in_payment = [
-            ProductInPaymentDTO(
-                name=product.name,
-                amount=calculate_product_price(
-                    product=product,
-                    is_self_pickup=command.is_self_pickup,
-                    payment_method=command.payment_method,
-                    products_count=products_count,
-                    order_weight=order_weight,
-                ),
-                quantity=item.quantity,
-                payment_method=PaymentMethod.FULL_PAYMENT,
-                measure=product.units_of_measurement,
-            )
-            for product, item in zip(products, command.items)
-        ]
-
-        total_price = calculate_total_price(products_in_payment)
         payment_data = await self.acquiring_gateway.create_payment_operation_with_receipt(
             client_email=command.customer_email,
             items=products_in_payment,
@@ -78,7 +67,6 @@ class CreateOrderUseCase:
             is_self_pickup=command.is_self_pickup,
             total_price=total_price.value,
         )
-
         order_items = [
             OrderItem.create(
                 order_id=order.id,
