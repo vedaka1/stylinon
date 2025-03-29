@@ -6,16 +6,14 @@ from src.application.products.dto import ProductInPaymentDTO
 from src.infrastructure.integrations.acquiring.exceptions import (
     CreatePaymentOperationWithReceiptException,
 )
-from src.infrastructure.integrations.acquiring.mappers import (
-    map_product_in_payment_to_dict,
-)
+from src.infrastructure.integrations.acquiring.mappers import map_product_in_payment_to_dict
 from src.infrastructure.settings import settings
 
 
 class TochkaAcquiringGateway(AcquiringGatewayInterface):
     def __init__(self, session: aiohttp.ClientSession) -> None:
         self.session = session
-        self.base_url = 'https://enter.tochka.com/sandbox/v2'
+        self.base_url = settings.acquiring.ACQUIRING_URL
         self.api_version = 'v1.0'
         self.redirect_url = settings.DOMAIN_URL
 
@@ -27,7 +25,7 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
         purpose: str = 'Перевод за оказанные услуги',
         payment_mode: list[str] = ['sbp', 'card'],
         save_card: bool = True,
-        consumerId: str | None = None,
+        consumer_id: str | None = None,
     ) -> dict[str, Any]:
         request_data = {
             'Data': {
@@ -46,10 +44,11 @@ class TochkaAcquiringGateway(AcquiringGatewayInterface):
                 'Items': [map_product_in_payment_to_dict(item) for item in items],
             },
         }
-        if consumerId:
-            request_data['Data']['consumerId'] = consumerId
+        if consumer_id:
+            request_data['Data']['consumerId'] = consumer_id
         response = await self.session.post(
-            f'{self.base_url}/acquiring/{self.api_version}/payments_with_receipt', json=request_data,
+            f'{self.base_url}/acquiring/{self.api_version}/payments_with_receipt',
+            json=request_data,
         )
         if response.status == 200:
             response_data = await response.json()

@@ -25,7 +25,7 @@ class SettingsProvider(Provider):
 
     @provide(scope=Scope.APP)
     def acquiring_session(self) -> aiohttp.ClientSession:
-        headers = {'Authorization': f'Bearer {settings.tochka.TOKEN}'}
+        headers = {'Authorization': f'Bearer {settings.acquiring.TOKEN}'}
         return aiohttp.ClientSession(headers=headers)
 
     @provide(scope=Scope.APP)

@@ -51,36 +51,36 @@ _ASGIApp = typing.Callable[
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def postgres_url() -> Generator[str, None, None]:
     postgres = PostgresContainer(
-        image="postgres:15-alpine",
-        username="username",
-        password="password",
-        dbname="test",
+        image='postgres:15-alpine',
+        username='username',
+        password='password',
+        dbname='test',
     )
-    if os.name == "nt":
-        postgres.get_container_host_ip = lambda: "localhost"
+    if os.name == 'nt':
+        postgres.get_container_host_ip = lambda: 'localhost'
     try:
         postgres.start()
-        postgres_url_ = postgres.get_connection_url().replace("psycopg2", "asyncpg")
-        logger.info("postgres url %s", postgres_url_)
+        postgres_url_ = postgres.get_connection_url().replace('psycopg2', 'asyncpg')
+        logger.info('postgres url %s', postgres_url_)
         yield postgres_url_
     finally:
         postgres.stop()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 async def setup_db(postgres_url: str) -> AsyncGenerator[None, None]:
     engine = get_async_engine(postgres_url)
-    print("URL: ", postgres_url)
+    print('URL: ', postgres_url)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
     await engine.dispose()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
     from dishka import AsyncContainer, Provider, Scope, make_async_container, provide
 
@@ -104,7 +104,7 @@ async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
         async def acquiring_session(
             self,
         ) -> AsyncGenerator[aiohttp.ClientSession, None]:
-            headers = {"Authorization": f"Bearer {settings.tochka.TOKEN}"}
+            headers = {'Authorization': f'Bearer {settings.acquiring.TOKEN}'}
             acquiring_session = aiohttp.ClientSession(headers=headers)
             yield acquiring_session
             await acquiring_session.close()
@@ -115,7 +115,7 @@ async def container(postgres_url: str) -> AsyncGenerator[AsyncContainer, None]:
 
         @provide(scope=Scope.APP)
         def sender_name(self) -> SenderName:
-            return SenderName("Test")
+            return SenderName('Test')
 
     def get_container() -> AsyncContainer:
         return make_async_container(
@@ -136,7 +136,7 @@ async def application_exception_handler(
     request: Request,
     exc: ApplicationException,
 ) -> ORJSONResponse:
-    logger.error(msg="Handle error", exc_info=exc, extra={"error": exc})
+    logger.error(msg='Handle error', exc_info=exc, extra={'error': exc})
     return ErrorAPIResponse(details=exc.message, status_code=exc.status_code)
 
 
@@ -147,7 +147,7 @@ def init_exc_handlers(app: FastAPI) -> None:
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def app(container: AsyncContainer) -> Generator[FastAPI, None, None]:
     app = FastAPI()
 
@@ -157,24 +157,24 @@ def app(container: AsyncContainer) -> Generator[FastAPI, None, None]:
     api_v1.include_router(api_router_v1)
     api_v1.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost"],
+        allow_origins=['http://localhost'],
         allow_credentials=True,
-        allow_methods=["GET", "POST", "HEAD", "OPTIONS", "DELETE", "PUT", "PATCH"],
+        allow_methods=['GET', 'POST', 'HEAD', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
         allow_headers=[
-            "Access-Control-Allow-Headers",
-            "Content-Type",
-            "Authorization",
-            "Access-Control-Allow-Origin",
+            'Access-Control-Allow-Headers',
+            'Content-Type',
+            'Authorization',
+            'Access-Control-Allow-Origin',
         ],
     )
-    app.mount("/api/v1", api_v1)
+    app.mount('/api/v1', api_v1)
     yield app
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def client(app: FastAPI) -> Generator[AsyncClient, None, None]:
     client = AsyncClient(
-        base_url="http://localhost:5000/api/v1",
+        base_url='http://localhost:5000/api/v1',
         transport=ASGITransport(app=cast(_ASGIApp, app)),
     )
     yield client
@@ -186,7 +186,7 @@ async def clean_users_table(container: AsyncContainer) -> AsyncGenerator[None, N
     async with container() as di_container:
         sessionmaker = await di_container.get(async_sessionmaker[AsyncSession])
         async with sessionmaker() as session:
-            await session.execute(text("DELETE FROM users"))
+            await session.execute(text('DELETE FROM users'))
             await session.commit()
 
 
@@ -196,5 +196,5 @@ async def clean_orders_table(container: AsyncContainer) -> AsyncGenerator[None, 
     async with container() as di_container:
         sessionmaker = await di_container.get(async_sessionmaker[AsyncSession])
         async with sessionmaker() as session:
-            await session.execute(text("DELETE FROM orders"))
+            await session.execute(text('DELETE FROM orders'))
             await session.commit()

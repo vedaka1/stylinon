@@ -14,5 +14,5 @@ class AcquiringGatewayInterface(ABC):
         purpose: str = 'Перевод за оказанные услуги',
         payment_mode: list[str] = ['sbp', 'card'],
         save_card: bool = True,
-        consumerId: str | None = None,
+        consumer_id: str | None = None,
     ) -> dict[str, Any]: ...

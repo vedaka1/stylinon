@@ -30,7 +30,7 @@ def load_rsa_private_key() -> RSAPrivateKey:
 
 class JWTProcessor(JWTProcessorInterface):
     private_key: RSAPrivateKey = load_rsa_private_key()
-    acquiring_key: jwt.PyJWK = jwt.PyJWK.from_json(settings.tochka.PUBLIC_KEY)
+    acquiring_key: jwt.PyJWK = jwt.PyJWK.from_json(settings.acquiring.PUBLIC_KEY)
 
     def create_access_token(self, user_id: UUID, user_role: UserRole, email: str) -> str:
         user_scopes = get_role_restrictions(role=user_role)
@@ -100,7 +100,7 @@ class JWTProcessor(JWTProcessorInterface):
 
     def validate_acquiring_token(self, token: str) -> dict[str, Any]:
         try:
-            payload = jwt.decode(jwt=token, key=self.acquiring_key, algorithms=[settings.tochka.ALGORITHM])
+            payload = jwt.decode(jwt=token, key=self.acquiring_key, algorithms=[settings.acquiring.ALGORITHM])
             return cast(dict[str, Any], payload)
         except (jwt.DecodeError, ValueError, KeyError):
             raise ApplicationException
