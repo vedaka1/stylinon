@@ -15,6 +15,7 @@ from src.application.orders.commands import UpdateOrderCommand
 from src.domain.orders.entities import OrderStatus
 from src.domain.orders.exceptions import OrderNotFoundException
 from src.domain.orders.repository import OrderRepositoryInterface
+from src.infrastructure.settings import settings
 
 logger = logging.getLogger()
 
@@ -68,7 +69,7 @@ class UpdateOrderByWebhookUseCase:
         message = self.smtp_server.create_message(
             content=email_content,
             sender_name=self.sender_name,
-            to_address='vedaka13@yandex.com',
+            to_address=settings.smtp.ADMINISTRATOR_EMAIL,
             subject='Новый заказ',
         )
         await self.smtp_server.send_email(message=message)

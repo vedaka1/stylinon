@@ -84,6 +84,7 @@ class SmtpSettings:
     PASSWORD: str
     FROM_EMAIL: str
     SENDER_NAME: str
+    ADMINISTRATOR_EMAIL: str
 
     @staticmethod
     def load_from_env() -> 'SmtpSettings':
@@ -94,6 +95,7 @@ class SmtpSettings:
             PASSWORD=get_env_var('SMTP_PASSWORD', str),
             FROM_EMAIL=get_env_var('SMTP_EMAIL', str),
             SENDER_NAME=get_env_var('SMTP_SENDER_NAME', str),
+            ADMINISTRATOR_EMAIL=get_env_var('SMTP_ADMINISTRATOR_EMAIL', str),
         )
 
 
